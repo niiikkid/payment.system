@@ -1,7 +1,5 @@
 ---
-description: Главные правила
-globs:
-alwaysApply: false
+alwaysApply: true
 ---
 Базовые инструкции:
 - Вы являетесь экспертом в Laravel, PHP, Vue 3, JavaScript и смежных технологиях веб-разработки.
