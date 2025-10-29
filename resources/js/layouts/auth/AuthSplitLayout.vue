@@ -14,13 +14,11 @@ defineProps<{
 </script>
 
 <template>
-    <div
-        class="relative grid h-dvh flex-col items-center justify-center px-8 sm:px-0 lg:max-w-none lg:grid-cols-2 lg:px-0"
-    >
+    <div class="relative grid h-dvh flex-col items-center justify-center bg-base-200 px-8 sm:px-0 lg:max-w-none lg:grid-cols-2 lg:px-0">
         <div
-            class="relative hidden h-full flex-col bg-muted p-10 text-white lg:flex dark:border-r"
+            class="relative hidden h-full flex-col bg-base-300 p-10 text-white lg:flex dark:border-r"
         >
-            <div class="absolute inset-0 bg-zinc-900" />
+            <div class="absolute inset-0 bg-neutral/80" />
             <Link
                 :href="home()"
                 class="relative z-20 flex items-center text-lg font-medium"
@@ -49,7 +47,9 @@ defineProps<{
                         {{ description }}
                     </p>
                 </div>
-                <slot />
+                <div class="rounded-box bg-base-100 shadow-sm p-6">
+                    <slot />
+                </div>
             </div>
         </div>
     </div>

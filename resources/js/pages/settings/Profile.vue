@@ -83,7 +83,7 @@ const user = page.props.auth.user;
                             <Link
                                 :href="send()"
                                 as="button"
-                                class="text-foreground underline decoration-neutral-300 underline-offset-4 transition-colors duration-300 ease-out hover:decoration-current! dark:decoration-neutral-500"
+                                class="text-primary underline underline-offset-4 transition-colors duration-300 ease-out"
                             >
                                 Click here to resend the verification email.
                             </Link>
@@ -113,7 +113,7 @@ const user = page.props.auth.user;
                         >
                             <p
                                 v-show="recentlySuccessful"
-                                class="text-sm text-neutral-600"
+                                class="text-sm text-base-content/70"
                             >
                                 Saved.
                             </p>

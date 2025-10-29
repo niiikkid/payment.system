@@ -14,10 +14,16 @@ withDefaults(defineProps<Props>(), {
 </script>
 
 <template>
-    <AppShell class="flex-col">
-        <AppHeader :breadcrumbs="breadcrumbs" />
+    <AppShell class="flex-col bg-base-200">
+        <div class="bg-base-100/60 backdrop-blur supports-[backdrop-filter]:bg-base-100/60 sticky top-0 z-10 border-b border-base-200">
+            <AppHeader :breadcrumbs="breadcrumbs" />
+        </div>
         <AppContent>
-            <slot />
+            <div class="p-4 lg:p-6">
+                <div class="rounded-box bg-base-100 shadow-sm p-4 lg:p-6">
+                    <slot />
+                </div>
+            </div>
         </AppContent>
     </AppShell>
 </template>

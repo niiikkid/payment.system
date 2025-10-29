@@ -33,7 +33,7 @@ const currentPath = typeof window !== undefined ? window.location.pathname : '';
 </script>
 
 <template>
-    <div class="px-4 py-6">
+    <div class="bg-base-200 px-4 py-6">
         <Heading
             title="Settings"
             description="Manage your profile and account settings"
@@ -48,7 +48,7 @@ const currentPath = typeof window !== undefined ? window.location.pathname : '';
                         variant="ghost"
                         :class="[
                             'w-full justify-start',
-                            { 'bg-muted': urlIsActive(item.href, currentPath) },
+                            { 'bg-base-200': urlIsActive(item.href, currentPath) },
                         ]"
                         as-child
                     >
@@ -64,7 +64,9 @@ const currentPath = typeof window !== undefined ? window.location.pathname : '';
 
             <div class="flex-1 md:max-w-2xl">
                 <section class="max-w-xl space-y-12">
-                    <slot />
+                    <div class="rounded-box bg-base-100 shadow-sm p-4 lg:p-6">
+                        <slot />
+                    </div>
                 </section>
             </div>
         </div>
