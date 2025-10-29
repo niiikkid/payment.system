@@ -1,111 +1,123 @@
 <script setup lang="ts">
-import InputError from '@/components/InputError.vue';
-import TextLink from '@/components/TextLink.vue';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import AuthBase from '@/layouts/AuthLayout.vue';
 import { login } from '@/routes';
-import { store } from '@/routes/register';
-import { Form, Head } from '@inertiajs/vue3';
-import { LoaderCircle } from 'lucide-vue-next';
+import { store as registerStore } from '@/routes/register';
+import { Head, Link, useForm } from '@inertiajs/vue3';
+
+const form = useForm({
+    name: '',
+    email: '',
+    password: '',
+    password_confirmation: '',
+});
+
+function submit() {
+    form.post(registerStore.url(), {
+        onFinish: () => form.reset('password', 'password_confirmation'),
+    });
+}
 </script>
 
 <template>
     <AuthBase
-        title="Create an account"
-        description="Enter your details below to create your account"
+        title="Создать аккаунт"
+        description="Заполните данные, чтобы создать аккаунт"
     >
-        <Head title="Register" />
+        <Head title="Регистрация" />
 
-        <Form
-            v-bind="store.form()"
-            :reset-on-success="['password', 'password_confirmation']"
-            v-slot="{ errors, processing }"
-            class="flex flex-col gap-6"
-        >
+        <form @submit.prevent="submit" class="flex flex-col gap-6">
             <div class="grid gap-6">
                 <div class="grid gap-2">
-                    <Label for="name">Name</Label>
-                    <Input
+                    <label for="name" class="label">
+                        <span class="label-text">Имя</span>
+                    </label>
+                    <input
                         id="name"
                         type="text"
                         required
                         autofocus
-                        :tabindex="1"
+                        tabindex="1"
                         autocomplete="name"
                         name="name"
-                        placeholder="Full name"
+                        placeholder="Полное имя"
+                        v-model="form.name"
+                        class="input input-bordered w-full"
                     />
-                    <InputError :message="errors.name" />
+                    <p v-if="form.errors.name" class="text-error text-sm">{{ form.errors.name }}</p>
                 </div>
 
                 <div class="grid gap-2">
-                    <Label for="email">Email address</Label>
-                    <Input
+                    <label for="email" class="label">
+                        <span class="label-text">E‑mail</span>
+                    </label>
+                    <input
                         id="email"
                         type="email"
                         required
-                        :tabindex="2"
+                        tabindex="2"
                         autocomplete="email"
                         name="email"
                         placeholder="email@example.com"
+                        v-model="form.email"
+                        class="input input-bordered w-full"
                     />
-                    <InputError :message="errors.email" />
+                    <p v-if="form.errors.email" class="text-error text-sm">{{ form.errors.email }}</p>
                 </div>
 
                 <div class="grid gap-2">
-                    <Label for="password">Password</Label>
-                    <Input
+                    <label for="password" class="label">
+                        <span class="label-text">Пароль</span>
+                    </label>
+                    <input
                         id="password"
                         type="password"
                         required
-                        :tabindex="3"
+                        tabindex="3"
                         autocomplete="new-password"
                         name="password"
-                        placeholder="Password"
+                        placeholder="Пароль"
+                        v-model="form.password"
+                        class="input input-bordered w-full"
                     />
-                    <InputError :message="errors.password" />
+                    <p v-if="form.errors.password" class="text-error text-sm">{{ form.errors.password }}</p>
                 </div>
 
                 <div class="grid gap-2">
-                    <Label for="password_confirmation">Confirm password</Label>
-                    <Input
+                    <label for="password_confirmation" class="label">
+                        <span class="label-text">Подтвердите пароль</span>
+                    </label>
+                    <input
                         id="password_confirmation"
                         type="password"
                         required
-                        :tabindex="4"
+                        tabindex="4"
                         autocomplete="new-password"
                         name="password_confirmation"
-                        placeholder="Confirm password"
+                        placeholder="Подтвердите пароль"
+                        v-model="form.password_confirmation"
+                        class="input input-bordered w-full"
                     />
-                    <InputError :message="errors.password_confirmation" />
+                    <p v-if="form.errors.password_confirmation" class="text-error text-sm">{{ form.errors.password_confirmation }}</p>
                 </div>
 
-                <Button
+                <button
                     type="submit"
-                    class="mt-2 w-full"
+                    class="btn btn-primary mt-2 w-full"
                     tabindex="5"
-                    :disabled="processing"
+                    :disabled="form.processing"
                     data-test="register-user-button"
                 >
-                    <LoaderCircle
-                        v-if="processing"
-                        class="h-4 w-4 animate-spin"
-                    />
-                    Create account
-                </Button>
+                    <span v-if="form.processing" class="loading loading-spinner loading-sm mr-2" />
+                    Создать аккаунт
+                </button>
             </div>
 
-            <div class="text-center text-sm text-muted-foreground">
-                Already have an account?
-                <TextLink
-                    :href="login()"
-                    class="underline underline-offset-4"
-                    :tabindex="6"
-                    >Log in</TextLink
-                >
+            <div class="text-center text-sm text-base-content/60">
+                Уже есть аккаунт?
+                <Link :href="login().url" class="link link-hover" tabindex="6">Войти</Link>
             </div>
-        </Form>
+        </form>
     </AuthBase>
 </template>
+
+

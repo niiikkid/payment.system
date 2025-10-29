@@ -1,49 +1,44 @@
 <script setup lang="ts">
-import TextLink from '@/components/TextLink.vue';
-import { Button } from '@/components/ui/button';
 import AuthLayout from '@/layouts/AuthLayout.vue';
 import { logout } from '@/routes';
 import { send } from '@/routes/verification';
-import { Form, Head } from '@inertiajs/vue3';
-import { LoaderCircle } from 'lucide-vue-next';
+import { Head, Link, useForm } from '@inertiajs/vue3';
 
-defineProps<{
-    status?: string;
-}>();
+const props = defineProps<{ status?: string }>();
+
+const form = useForm({});
+
+function resend() {
+    form.post(send.url());
+}
 </script>
 
 <template>
     <AuthLayout
-        title="Verify email"
-        description="Please verify your email address by clicking on the link we just emailed to you."
+        title="Подтверждение e‑mail"
+        description="Пожалуйста, подтвердите e‑mail, перейдя по ссылке, которую мы вам отправили."
     >
-        <Head title="Email verification" />
+        <Head title="Подтверждение e‑mail" />
 
         <div
-            v-if="status === 'verification-link-sent'"
+            v-if="props.status === 'verification-link-sent'"
             class="mb-4 text-center text-sm font-medium text-success"
         >
-            A new verification link has been sent to the email address you
-            provided during registration.
+            Новая ссылка подтверждения отправлена на e‑mail,
+            указанный при регистрации.
         </div>
 
-        <Form
-            v-bind="send.form()"
-            class="space-y-6 text-center"
-            v-slot="{ processing }"
-        >
-            <Button :disabled="processing" variant="secondary">
-                <LoaderCircle v-if="processing" class="h-4 w-4 animate-spin" />
-                Resend verification email
-            </Button>
+        <div class="space-y-6 text-center">
+            <button class="btn btn-secondary" :disabled="form.processing" @click="resend">
+                <span v-if="form.processing" class="loading loading-spinner loading-sm mr-2" />
+                Отправить письмо повторно
+            </button>
 
-            <TextLink
-                :href="logout()"
-                as="button"
-                class="mx-auto block text-sm"
-            >
-                Log out
-            </TextLink>
-        </Form>
+            <Link :href="logout().url" as="button" class="link link-hover block text-sm mx-auto">
+                Выйти
+            </Link>
+        </div>
     </AuthLayout>
 </template>
+
+

@@ -1,68 +1,64 @@
 <script setup lang="ts">
-import InputError from '@/components/InputError.vue';
-import TextLink from '@/components/TextLink.vue';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import AuthLayout from '@/layouts/AuthLayout.vue';
 import { login } from '@/routes';
-import { email } from '@/routes/password';
-import { Form, Head } from '@inertiajs/vue3';
-import { LoaderCircle } from 'lucide-vue-next';
+import { email as sendEmail } from '@/routes/password';
+import { Head, Link, useForm } from '@inertiajs/vue3';
 
-defineProps<{
-    status?: string;
-}>();
+const props = defineProps<{ status?: string }>();
+
+const form = useForm({
+    email: '',
+});
+
+function submit() {
+    form.post(sendEmail.url());
+}
 </script>
 
 <template>
     <AuthLayout
-        title="Forgot password"
-        description="Enter your email to receive a password reset link"
+        title="Забыли пароль"
+        description="Укажите e‑mail для получения ссылки на сброс"
     >
-        <Head title="Forgot password" />
+        <Head title="Забыли пароль" />
 
-        <div
-            v-if="status"
-            class="mb-4 text-center text-sm font-medium text-success"
-        >
-            {{ status }}
+        <div v-if="props.status" class="mb-4 text-center text-sm font-medium text-success">
+            {{ props.status }}
         </div>
 
         <div class="space-y-6">
-            <Form v-bind="email.form()" v-slot="{ errors, processing }">
+            <form @submit.prevent="submit" class="space-y-4">
                 <div class="grid gap-2">
-                    <Label for="email">Email address</Label>
-                    <Input
+                    <label for="email" class="label">
+                        <span class="label-text">E‑mail</span>
+                    </label>
+                    <input
                         id="email"
                         type="email"
                         name="email"
                         autocomplete="off"
                         autofocus
                         placeholder="email@example.com"
+                        v-model="form.email"
+                        class="input input-bordered w-full"
                     />
-                    <InputError :message="errors.email" />
+                    <p v-if="form.errors.email" class="text-error text-sm">{{ form.errors.email }}</p>
                 </div>
 
-                <div class="my-6 flex items-center justify-start">
-                    <Button
-                        class="w-full"
-                        :disabled="processing"
-                        data-test="email-password-reset-link-button"
-                    >
-                        <LoaderCircle
-                            v-if="processing"
-                            class="h-4 w-4 animate-spin"
-                        />
-                        Email password reset link
-                    </Button>
+                <div class="my-2">
+                    <button class="btn btn-primary w-full" :disabled="form.processing" data-test="email-password-reset-link-button">
+                        <span v-if="form.processing" class="loading loading-spinner loading-sm mr-2" />
+                        Отправить ссылку для сброса
+                    </button>
                 </div>
-            </Form>
+            </form>
 
-            <div class="space-x-1 text-center text-sm text-muted-foreground">
-                <span>Or, return to</span>
-                <TextLink :href="login()">log in</TextLink>
+            <div class="space-x-1 text-center text-sm text-base-content/60">
+                <span>Или вернуться ко</span>
+                <Link :href="login().url" class="link link-hover">входу</Link>
             </div>
         </div>
     </AuthLayout>
 </template>
+
+

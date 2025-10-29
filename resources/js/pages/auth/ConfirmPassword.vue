@@ -1,56 +1,53 @@
 <script setup lang="ts">
-import InputError from '@/components/InputError.vue';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import AuthLayout from '@/layouts/AuthLayout.vue';
 import { store } from '@/routes/password/confirm';
-import { Form, Head } from '@inertiajs/vue3';
-import { LoaderCircle } from 'lucide-vue-next';
+import { Head, useForm } from '@inertiajs/vue3';
+
+const form = useForm({
+    password: '',
+});
+
+function submit() {
+    form.post(store.url(), {
+        onFinish: () => form.reset('password'),
+        preserveScroll: true,
+    });
+}
 </script>
 
 <template>
     <AuthLayout
-        title="Confirm your password"
-        description="This is a secure area of the application. Please confirm your password before continuing."
+        title="Подтвердите пароль"
+        description="Это защищённая зона приложения. Подтвердите пароль, чтобы продолжить."
     >
-        <Head title="Confirm password" />
+        <Head title="Подтверждение пароля" />
 
-        <Form
-            v-bind="store.form()"
-            reset-on-success
-            v-slot="{ errors, processing }"
-        >
-            <div class="space-y-6">
-                <div class="grid gap-2">
-                    <Label htmlFor="password">Password</Label>
-                    <Input
-                        id="password"
-                        type="password"
-                        name="password"
-                        class="mt-1 block w-full"
-                        required
-                        autocomplete="current-password"
-                        autofocus
-                    />
-
-                    <InputError :message="errors.password" />
-                </div>
-
-                <div class="flex items-center">
-                    <Button
-                        class="w-full"
-                        :disabled="processing"
-                        data-test="confirm-password-button"
-                    >
-                        <LoaderCircle
-                            v-if="processing"
-                            class="h-4 w-4 animate-spin"
-                        />
-                        Confirm Password
-                    </Button>
-                </div>
+        <form @submit.prevent="submit" class="space-y-6">
+            <div class="grid gap-2">
+                <label for="password" class="label">
+                    <span class="label-text">Пароль</span>
+                </label>
+                <input
+                    id="password"
+                    type="password"
+                    name="password"
+                    class="input input-bordered w-full"
+                    required
+                    autocomplete="current-password"
+                    autofocus
+                    v-model="form.password"
+                />
+                <p v-if="form.errors.password" class="text-error text-sm">{{ form.errors.password }}</p>
             </div>
-        </Form>
+
+            <div class="flex items-center">
+                <button class="btn btn-primary w-full" :disabled="form.processing" data-test="confirm-password-button">
+                    <span v-if="form.processing" class="loading loading-spinner loading-sm mr-2" />
+                    Подтвердить пароль
+                </button>
+            </div>
+        </form>
     </AuthLayout>
 </template>
+
+
