@@ -35,4 +35,9 @@ return [
         ],
     ],
 
+    'trongrid' => [
+        'base_url' => env('TRONGRID_BASE_URL', 'https://api.trongrid.io'),
+        'api_key' => env('TRONGRID_API_KEY'),
+    ],
+
 ];

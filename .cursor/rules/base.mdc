@@ -27,7 +27,8 @@ PHP/Laravel:
 - При работе с API учитывай миксины в файле @_ide_helper_custom.php
 - При добавлении новых настроек в сервис SettingService используй команду php artisan app:install-settings для установки новых настроек.
 - Используй ->resolve() для ресурсов без пагинации, иначе данные не выводятся в веб панели. Так как данные упоковываются в data объект.
-- Для серисов создавай контракты в папке Contracts, они должны называться ServiceNameContract и делай связывание через AppServiceProvider
+- Для серисов создавай контракты в папке Contracts, они должны называться ServiceNameContract и делай связывание через AppServiceProvider.
+- Сервисы создавай в папке Services, для каждого сервиса должна быть папка с названием сервиса, а внутри базовый класс. Services/Money/MoneyService
 
 Vue 3 Setup, JavaScript, InertiaJS:
 - Script должен находиться над template в компонентах vue
