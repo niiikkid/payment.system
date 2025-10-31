@@ -38,7 +38,6 @@ return [
     'trongrid' => [
         'base_url' => env('TRONGRID_BASE_URL', 'https://api.trongrid.io'),
         'api_key' => env('TRONGRID_API_KEY'),
-        'usdt_contract' => env('TRON_USDT_CONTRACT', 'TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t'),
     ],
 
 ];

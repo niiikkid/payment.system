@@ -27,7 +27,7 @@ class BlockchainService implements BlockchainServiceContract
             throw new UnsupportedNetworkException('Only TRON network is supported for this operation.');
         }
         if ($currency === Currency::USDT) {
-            $minor = $this->getTrc20BalanceMinorByContract($this->getUsdtContract(), $address);
+            $minor = $this->getTrc20BalanceMinorByContract($address);
             return $money->fromMinor($minor, Currency::USDT);
         }
         if ($currency === Currency::TRX) {
@@ -52,7 +52,7 @@ class BlockchainService implements BlockchainServiceContract
         $response = Http::withHeaders($this->buildHeaders())
             ->acceptJson()
             ->get($url, [
-                'contract_address' => $this->getUsdtContract(),
+                'contract_address' => self::TRON_USDT_CONTRACT,
                 'only_confirmed' => true,
                 'limit' => 200,
             ]);
@@ -94,38 +94,40 @@ class BlockchainService implements BlockchainServiceContract
         return $result;
     }
 
-    private function getTrc20BalanceMinorByContract(string $contract, string $address): string
+    private function getTrc20BalanceMinorByContract(string $address): string
     {
-        $url = rtrim($this->getBaseUrl(), '/') . "/v1/accounts/{$address}/tokens";
-        $response = Http::withHeaders($this->buildHeaders())
-            ->acceptJson()
-            ->get($url, [
-                'contract_address' => $contract,
-                'only_confirmed' => true,
-            ]);
+        $url = 'https://apilist.tronscan.org/api/account';
+        $response = Http::acceptJson()->get($url, [
+            'address' => $address,
+            'includeToken' => true,
+        ]);
         if (!$response->successful()) {
             throw ApiRequestException::forHttpStatus($response->status(), $url, $response->body());
         }
 
         $payload = $response->json();
-        $data = is_array($payload) ? ($payload['data'] ?? []) : [];
-        if (!is_array($data)) {
-            throw new ApiRequestException('Malformed TronGrid response: data is not an array.');
+        if (!is_array($payload)) {
+            throw new ApiRequestException('Malformed Tronscan response: not an object');
         }
 
-        foreach ($data as $item) {
-            if (!is_array($item)) {
+        $tokens = $payload['trc20token_balances'] ?? [];
+        if (!is_array($tokens)) {
+            throw new ApiRequestException('Malformed Tronscan response: trc20token_balances is not an array');
+        }
+
+        foreach ($tokens as $token) {
+            if (!is_array($token)) {
                 continue;
             }
-            $tokenId = ($item['token_id'] ?? ($item['tokenId'] ?? ($item['token_address'] ?? null)));
-            if ($tokenId && strcasecmp((string) $tokenId, $contract) === 0) {
-                $raw = $item['balance'] ?? '0';
-                $rawStr = is_string($raw) ? $raw : (string) $raw;
-                return $rawStr; // minor units
+            $name = (string) ($token['tokenName'] ?? '');
+            $abbr = (string) ($token['tokenAbbr'] ?? '');
+            if (strcasecmp($name, 'Tether USD') === 0 || strcasecmp($abbr, 'USDT') === 0) {
+                $raw = $token['balance'] ?? '0'; // minor units
+                return is_string($raw) ? $raw : (string) $raw;
             }
         }
 
-        throw TokenContractNotFoundException::forAddress($address, $contract);
+        throw TokenContractNotFoundException::forAddress($address, self::TRON_USDT_CONTRACT);
     }
 
     private function getTrxBalanceMinor(string $address): string
@@ -176,12 +178,6 @@ class BlockchainService implements BlockchainServiceContract
             }
         }
         return $base;
-    }
-
-    private function getUsdtContract(): string
-    {
-        $fromConfig = (string) (config('services.trongrid.usdt_contract') ?? '');
-        return $fromConfig !== '' ? $fromConfig : self::TRON_USDT_CONTRACT;
     }
 }
 
