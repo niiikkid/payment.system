@@ -34,6 +34,15 @@ final class NetworkCurrency
     {
         return self::CURRENCY_TO_NETWORKS[$currency->value] ?? [];
     }
+
+    /**
+     * Проверить, поддерживается ли валюта на указанной сети.
+     */
+    public static function isSupported(Currency $currency, Network $network): bool
+    {
+        $networks = self::networksByCurrency($currency);
+        return in_array($network, $networks, true);
+    }
 }
 
 

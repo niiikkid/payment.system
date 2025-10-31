@@ -5,6 +5,9 @@ declare(strict_types=1);
 namespace App\Contracts\Address;
 
 use App\Models\Address;
+use App\Enums\Currency;
+use App\Enums\Network;
+use App\Services\Money\MoneyAmount;
 
 interface AddressServiceContract
 {
@@ -22,6 +25,13 @@ interface AddressServiceContract
 
     /** Обновить баланс и выставить время последней проверки = now() */
     public function updateChecked(Address $address, string $balance): Address;
+
+    /**
+     * Выбрать активный адрес для оплаты по заданной сумме с ротацией.
+     * Адрес подбирается среди активных адресов той же валюты/сети,
+     * где нет активного инвойса с такой же суммой (уникальность суммы на адресе).
+     */
+    public function pickForPayment(Currency $currency, Network $network, MoneyAmount $amount): Address;
 }
 
 

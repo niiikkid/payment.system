@@ -9,14 +9,18 @@ use App\Enums\Currency;
 use App\Enums\Network;
 use App\Enums\NetworkCurrency;
 use App\Models\Address;
+use App\Models\Invoice;
 use App\Contracts\Blockchain\BlockchainServiceContract;
 use App\Contracts\Money\MoneyServiceContract;
+use App\Services\Money\MoneyAmount;
 use App\Exceptions\Address\CurrencyNetworkMismatchException;
 use App\Exceptions\Address\DuplicateAddressException;
 use App\Exceptions\Address\InvalidBalanceFormatException;
 use App\Exceptions\Address\AddressNotFoundOnBlockchainException;
 use App\Exceptions\Address\UnsupportedCurrencyException;
 use App\Exceptions\Address\UnsupportedNetworkException;
+use App\Exceptions\Address\NoAvailableAddressException;
+use App\Enums\InvoiceStatus;
 use App\Exceptions\Blockchain\TokenContractNotFoundException;
 use Carbon\Carbon;
 
@@ -85,6 +89,47 @@ class AddressService implements AddressServiceContract
     {
         $address->update(['is_active' => false]);
         return $address->refresh();
+    }
+
+    public function pickForPayment(Currency $currency, Network $network, MoneyAmount $amount): Address
+    {
+        if (!NetworkCurrency::isSupported($currency, $network)) {
+            throw new CurrencyNetworkMismatchException('Currency ' . $currency->value . ' is not available on network ' . $network->value);
+        }
+
+        // Сумма уже MoneyAmount: приводим к минорным единицам для сравнения с БД
+        $amountMinor = $this->money->toMinor($amount);
+
+        $activeStatuses = InvoiceStatus::active();
+
+        $activeCountSub = Invoice::query()
+            ->selectRaw('count(*)')
+            ->whereColumn('invoices.address_id', 'addresses.id')
+            ->whereIn('status', $activeStatuses);
+
+        $candidate = Address::query()
+            ->select('*')
+            ->selectSub($activeCountSub, 'active_invoices_count')
+            ->where('currency', $currency->value)
+            ->where('network', $network->value)
+            ->where('is_active', true)
+            ->whereNotExists(function ($q) use ($amountMinor, $activeStatuses) {
+                $q->selectRaw('1')
+                    ->from('invoices')
+                    ->whereColumn('invoices.address_id', 'addresses.id')
+                    ->whereIn('invoices.status', $activeStatuses)
+                    ->where('invoices.amount', $amountMinor);
+            })
+            ->orderBy('active_invoices_count')
+            ->orderBy('last_checked_at')
+            ->orderBy('id')
+            ->first();
+
+        if (!$candidate) {
+            throw new NoAvailableAddressException('No available address for the given amount right now');
+        }
+
+        return $candidate;
     }
 
     public function updateChecked(Address $address, string $balance): Address
