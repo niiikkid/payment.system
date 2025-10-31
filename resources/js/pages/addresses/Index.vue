@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import AppSidebarLayout from '@/layouts/app/AppSidebarLayout.vue';
 import { Link, useForm } from '@inertiajs/vue3';
+import CurrencyNetworkBadge from '@/components/ui/CurrencyNetworkBadge.vue';
+import AddressCopy from '@/components/ui/AddressCopy.vue';
 
 interface AddressItem {
     id: number;
@@ -93,7 +95,6 @@ function toggleAddress(id: number, nextActive: boolean) {
                                 <tr>
                                     <th>ID</th>
                                     <th>Валюта</th>
-                                    <th>Сеть</th>
                                     <th>Адрес</th>
                                     <th>Баланс</th>
                                     <th>Активен</th>
@@ -103,9 +104,12 @@ function toggleAddress(id: number, nextActive: boolean) {
                             <tbody>
                                 <tr v-for="addr in props.addresses" :key="addr.id">
                                     <td>{{ addr.id }}</td>
-                                    <td><span class="badge">{{ addr.currency_label }}</span></td>
-                                    <td><span class="badge badge-ghost">{{ addr.network_label }}</span></td>
-                                    <td class="font-mono text-xs break-all">{{ addr.address }}</td>
+                                    <td>
+                                        <CurrencyNetworkBadge :currency-label="addr.currency_label" :network-label="addr.network_label" />
+                                    </td>
+                                    <td class="font-mono text-xs">
+                                        <AddressCopy :address="addr.address" />
+                                    </td>
                                     <td>{{ addr.balance }}</td>
                                     <td>
                                         <div class="flex items-center gap-2">
@@ -114,7 +118,7 @@ function toggleAddress(id: number, nextActive: boolean) {
                                     </td>
                                 </tr>
                                 <tr v-if="props.addresses.length === 0">
-                                    <td colspan="7" class="text-center text-sm opacity-70 py-6">Пока нет адресов</td>
+                                    <td colspan="6" class="text-center text-sm opacity-70 py-6">Пока нет адресов</td>
                                 </tr>
                             </tbody>
                         </table>
