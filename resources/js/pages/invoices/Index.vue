@@ -3,6 +3,9 @@ import AppSidebarLayout from '@/layouts/app/AppSidebarLayout.vue';
 import { Link, usePage, router } from '@inertiajs/vue3';
 import { ref } from 'vue';
 import axios from 'axios';
+import CurrencyNetworkBadge from '@/components/ui/CurrencyNetworkBadge.vue';
+import AddressCopy from '@/components/ui/AddressCopy.vue';
+import UidCopy from '@/components/ui/UidCopy.vue';
 
 type Invoice = {
   id: string
@@ -121,11 +124,17 @@ async function submitCreate() {
               </thead>
               <tbody>
                 <tr v-for="inv in invoices.data" :key="inv.id">
-                  <td class="font-mono text-xs">{{ inv.id }}</td>
-                  <td>{{ inv.address_id }}</td>
+                  <td class="font-mono text-xs">
+                    <UidCopy :uid="inv.id" />
+                  </td>
+                  <td class="font-mono text-xs">
+                    <AddressCopy v-if="inv.address" :address="inv.address" />
+                    <span v-else class="opacity-60">#{{ inv.address_id }}</span>
+                  </td>
                   <td>{{ inv.amount }}</td>
-                  <td>{{ inv.currency }}</td>
-                  <td>{{ inv.network }}</td>
+                  <td colspan="2">
+                    <CurrencyNetworkBadge :currency-label="inv.currency_label || inv.currency" :network-label="inv.network_label || inv.network" />
+                  </td>
                   <td>
                     <span class="badge" :class="{
                       'badge-warning': statuses.active.includes(inv.status),
@@ -163,13 +172,18 @@ async function submitCreate() {
             <div class="card bg-base-200 shadow-sm">
               <div class="card-body p-4">
                 <div class="text-xs opacity-60">ID</div>
-                <div class="font-mono break-all">{{ selected.id }}</div>
+                <div class="font-mono break-all">
+                  <UidCopy v-if="selected?.id" :uid="selected.id" />
+                </div>
               </div>
             </div>
             <div class="card bg-base-200 shadow-sm">
               <div class="card-body p-4">
                 <div class="text-xs opacity-60">Адрес</div>
-                <div class="font-mono">{{ selected.address_id }}</div>
+                <div class="font-mono">
+                  <AddressCopy v-if="selected?.address" :address="selected.address" />
+                  <span v-else class="opacity-60">#{{ selected.address_id }}</span>
+                </div>
               </div>
             </div>
             <div class="card bg-base-200 shadow-sm">
@@ -181,10 +195,7 @@ async function submitCreate() {
             <div class="card bg-base-200 shadow-sm">
               <div class="card-body p-4">
                 <div class="text-xs opacity-60">Валюта / Сеть</div>
-                <div class="flex items-center gap-2">
-                  <span class="badge badge-outline">{{ selected.currency }}</span>
-                  <span class="badge badge-outline">{{ selected.network }}</span>
-                </div>
+                <CurrencyNetworkBadge :currency-label="selected.currency_label || selected.currency" :network-label="selected.network_label || selected.network" />
               </div>
             </div>
             <div class="card bg-base-200 shadow-sm md:col-span-2">

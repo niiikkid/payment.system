@@ -21,6 +21,7 @@ class InvoiceController extends Controller
     public function index(): Response
     {
         $paginator = Invoice::query()
+            ->with('address')
             ->latest('id')
             ->paginate(20)
             ->through(fn ($invoice) => (new InvoiceResource($invoice))->resolve());
