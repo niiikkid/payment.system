@@ -5,6 +5,9 @@ declare(strict_types=1);
 namespace App\Console\Commands;
 
 use App\Contracts\Blockchain\BlockchainServiceContract;
+use App\Contracts\Money\MoneyServiceContract;
+use App\Enums\Currency;
+use App\Enums\Network;
 use Illuminate\Console\Command;
 
 class TronScanUsdtCommand extends Command
@@ -12,40 +15,32 @@ class TronScanUsdtCommand extends Command
     /**
      * The name and signature of the console command.
      *
-     * Example: php artisan tron:scan-usdt TJ... --limit=30
+     * Example: php artisan chain:balance TJ... --network=tron --currency=USDT
      */
-    protected $signature = 'tron:scan-usdt {address : Tron адрес} {--limit=30 : Кол-во транзакций} {--outgoing : Показать исходящие вместо входящих} {--network=tron : Сеть (например: tron)}';
+    protected $signature = 'chain:balance {address : Адрес в сети} {--network=tron : Сеть (например: tron)} {--currency=USDT : Валюта (например: USDT|TRX)}';
 
     /**
       * The console command description.
       */
-    protected $description = 'Сканировать входящие/исходящие USDT по адресу через выбранную сеть и вывести результат';
+    protected $description = 'Показать баланс адреса по сети и валюте';
 
-    public function handle(BlockchainServiceContract $blockchain): int
+    public function handle(BlockchainServiceContract $blockchain, MoneyServiceContract $money): int
     {
         $address = (string) $this->argument('address');
-        $limit = (int) $this->option('limit');
-        $network = (string) $this->option('network');
+        $networkOpt = (string) $this->option('network');
+        $currencyOpt = (string) $this->option('currency');
 
-        $isOutgoing = (bool) $this->option('outgoing');
-        $this->info("Запрос сети={$network} для адреса: {$address}, limit={$limit}, тип=" . ($isOutgoing ? 'исходящие' : 'входящие'));
+        $network = Network::tryFrom(strtolower(trim($networkOpt)));
+        $currency = Currency::tryFrom(strtoupper(trim($currencyOpt)));
 
-        $items = $isOutgoing
-            ? $blockchain->getUsdtOutgoingTransfers($network, $address, $limit)
-            : $blockchain->getUsdtIncomingTransfers($network, $address, $limit);
-
-        if (empty($items)) {
-            $this->warn(($isOutgoing ? 'Исходящих' : 'Входящих') . ' транзакций не найдено.');
-            return self::SUCCESS;
+        if (!$network || !$currency) {
+            $this->error('Некорректные параметры network/currency.');
+            return self::INVALID;
         }
+        $this->info("Запрос баланса: сеть={$network->value}, валюта={$currency->value}, адрес={$address}");
 
-        foreach ($items as $item) {
-            $txid = $item['txid'] ?? '';
-            $amount = $item['amount'] ?? '0.000000';
-            $timestamp = $item['timestamp'] ?? null;
-            $tsHuman = $timestamp ? date('Y-m-d H:i:s', (int) ($timestamp / 1000)) : 'n/a';
-            $this->line(($isOutgoing ? 'Найдена исходящая' : 'Найдена входящая') . ": {$txid}, amount: {$amount}, at: {$tsHuman}");
-        }
+        $balance = $blockchain->getAddressBalance($network, $currency, $address);
+        $this->line('Баланс: ' . $money->format($balance) . ' ' . $currency->value);
 
         return self::SUCCESS;
     }

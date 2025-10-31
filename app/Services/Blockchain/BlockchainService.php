@@ -10,6 +10,7 @@ use App\Enums\Currency;
 use App\Enums\Network;
 use App\Enums\NetworkCurrency;
 use App\Exceptions\Address\CurrencyNetworkMismatchException;
+use App\Services\Money\MoneyAmount;
 
 class BlockchainService implements BlockchainServiceContract
 {
@@ -22,48 +23,19 @@ class BlockchainService implements BlockchainServiceContract
         $this->strategies[$strategy->getNetworkKey()] = $strategy;
     }
 
-    public function getIncomingTransfers(string $network, string $currency, string $address, int $limit = 30): array
+    public function getAddressBalance(Network $network, Currency $currency, string $address): MoneyAmount
     {
-        $client = $this->strategies[$network] ?? null;
+        $client = $this->strategies[$network->value] ?? null;
         if (!$client) {
-            return [];
+            return new MoneyAmount(\Brick\Math\BigDecimal::of('0')->toScale(6), $currency);
         }
 
-        $networkEnum = Network::tryFrom(strtolower(trim($network)));
-        $currencyEnum = Currency::tryFrom(strtoupper(trim($currency)));
-
-        if (!$networkEnum || !$currencyEnum) {
-            return [];
+        $allowedNetworks = NetworkCurrency::networksByCurrency($currency);
+        if (!in_array($network, $allowedNetworks, true)) {
+            throw new CurrencyNetworkMismatchException('Currency ' . $currency->value . ' is not available on network ' . $network->value);
         }
 
-        $allowedNetworks = NetworkCurrency::networksByCurrency($currencyEnum);
-        if (!in_array($networkEnum, $allowedNetworks, true)) {
-            throw new CurrencyNetworkMismatchException('Currency ' . $currencyEnum->value . ' is not available on network ' . $networkEnum->value);
-        }
-
-        return $client->getIncomingTransfers($currencyEnum, $address, $limit);
-    }
-
-    public function getOutgoingTransfers(string $network, string $currency, string $address, int $limit = 30): array
-    {
-        $client = $this->strategies[$network] ?? null;
-        if (!$client) {
-            return [];
-        }
-
-        $networkEnum = Network::tryFrom(strtolower(trim($network)));
-        $currencyEnum = Currency::tryFrom(strtoupper(trim($currency)));
-
-        if (!$networkEnum || !$currencyEnum) {
-            return [];
-        }
-
-        $allowedNetworks = NetworkCurrency::networksByCurrency($currencyEnum);
-        if (!in_array($networkEnum, $allowedNetworks, true)) {
-            throw new CurrencyNetworkMismatchException('Currency ' . $currencyEnum->value . ' is not available on network ' . $networkEnum->value);
-        }
-
-        return $client->getOutgoingTransfers($currencyEnum, $address, $limit);
+        return $client->getAddressBalance($currency, $address);
     }
 }
 

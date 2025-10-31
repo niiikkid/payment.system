@@ -7,18 +7,22 @@ namespace App\Services\Blockchain\Networks\Tron;
 use App\Contracts\Blockchain\Networks\BlockchainNetworkServiceContract;
 use App\Enums\Currency;
 use Illuminate\Support\Facades\Http;
+use App\Contracts\Money\MoneyServiceContract;
+use App\Services\Money\MoneyAmount;
 
 class TronService implements BlockchainNetworkServiceContract
 {
     private string $baseUrl;
     private ?string $apiKey;
+    private MoneyServiceContract $money;
 
     private const DEFAULT_USDT_CONTRACT = 'TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t';
 
-    public function __construct()
+    public function __construct(MoneyServiceContract $money)
     {
         $this->baseUrl = (string) (config('services.trongrid.base_url') ?? 'https://api.trongrid.io');
         $this->apiKey = config('services.trongrid.api_key');
+        $this->money = $money;
     }
 
     public function getNetworkKey(): string
@@ -26,252 +30,75 @@ class TronService implements BlockchainNetworkServiceContract
         return 'tron';
     }
 
-    public function getIncomingTransfers(Currency $currency, string $address, int $limit = 30): array
+    public function getAddressBalance(Currency $currency, string $address): MoneyAmount
     {
         return match ($currency) {
-            Currency::USDT => $this->getTrc20IncomingByContract(self::DEFAULT_USDT_CONTRACT, $address, $limit),
-            Currency::TRX => $this->getTrxIncomingTransfers($address, $limit),
-            default => [],
+            Currency::USDT => $this->money->create($this->getTrc20BalanceByContract(self::DEFAULT_USDT_CONTRACT, $address), Currency::USDT),
+            Currency::TRX => $this->money->create($this->getTrxBalance($address), Currency::TRX),
         };
     }
 
-    public function getOutgoingTransfers(Currency $currency, string $address, int $limit = 30): array
+    private function getTrxBalance(string $address): string
     {
-        return match ($currency) {
-            Currency::USDT => $this->getTrc20OutgoingByContract(self::DEFAULT_USDT_CONTRACT, $address, $limit),
-            Currency::TRX => $this->getTrxOutgoingTransfers($address, $limit),
-            default => [],
-        };
-    }
-
-    private function getTrc20IncomingByContract(string $contract, string $address, int $limit = 30): array
-    {
-        $url = rtrim($this->baseUrl, '/') . "/v1/accounts/{$address}/transactions/trc20";
+        $url = rtrim($this->baseUrl, '/') . "/v1/accounts/{$address}";
 
         $response = Http::withHeaders($this->buildHeaders())
             ->acceptJson()
             ->get($url, [
-                'limit' => $limit,
-                'contract_address' => $contract,
-            ]);
-
-        if (!$response->successful()) {
-            return [];
-        }
-
-        $payload = $response->json();
-        $data = is_array($payload) ? ($payload['data'] ?? []) : [];
-        if (!is_array($data)) {
-            return [];
-        }
-
-        $normalized = [];
-        foreach ($data as $tx) {
-            if (!is_array($tx)) {
-                continue;
-            }
-            $to = $tx['to'] ?? null;
-            $value = $tx['value'] ?? null;
-            $txid = $tx['transaction_id'] ?? ($tx['txid'] ?? null);
-            $timestamp = $tx['block_timestamp'] ?? null;
-
-            if (!$txid || !$to || !$value) {
-                continue;
-            }
-
-            if (mb_strtolower((string) $to) !== mb_strtolower($address)) {
-                continue;
-            }
-
-            $amount = $this->fromTrc20Decimals((string) $value, 6);
-
-            $normalized[] = [
-                'txid' => (string) $txid,
-                'amount' => $amount,
-                'timestamp' => is_numeric($timestamp) ? (int) $timestamp : null,
-            ];
-        }
-
-        return $normalized;
-    }
-
-    private function getTrc20OutgoingByContract(string $contract, string $address, int $limit = 30): array
-    {
-        $url = rtrim($this->baseUrl, '/') . "/v1/accounts/{$address}/transactions/trc20";
-
-        $response = Http::withHeaders($this->buildHeaders())
-            ->acceptJson()
-            ->get($url, [
-                'limit' => $limit,
-                'contract_address' => $contract,
-            ]);
-
-        if (!$response->successful()) {
-            return [];
-        }
-
-        $payload = $response->json();
-        $data = is_array($payload) ? ($payload['data'] ?? []) : [];
-        if (!is_array($data)) {
-            return [];
-        }
-
-        $normalized = [];
-        foreach ($data as $tx) {
-            if (!is_array($tx)) {
-                continue;
-            }
-            $from = $tx['from'] ?? null;
-            $value = $tx['value'] ?? null;
-            $txid = $tx['transaction_id'] ?? ($tx['txid'] ?? null);
-            $timestamp = $tx['block_timestamp'] ?? null;
-
-            if (!$txid || !$from || !$value) {
-                continue;
-            }
-
-            if (mb_strtolower((string) $from) !== mb_strtolower($address)) {
-                continue;
-            }
-
-            $amount = $this->fromTrc20Decimals((string) $value, 6);
-
-            $normalized[] = [
-                'txid' => (string) $txid,
-                'amount' => $amount,
-                'timestamp' => is_numeric($timestamp) ? (int) $timestamp : null,
-            ];
-        }
-
-        return $normalized;
-    }
-
-    private function getTrxIncomingTransfers(string $address, int $limit = 30): array
-    {
-        $url = rtrim($this->baseUrl, '/') . "/v1/accounts/{$address}/transactions";
-
-        $response = Http::withHeaders($this->buildHeaders())
-            ->acceptJson()
-            ->get($url, [
-                'limit' => $limit,
                 'only_confirmed' => true,
             ]);
 
         if (!$response->successful()) {
-            return [];
+            return '0.000000';
         }
 
         $payload = $response->json();
         $data = is_array($payload) ? ($payload['data'] ?? []) : [];
-        if (!is_array($data)) {
-            return [];
+        if (!is_array($data) || empty($data) || !is_array($data[0] ?? null)) {
+            return '0.000000';
         }
-
-        $normalized = [];
-        foreach ($data as $tx) {
-            if (!is_array($tx)) {
-                continue;
-            }
-
-            $rawData = $tx['raw_data'] ?? null;
-            if (!is_array($rawData)) {
-                continue;
-            }
-            $contracts = $rawData['contract'] ?? null;
-            if (!is_array($contracts) || empty($contracts) || !is_array($contracts[0] ?? null)) {
-                continue;
-            }
-            $contract = $contracts[0];
-            $parameter = $contract['parameter']['value'] ?? null;
-            if (!is_array($parameter)) {
-                continue;
-            }
-
-            $to = $parameter['to_address'] ?? null;
-            $amount = $parameter['amount'] ?? null;
-            $txid = $tx['txID'] ?? ($tx['transaction_id'] ?? null);
-            $timestamp = $tx['block_timestamp'] ?? null;
-
-            if (!$txid || !$to || !is_numeric($amount)) {
-                continue;
-            }
-
-            if (mb_strtolower((string) $to) !== mb_strtolower($address)) {
-                continue;
-            }
-
-            $normalized[] = [
-                'txid' => (string) $txid,
-                'amount' => $this->fromTrc20Decimals((string) $amount, 6),
-                'timestamp' => is_numeric($timestamp) ? (int) $timestamp : null,
-            ];
-        }
-
-        return $normalized;
+        $account = $data[0];
+        $raw = $account['balance'] ?? 0;
+        $rawStr = is_string($raw) ? $raw : (string) $raw;
+        return $this->fromTrc20Decimals($rawStr, 6);
     }
 
-    private function getTrxOutgoingTransfers(string $address, int $limit = 30): array
+    private function getTrc20BalanceByContract(string $contract, string $address): string
     {
-        $url = rtrim($this->baseUrl, '/') . "/v1/accounts/{$address}/transactions";
+        $url = rtrim($this->baseUrl, '/') . "/v1/accounts/{$address}/tokens";
 
         $response = Http::withHeaders($this->buildHeaders())
             ->acceptJson()
             ->get($url, [
-                'limit' => $limit,
+                'contract_address' => $contract,
                 'only_confirmed' => true,
             ]);
 
         if (!$response->successful()) {
-            return [];
+            return '0.000000';
         }
 
         $payload = $response->json();
         $data = is_array($payload) ? ($payload['data'] ?? []) : [];
         if (!is_array($data)) {
-            return [];
+            return '0.000000';
         }
 
-        $normalized = [];
-        foreach ($data as $tx) {
-            if (!is_array($tx)) {
+        // Ищем первый токен по контракту и читаем баланс
+        foreach ($data as $item) {
+            if (!is_array($item)) {
                 continue;
             }
-
-            $rawData = $tx['raw_data'] ?? null;
-            if (!is_array($rawData)) {
-                continue;
+            // Возможные ключи: token_id, tokenId, token_address
+            $tokenId = ($item['token_id'] ?? ($item['tokenId'] ?? ($item['token_address'] ?? null)));
+            if ($tokenId && strcasecmp((string) $tokenId, $contract) === 0) {
+                $raw = $item['balance'] ?? '0';
+                $rawStr = is_string($raw) ? $raw : (string) $raw;
+                return $this->fromTrc20Decimals($rawStr, 6);
             }
-            $contracts = $rawData['contract'] ?? null;
-            if (!is_array($contracts) || empty($contracts) || !is_array($contracts[0] ?? null)) {
-                continue;
-            }
-            $contract = $contracts[0];
-            $parameter = $contract['parameter']['value'] ?? null;
-            if (!is_array($parameter)) {
-                continue;
-            }
-
-            $from = $parameter['owner_address'] ?? null;
-            $amount = $parameter['amount'] ?? null;
-            $txid = $tx['txID'] ?? ($tx['transaction_id'] ?? null);
-            $timestamp = $tx['block_timestamp'] ?? null;
-
-            if (!$txid || !$from || !is_numeric($amount)) {
-                continue;
-            }
-
-            if (mb_strtolower((string) $from) !== mb_strtolower($address)) {
-                continue;
-            }
-
-            $normalized[] = [
-                'txid' => (string) $txid,
-                'amount' => $this->fromTrc20Decimals((string) $amount, 6),
-                'timestamp' => is_numeric($timestamp) ? (int) $timestamp : null,
-            ];
         }
 
-        return $normalized;
+        return '0.000000';
     }
 
     private function buildHeaders(): array

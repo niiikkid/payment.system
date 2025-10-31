@@ -4,19 +4,19 @@ declare(strict_types=1);
 
 namespace App\Contracts\Blockchain;
 
+use App\Services\Money\MoneyAmount;
+use App\Enums\Network;
+use App\Enums\Currency;
+
 interface BlockchainServiceContract
 {
     /**
-     * Универсальные входящие переводы по связке сеть+валюта.
+     * Получить баланс адреса по связке сеть+валюта.
      * network: системный ключ сети, например: 'tron'.
      * currency: код валюты в верхнем регистре, например: 'USDT'.
+     * Возвращает строку с десятичным числом в стандартной точности.
      */
-    public function getIncomingTransfers(string $network, string $currency, string $address, int $limit = 30): array;
-
-    /**
-     * Универсальные исходящие переводы по связке сеть+валюта.
-     */
-    public function getOutgoingTransfers(string $network, string $currency, string $address, int $limit = 30): array;
+    public function getAddressBalance(Network $network, Currency $currency, string $address): MoneyAmount;
 }
 
 
