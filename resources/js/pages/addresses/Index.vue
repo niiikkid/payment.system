@@ -109,8 +109,7 @@ function toggleAddress(id: number, nextActive: boolean) {
                                     <td>{{ addr.balance }}</td>
                                     <td>
                                         <div class="flex items-center gap-2">
-                                            <input type="checkbox" class="toggle" :checked="addr.is_active" @change="toggleAddress(addr.id, !addr.is_active)" />
-                                            <span :class="['badge','badge-xs', addr.is_active ? 'badge-success' : 'badge-error']">{{ addr.is_active ? 'Да' : 'Нет' }}</span>
+                                            <input type="checkbox" class="toggle" :class="{'toggle-success': addr.is_active}" :checked="addr.is_active" @change="toggleAddress(addr.id, !addr.is_active)" />
                                         </div>
                                     </td>
                                 </tr>
