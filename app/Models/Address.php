@@ -9,6 +9,7 @@ use App\Enums\Network;
 use App\Casts\MoneyAmountCast;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Address extends Model
 {
@@ -36,6 +37,11 @@ class Address extends Model
         'balance' => '0',
         'last_checked_at' => null,
     ];
+
+    public function invoices(): HasMany
+    {
+        return $this->hasMany(Invoice::class);
+    }
 }
 
 
