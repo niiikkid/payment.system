@@ -34,9 +34,7 @@ withDefaults(defineProps<Props>(), {
                 </div>
             </div>
             <div class="p-4 lg:p-6">
-                <div class="rounded-box bg-base-100 p-4 shadow-sm lg:p-6">
-                    <slot />
-                </div>
+                <slot />
             </div>
         </main>
     </div>
