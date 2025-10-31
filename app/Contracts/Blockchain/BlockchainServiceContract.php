@@ -10,13 +10,11 @@ use App\Enums\Currency;
 
 interface BlockchainServiceContract
 {
-    /**
-     * Получить баланс адреса по связке сеть+валюта.
-     * network: системный ключ сети, например: 'tron'.
-     * currency: код валюты в верхнем регистре, например: 'USDT'.
-     * Возвращает строку с десятичным числом в стандартной точности.
-     */
+    /** Получить баланс адреса для указанной сети и валюты */
     public function getAddressBalance(Network $network, Currency $currency, string $address): MoneyAmount;
+
+    /** Получить входящие транзакции для адреса (без пагинации) */
+    public function getIncomingTransactions(Network $network, Currency $currency, string $address): array;
 }
 
 

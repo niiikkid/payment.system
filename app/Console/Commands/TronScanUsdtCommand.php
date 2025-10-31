@@ -41,6 +41,8 @@ class TronScanUsdtCommand extends Command
 
         $balance = $blockchain->getAddressBalance($network, $currency, $address);
         $this->line('Баланс: ' . $money->format($balance) . ' ' . $currency->value);
+        $transactions = $blockchain->getIncomingTransactions($network, $currency, $address);
+        dump($transactions);
 
         return self::SUCCESS;
     }

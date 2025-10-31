@@ -8,7 +8,6 @@ use App\Mixins\ResponseMixins;
 use App\Contracts\Money\MoneyServiceContract;
 use App\Services\Address\AddressService;
 use App\Services\Blockchain\BlockchainService;
-use App\Services\Blockchain\Networks\Tron\TronService as TronNetworkService;
 use App\Services\Money\MoneyService;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\ServiceProvider;
@@ -22,12 +21,7 @@ class AppServiceProvider extends ServiceProvider
     {
         $this->app->bind(AddressServiceContract::class, AddressService::class);
         $this->app->singleton(MoneyServiceContract::class, MoneyService::class);
-        $this->app->singleton(BlockchainServiceContract::class, function ($app) {
-            $service = new BlockchainService();
-            // регистрируем доступные стратегии сетей
-            $service->registerStrategy($app->make(TronNetworkService::class));
-            return $service;
-        });
+        $this->app->singleton(BlockchainServiceContract::class, BlockchainService::class);
     }
 
     /**
