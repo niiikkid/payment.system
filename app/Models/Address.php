@@ -6,6 +6,7 @@ namespace App\Models;
 
 use App\Enums\Currency;
 use App\Enums\Network;
+use App\Casts\MoneyAmountCast;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -27,6 +28,7 @@ class Address extends Model
         'network' => Network::class,
         'is_active' => 'boolean',
         'last_checked_at' => 'datetime',
+        'balance' => MoneyAmountCast::class,
     ];
 
     protected $attributes = [
