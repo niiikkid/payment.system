@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import AppSidebarLayout from '@/layouts/app/AppSidebarLayout.vue';
-import { Link, useForm } from '@inertiajs/vue3';
+import { Link, useForm, usePage } from '@inertiajs/vue3';
 import CurrencyNetworkBadge from '@/components/ui/CurrencyNetworkBadge.vue';
 import AddressCopy from '@/components/ui/AddressCopy.vue';
 
@@ -25,6 +25,8 @@ interface Props {
 
 const props = defineProps<Props>();
 
+const page = usePage();
+
 const createForm = useForm({
     currency: '',
     network: '',
@@ -47,7 +49,7 @@ function toggleAddress(id: number, nextActive: boolean) {
 </script>
 
 <template>
-    <AppSidebarLayout :breadcrumbs="[{ title: 'Главная', href: '/' }, { title: 'Адреса' }]">
+    <AppSidebarLayout :breadcrumbs="[{ title: 'Главная', href: '/' }, { title: 'Адреса', href: '/addresses' }]">
         <div class="flex items-center justify-between gap-4">
             <h1 class="text-xl font-semibold">Адреса</h1>
             <Link href="/dashboard" class="btn btn-ghost btn-sm">На дашборд</Link>
@@ -58,6 +60,14 @@ function toggleAddress(id: number, nextActive: boolean) {
                 <div class="card-body">
                     <h2 class="card-title">Добавить новый адрес</h2>
                     <form @submit.prevent="submitCreate" class="grid gap-4">
+                        <div v-if="page.props.flash?.error" class="alert alert-error">
+                            <span>{{ page.props.flash.error }}</span>
+                        </div>
+                        <div v-if="Object.keys(createForm.errors).length" class="alert alert-error">
+                            <span>
+                                {{ createForm.errors.address || createForm.errors.network || createForm.errors.currency || 'Ошибка при добавлении адреса' }}
+                            </span>
+                        </div>
                         <div class="form-control">
                             <label class="label"><span class="label-text">Валюта</span></label>
                             <select v-model="createForm.currency" class="select select-bordered" required>

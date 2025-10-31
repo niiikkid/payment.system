@@ -9,15 +9,25 @@ use App\Enums\Currency;
 use App\Enums\Network;
 use App\Enums\NetworkCurrency;
 use App\Models\Address;
+use App\Contracts\Blockchain\BlockchainServiceContract;
+use App\Contracts\Money\MoneyServiceContract;
 use App\Exceptions\Address\CurrencyNetworkMismatchException;
 use App\Exceptions\Address\DuplicateAddressException;
 use App\Exceptions\Address\InvalidBalanceFormatException;
+use App\Exceptions\Address\AddressNotFoundOnBlockchainException;
 use App\Exceptions\Address\UnsupportedCurrencyException;
 use App\Exceptions\Address\UnsupportedNetworkException;
+use App\Exceptions\Blockchain\TokenContractNotFoundException;
 use Carbon\Carbon;
 
 class AddressService implements AddressServiceContract
 {
+    public function __construct(
+        private readonly BlockchainServiceContract $blockchain,
+        private readonly MoneyServiceContract $money,
+    ) {
+    }
+
     public function create(string $currency, string $network, string $address): Address
     {
         $currencyEnum = Currency::tryFrom(strtoupper(trim($currency)));
@@ -45,13 +55,23 @@ class AddressService implements AddressServiceContract
             throw new DuplicateAddressException('Address already exists for the network & currency');
         }
 
+        // Получаем баланс адреса из блокчейн-сервиса
+        try {
+            $balance = $this->blockchain->getAddressBalance($networkEnum, $currencyEnum, $address);
+        } catch (TokenContractNotFoundException $e) {
+            // Отсутствие токена/баланса трактуем как несуществующий адрес для нужной валюты
+            throw new AddressNotFoundOnBlockchainException('Address does not exist on blockchain for specified currency/network.');
+        }
+
+        $balanceMinor = $this->money->toMinor($balance);
+
         return Address::query()->create([
             'currency' => $currencyEnum,
             'network' => $networkEnum,
             'address' => $address,
             'is_active' => true,
-            'balance' => '0',
-            'last_checked_at' => null,
+            'balance' => $balanceMinor,
+            'last_checked_at' => Carbon::now(),
         ]);
     }
 

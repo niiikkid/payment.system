@@ -11,6 +11,11 @@ use App\Models\Address;
 use App\Services\Address\AddressService;
 use App\Enums\Currency;
 use App\Enums\Network;
+use App\Exceptions\Address\AddressNotFoundOnBlockchainException;
+use App\Exceptions\Address\DuplicateAddressException;
+use App\Exceptions\Address\UnsupportedCurrencyException;
+use App\Exceptions\Address\UnsupportedNetworkException;
+use App\Exceptions\Address\CurrencyNetworkMismatchException;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -54,13 +59,19 @@ class AddressController extends Controller
      */
     public function store(StoreAddressRequest $request, AddressService $addressService)
     {
-        $addressService->create(
-            $request->string('currency')->toString(),
-            $request->string('network')->toString(),
-            $request->string('address')->toString(),
-        );
+        try {
+            $addressService->create(
+                $request->string('currency')->toString(),
+                $request->string('network')->toString(),
+                $request->string('address')->toString(),
+            );
 
-        return back()->with('success', 'Address added');
+            return back()->with('success', 'Address added');
+        } catch (\Exception $e) {
+            return back()
+                ->with('error', 'Не удалось добавить адрес.')
+                ->onlyInput('currency', 'network', 'address');
+        }
     }
 
     /**
