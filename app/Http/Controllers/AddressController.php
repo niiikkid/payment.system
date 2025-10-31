@@ -30,7 +30,7 @@ class AddressController extends Controller
             $value = $c->value;
             return [
                 'value' => $value,
-                'label' => Str::ucfirst(Str::lower($value)),
+                'label' => strtoupper($value),
             ];
         }, Currency::cases());
 
@@ -38,7 +38,7 @@ class AddressController extends Controller
             $value = $n->value;
             return [
                 'value' => $value,
-                'label' => Str::ucfirst(Str::lower($value)),
+                'label' => strtoupper($value),
             ];
         }, Network::cases());
 

@@ -21,9 +21,9 @@ class AddressResource extends JsonResource
         return [
             'id' => $this->id,
             'currency' => $this->currency->value,
-            'currency_label' => Str::ucfirst(Str::lower($this->currency->value)),
+            'currency_label' => strtoupper($this->currency->value),
             'network' => $this->network->value,
-            'network_label' => Str::ucfirst(Str::lower($this->network->value)),
+            'network_label' => Str::upper($this->network->value),
             'address' => $this->address,
             'is_active' => (bool) $this->is_active,
             'balance' => $this->balance,
