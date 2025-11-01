@@ -16,6 +16,8 @@ use App\Models\Invoice;
 use Illuminate\Http\RedirectResponse;
 use Inertia\Inertia;
 use Inertia\Response;
+use Endroid\QrCode\QrCode;
+use Endroid\QrCode\Writer\PngWriter;
 
 class InvoiceController extends Controller
 {
@@ -90,6 +92,30 @@ class InvoiceController extends Controller
         $invoice->load('address');
 
         return (new InvoiceResource($invoice))->resolve();
+    }
+
+    public function publicQr(Invoice $invoice)
+    {
+        $invoice->load('address');
+
+        $address = $invoice->address?->address;
+        if (!$address) {
+            abort(404);
+        }
+
+        $writer = new PngWriter();
+        $qrCode = new QrCode(
+            data: $address,
+            size: 400,
+            margin: 10,
+        );
+
+        $result = $writer->write($qrCode);
+
+        return response($result->getString(), 200, [
+            'Content-Type' => $result->getMimeType(),
+            'Cache-Control' => 'no-store, no-cache, must-revalidate, max-age=0',
+        ]);
     }
 
     public function update(UpdateInvoiceRequest $request, Invoice $invoice, InvoiceServiceContract $service): array

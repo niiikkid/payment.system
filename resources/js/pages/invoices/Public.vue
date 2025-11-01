@@ -36,6 +36,8 @@ const statuses = computed(() => page.props.statuses as { active: string[]; final
 
 const invoice = ref<Invoice>(initial);
 
+const qrUrl = computed(() => `/pay/${invoice.value.id}/qr`);
+
 const isFinal = computed(() => statuses.value.final?.includes(invoice.value.status) ?? false);
 
 let timer: number | null = null;
@@ -235,8 +237,15 @@ function onAddressKeydown(e: KeyboardEvent) {
                                   Валюта: {{ invoice.currency_label || invoice.currency }} • Сеть: {{ invoice.network_label || invoice.network }}
                                 </div>
                               </div>
-                              <div class="mx-auto rounded-box bg-neutral/90 aspect-square w-50 max-w-full grid place-content-center text-neutral-content select-none">
-                                <span class="text-sm opacity-80">QR будет здесь</span>
+                              <div class="mx-auto rounded-box bg-neutral/90 aspect-square w-50 max-w-full overflow-hidden">
+                                <img
+                                  v-if="invoice.address"
+                                  :src="qrUrl"
+                                  alt="QR для оплаты"
+                                  class="w-full h-full object-contain"
+                                  loading="eager"
+                                  decoding="async"
+                                />
                               </div>
                             </div>
 
