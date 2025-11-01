@@ -71,6 +71,27 @@ class InvoiceController extends Controller
         return (new InvoiceResource($invoice))->resolve();
     }
 
+    public function public(Invoice $invoice): Response
+    {
+        $invoice->load('address');
+
+        return Inertia::render('invoices/Public', [
+            'invoice' => (new InvoiceResource($invoice))->resolve(),
+            'appName' => config('app.name'),
+            'statuses' => [
+                'active' => InvoiceStatus::active(),
+                'final' => InvoiceStatus::final(),
+            ],
+        ]);
+    }
+
+    public function publicData(Invoice $invoice): array
+    {
+        $invoice->load('address');
+
+        return (new InvoiceResource($invoice))->resolve();
+    }
+
     public function update(UpdateInvoiceRequest $request, Invoice $invoice, InvoiceServiceContract $service): array
     {
         $status = InvoiceStatus::from($request->input('status'));

@@ -8,6 +8,10 @@ use App\Http\Controllers\InvoiceController;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
+// Public payment page
+Route::get('pay/{invoice}', [InvoiceController::class, 'public'])->name('invoices.public');
+Route::get('pay/{invoice}/data', [InvoiceController::class, 'publicData'])->name('invoices.public.data');
+
 Route::get('dashboard', [DashboardController::class, 'index'])
     ->middleware(['auth', 'verified'])
     ->name('dashboard');
