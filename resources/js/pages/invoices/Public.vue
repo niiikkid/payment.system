@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import SimpleLayout from '@/layouts/app/SimpleLayout.vue';
-import AddressFullCopy from '@/components/ui/AddressFullCopy.vue';
 import CurrencyNetworkBadge from '@/components/ui/CurrencyNetworkBadge.vue';
-import AmountCopy from '@/components/ui/AmountCopy.vue';
 import { usePage } from '@inertiajs/vue3';
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue';
 import axios from 'axios';
@@ -84,7 +82,7 @@ const statusText = computed(() => {
   return 'Ожидаем оплату';
 });
 
-function parseLocalDateTimeToMs(s: string | null): number | null {
+function parseMoscowLocalDateTimeToMs(s: string | null): number | null {
   if (!s) return null;
   const parts = s.trim().split(' ');
   if (parts.length !== 2) return null;
@@ -95,12 +93,12 @@ function parseLocalDateTimeToMs(s: string | null): number | null {
   const [year, month, day] = dParts;
   const [hours, minutes] = tParts;
   const seconds = tParts[2] ?? 0;
-  const ms = new Date(year, (month - 1), day, hours, minutes, seconds, 0).getTime();
-  return Number.isFinite(ms) ? ms : null;
+  // Трактуем строку как Московское время (UTC+3) и конвертируем в UTC-миллисекунды
+  const utcMs = Date.UTC(year, (month - 1), day, (hours - 3), minutes, seconds, 0);
+  return Number.isFinite(utcMs) ? utcMs : null;
 }
 
-const expiresAtMs = computed(() => parseLocalDateTimeToMs(invoice.value.expires_at));
-
+const expiresAtMs = computed(() => parseMoscowLocalDateTimeToMs(invoice.value.expires_at));
 const remainingSeconds = ref(0);
 const hh = computed(() => Math.floor(remainingSeconds.value / 3600));
 const mm = computed(() => Math.floor((remainingSeconds.value % 3600) / 60));
@@ -120,6 +118,52 @@ function startCountdown() {
   if (countdownTimer) clearInterval(countdownTimer);
   countdownTimer = window.setInterval(tickCountdown, 1000);
 }
+
+// Inline AmountCopy logic
+const amountTooltipText = ref('Скопировать сумму');
+let amountResetTimer: number | undefined;
+async function copyAmount() {
+  try {
+    await navigator.clipboard.writeText(String(invoice.value.amount ?? ''));
+    amountTooltipText.value = 'Скопировано';
+  } catch (_) {
+    amountTooltipText.value = 'Не удалось скопировать';
+  } finally {
+    if (amountResetTimer) clearTimeout(amountResetTimer);
+    amountResetTimer = window.setTimeout(() => {
+      amountTooltipText.value = 'Скопировать сумму';
+    }, 1500);
+  }
+}
+function onAmountKeydown(e: KeyboardEvent) {
+  if (e.key === 'Enter' || e.key === ' ') {
+    e.preventDefault();
+    copyAmount();
+  }
+}
+
+// Inline AddressFullCopy logic
+const addressTooltipText = ref('Скопировать');
+let addressResetTimer: number | undefined;
+async function copyAddress() {
+  try {
+    await navigator.clipboard.writeText(String(invoice.value.address ?? ''));
+    addressTooltipText.value = 'Скопировано';
+  } catch (_) {
+    addressTooltipText.value = 'Не удалось скопировать';
+  } finally {
+    if (addressResetTimer) clearTimeout(addressResetTimer);
+    addressResetTimer = window.setTimeout(() => {
+      addressTooltipText.value = 'Скопировать';
+    }, 1500);
+  }
+}
+function onAddressKeydown(e: KeyboardEvent) {
+  if (e.key === 'Enter' || e.key === ' ') {
+    e.preventDefault();
+    copyAddress();
+  }
+}
 </script>
 
 <template>
@@ -133,97 +177,95 @@ function startCountdown() {
 
     <div class="mt-8 card bg-base-100 shadow">
                 <div class="card-body p-4 lg:p-6">
-                    <div class="grid gap-6 md:grid-cols-2">
-                        <!-- Левая колонка: магазин и платёж -->
-                        <div class="grid gap-4">
-                            <div>
-                                <div class="text-xs opacity-60">Магазин</div>
-                                <div class="mt-1 flex items-center gap-3">
-                                    <img src="/favicon.svg" alt="logo" class="size-7 opacity-70" />
-                                    <div class="font-semibold">{{ appName }}</div>
-                                </div>
-                            </div>
-
-                            <div class="grid gap-3">
-                                <div class="text-xs opacity-60">К оплате</div>
-              <div class="flex items-center gap-3">
-                <div class="text-2xl font-bold font-mono">
-                  <AmountCopy :amount="invoice.amount" />
-                </div>
-                                    <CurrencyNetworkBadge :currency-label="invoice.currency_label || invoice.currency" :network-label="invoice.network_label || invoice.network" />
-                                </div>
-                                <div class="text-sm opacity-70" v-if="invoice.expires_at">
-                                    Оплатите до: {{ invoice.expires_at }}
-                                </div>
-                            </div>
-
-                            <div class="grid gap-2">
-                                <div class="text-xs opacity-60">Статус</div>
-                                <div class="flex items-center gap-2">
-                                    <span class="badge" :class="statusBadgeClass">{{ statusText }}</span>
-                                </div>
-                            </div>
-
-            <div class="grid gap-2" v-if="invoice.external_invoice_id">
-              <div class="text-xs opacity-60">ID заказа</div>
-              <div class="font-mono break-all">{{ invoice.external_invoice_id }}</div>
-            </div>
-
-            <div class="grid gap-2" v-if="invoice.tag">
-              <div class="text-xs opacity-60">Тег</div>
-              <div class="font-mono break-all">{{ invoice.tag }}</div>
-            </div>
-                        </div>
+                    <div class="grid gap-6 md:grid-cols-1">
 
           <!-- Правая колонка: реквизиты инвойса -->
           <div class="grid gap-4">
             <!-- Placeholder под QR-код -->
             <div>
-              <div class="text-xs opacity-60 mb-2">QR-code</div>
-              <div class="mx-auto rounded-box bg-neutral/90 aspect-square w-64 max-w-full grid place-content-center text-neutral-content select-none">
+              <div class="mb-2">
+                <div class="flex items-center gap-2 mb-3">
+                    <span class="text-error">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" />
+                        </svg>
+                    </span>
+                    <span class="text-base-content">Важно: переведите сумму точно до копейки, чтобы мы автоматически зачли ваш платёж.</span>
+                </div>
+                <div class="text-xs text-center opacity-70 mt-1">
+                  Валюта: {{ invoice.currency_label || invoice.currency }} • Сеть: {{ invoice.network_label || invoice.network }}
+                </div>
+              </div>
+              <div class="mx-auto rounded-box bg-neutral/90 aspect-square w-50 max-w-full grid place-content-center text-neutral-content select-none">
                 <span class="text-sm opacity-80">QR будет здесь</span>
               </div>
             </div>
 
             <!-- К оплате и сеть -->
-            <div class="grid gap-3">
-              <div class="text-xs opacity-60">К оплате</div>
+            <div class="grid gap-2">
+              <div class="text-base opacity-60">К оплате</div>
               <div class="flex items-center gap-3">
-                <div class="text-2xl font-bold font-mono">
-                  <AmountCopy :amount="invoice.amount" />
+                <div>
+                  <div class="tooltip" :data-tip="amountTooltipText">
+                    <div
+                      class="group text-lg min-h-0 flex items-center justify-between gap-2 font-mono cursor-pointer transition-colors"
+                      tabindex="0"
+                      @click="copyAmount"
+                      @keydown="onAmountKeydown"
+                    >
+                      <span>{{ String(invoice.amount) }}</span>
+                      <span class="shrink-0 text-info opacity-70 group-hover:opacity-100 transition-opacity" aria-hidden="true">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 md:w-6 md:h-6">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 0 0 2.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 0 0-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664m-5.8 0A2.251 2.251 0 0 1 13.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25ZM6.75 12h.008v.008H6.75V12Zm0 3h.008v.008H6.75V15Zm0 3h.008v.008H6.75V18Z" />
+                        </svg>
+                      </span>
+                    </div>
+                  </div>
                 </div>
-                <CurrencyNetworkBadge :currency-label="invoice.currency_label || invoice.currency" :network-label="invoice.network_label || invoice.network" />
+                <CurrencyNetworkBadge
+                    :currency-label="invoice.currency_label || invoice.currency"
+                    :network-label="invoice.network_label || invoice.network"
+                    size="lg"
+                />
               </div>
             </div>
+
+              <div class="grid gap-2" v-if="invoice.address">
+                  <div class="text-base opacity-60">Адрес для оплаты</div>
+                  <div class="font-mono">
+                      <div class="tooltip" :data-tip="addressTooltipText">
+                          <div
+                              class="group text-lg min-h-0 flex items-center justify-between gap-2 font-mono cursor-pointer transition-colors"
+                              tabindex="0"
+                              @click="copyAddress"
+                              @keydown="onAddressKeydown"
+                          >
+                              <span class="break-all">{{ invoice.address }}</span>
+                              <span class="shrink-0 text-info opacity-70 group-hover:opacity-100 transition-opacity" aria-hidden="true">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 md:w-6 md:h-6">
+                                  <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 0 0 2.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 0 0-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664m-5.8 0A2.251 2.251 0 0 1 13.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25ZM6.75 12h.008v.008H6.75V12Zm0 3h.008v.008H6.75V15Zm0 3h.008v.008H6.75V18Z" />
+                                </svg>
+                              </span>
+                          </div>
+                      </div>
+                  </div>
+              </div>
 
             <!-- Отсчёт времени -->
             <div class="grid gap-2" v-if="invoice.expires_at">
-              <div class="text-xs opacity-60">Осталось времени</div>
+              <div class="text-base opacity-60">Осталось времени</div>
               <span class="countdown font-mono text-xl">
-                <span :style="`--value:${hh};`" :aria-label="String(hh)">{{ hh }}</span>
+                <span :style="`--value:${hh};`" :aria-label="String(hh)" aria-live="polite">{{ hh }}</span>
                 :
-                <span :style="`--value:${mm}; --digits: 2;`" :aria-label="String(mm)">{{ String(mm).padStart(2,'0') }}</span>
+                <span :style="`--value:${mm}; --digits: 2;`" :aria-label="String(mm)" aria-live="polite">{{ String(mm).padStart(2,'0') }}</span>
                 :
-                <span :style="`--value:${ss}; --digits: 2;`" :aria-label="String(ss)">{{ String(ss).padStart(2,'0') }}</span>
+                <span :style="`--value:${ss}; --digits: 2;`" :aria-label="String(ss)" aria-live="polite">{{ String(ss).padStart(2,'0') }}</span>
               </span>
             </div>
 
-            <div class="grid gap-2" v-if="invoice.address">
-              <div class="text-xs opacity-60">Адрес для оплаты</div>
-              <div class="font-mono">
-                <AddressFullCopy :address="invoice.address" />
-              </div>
-            </div>
-
-            <div class="grid gap-2" v-if="(invoice.amount_received && Number(invoice.amount_received) > 0) || (invoice.confirmations && Number(invoice.confirmations) > 0)">
-              <div class="text-xs opacity-60">Получено / Подтв.</div>
-              <div class="font-mono">{{ invoice.amount_received }} / {{ invoice.confirmations }}</div>
-            </div>
-
             <div class="grid gap-2" v-if="invoice.txid">
-              <div class="text-xs opacity-60">Транзакция</div>
+              <div class="text-base opacity-60">Транзакция</div>
               <div class="flex items-center gap-2">
-                <span class="font-mono break-all">{{ invoice.txid }}</span>
                 <a v-if="invoice.tx_explorer_url" :href="invoice.tx_explorer_url || '#'" target="_blank" rel="noopener noreferrer" class="link link-primary">Обозреватель</a>
               </div>
             </div>
