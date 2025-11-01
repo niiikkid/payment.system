@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import AppSidebarLayout from '@/layouts/app/AppSidebarLayout.vue';
 import { Link, usePage, router } from '@inertiajs/vue3';
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import axios from 'axios';
 import CurrencyNetworkBadge from '@/components/ui/CurrencyNetworkBadge.vue';
 import AddressCopy from '@/components/ui/AddressCopy.vue';
@@ -29,10 +29,10 @@ type Invoice = {
 interface Option { value: string; label: string }
 
 const page = usePage();
-const invoices = page.props.invoices as any;
-const statuses = page.props.statuses as { active: string[]; final: string[] };
-const currencyOptions = page.props.currencyOptions as Option[];
-const networkOptions = page.props.networkOptions as Option[];
+const invoices = computed(() => page.props.invoices as any);
+const statuses = computed(() => page.props.statuses as { active: string[]; final: string[] });
+const currencyOptions = computed(() => page.props.currencyOptions as Option[]);
+const networkOptions = computed(() => page.props.networkOptions as Option[]);
 
 const selected: any = ref<Invoice | null>(null);
 const showModal = ref(false);
