@@ -9,6 +9,7 @@ use App\Contracts\Money\MoneyServiceContract;
 use App\Enums\InvoiceStatus;
 use App\Enums\Currency;
 use App\Enums\Network;
+use App\Http\Requests\UpdateInvoiceRequest;
 use App\Http\Requests\StoreInvoiceRequest;
 use App\Http\Resources\InvoiceResource;
 use App\Models\Invoice;
@@ -68,6 +69,16 @@ class InvoiceController extends Controller
     public function show(Invoice $invoice): array
     {
         return (new InvoiceResource($invoice))->resolve();
+    }
+
+    public function update(UpdateInvoiceRequest $request, Invoice $invoice, InvoiceServiceContract $service): array
+    {
+        $status = InvoiceStatus::from($request->input('status'));
+        $txid = $request->input('txid');
+
+        $updated = $service->updateStatusManually($invoice, $status, $txid);
+
+        return (new InvoiceResource($updated))->resolve();
     }
 }
 

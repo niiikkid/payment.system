@@ -133,6 +133,28 @@ class InvoiceService implements InvoiceServiceContract
         return false;
     }
 
+    public function updateStatusManually(Invoice $invoice, InvoiceStatus $status, ?string $txid = null): Invoice
+    {
+        $invoice->refresh();
+
+        // txid правила
+        if ($status === InvoiceStatus::PAID) {
+            $invoice->txid = (string) $txid;
+        } else {
+            $invoice->txid = null;
+        }
+
+        // amount_received и confirmations очищаются для любого статуса кроме pending
+        if ($status !== InvoiceStatus::PENDING) {
+            $invoice->amount_received = $this->money->create('0', $invoice->currency);
+            $invoice->confirmations = 0;
+        }
+
+        $invoice->status = $status;
+        $invoice->save();
+
+        return $invoice;
+    }
     /**
      * Найти точный входящий платёж в блокчейне для инвойса в пределах его окна оплаты.
      */

@@ -6,6 +6,7 @@ namespace App\Contracts\Invoice;
 
 use App\Enums\Currency;
 use App\Enums\Network;
+use App\Enums\InvoiceStatus;
 use App\Models\Invoice;
 use App\Services\Money\MoneyAmount;
 
@@ -34,6 +35,14 @@ interface InvoiceServiceContract
      * финализировать инвойс как PAID. Возвращает true, если инвойс был финализирован.
      */
     public function finalizeIfConfirmed(Invoice $invoice, int $minConfirmations = 10): bool;
+
+    /**
+     * Ручное обновление статуса инвойса с применением бизнес-правил:
+     * - если статус = paid, txid обязателен и сохраняется;
+     * - если статус один из cancelled/expired/pending/processing — txid очищается;
+     * - если статус любой кроме pending — amount_received и confirmations очищаются.
+     */
+    public function updateStatusManually(Invoice $invoice, InvoiceStatus $status, ?string $txid = null): Invoice;
 }
 
 

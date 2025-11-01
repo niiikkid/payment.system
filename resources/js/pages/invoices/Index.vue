@@ -38,6 +38,18 @@ const networkOptions = computed(() => page.props.networkOptions as Option[]);
 const selected: any = ref<Invoice | null>(null);
 const showModal = ref(false);
 const showCreate = ref(false);
+const showEdit = ref(false);
+
+const editPayload = ref<{ status: string; txid: string | null }>({ status: '', txid: null });
+const editLoading = ref(false);
+const editError = ref<string | null>(null);
+
+const allStatusOptions = computed(() => {
+  const a = statuses.value.active || [];
+  const f = statuses.value.final || [];
+  const merged = Array.from(new Set([...a, ...f]));
+  return merged.map(s => ({ value: s, label: s }));
+});
 
 function openDetails(inv: Invoice) {
   selected.value = inv;
@@ -46,6 +58,42 @@ function openDetails(inv: Invoice) {
 
 function closeDetails() {
   showModal.value = false;
+}
+
+function openEdit() {
+  if (!selected.value) return;
+  editError.value = null;
+  editPayload.value = {
+    status: selected.value.status,
+    txid: selected.value.txid || null,
+  };
+  showEdit.value = true;
+}
+
+function closeEdit() {
+  showEdit.value = false;
+}
+
+async function submitEdit() {
+  if (!selected.value) return;
+  editError.value = null;
+  editLoading.value = true;
+  try {
+    const res = await axios.post(`/invoices/${selected.value.id}`, {
+      _method: 'PATCH',
+      status: editPayload.value.status,
+      txid: editPayload.value.status === 'paid' ? (editPayload.value.txid || '') : null,
+    });
+    const updated = res.data;
+    // Обновляем выбранный и список (перезагрузка только пропса invoices)
+    selected.value = updated;
+    showEdit.value = false;
+    router.reload({ only: ['invoices'] });
+  } catch (e: any) {
+    editError.value = e?.response?.data?.message || e?.response?.data?.errors?.txid?.[0] || e?.message || 'Ошибка при обновлении инвойса';
+  } finally {
+    editLoading.value = false;
+  }
 }
 
 const createPayload = ref({
@@ -250,10 +298,42 @@ async function submitCreate() {
         </div>
 
         <div class="modal-action">
+          <button class="btn" @click="openEdit">Редактировать</button>
           <button class="btn btn-ghost" @click="closeDetails">Закрыть</button>
         </div>
       </div>
       <form method="dialog" class="modal-backdrop" @submit.prevent="closeDetails">
+        <button>close</button>
+      </form>
+    </dialog>
+
+    <!-- Edit Modal -->
+    <dialog class="modal modal-bottom md:modal-middle" :open="showEdit">
+      <div class="modal-box max-w-xl">
+        <h3 class="font-bold text-lg">Редактировать инвойс</h3>
+        <p class="text-sm opacity-70 mt-1">Сменить статус и при необходимости указать TXID</p>
+        <div v-if="editError" class="alert alert-error mt-3">
+          <span>{{ editError }}</span>
+        </div>
+        <form class="mt-4 grid gap-4" @submit.prevent="submitEdit">
+          <div class="form-control w-full">
+            <label class="label"><span class="label-text">Статус</span></label>
+            <select v-model="editPayload.status" class="select select-bordered w-full" required>
+              <option v-for="opt in allStatusOptions" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
+            </select>
+          </div>
+          <div class="form-control w-full" v-if="editPayload.status === 'paid'">
+            <label class="label"><span class="label-text">TXID</span></label>
+            <input v-model.trim="editPayload.txid" type="text" class="input input-bordered w-full" placeholder="Введите хэш транзакции" required />
+            <label class="label"><span class="label-text-alt opacity-60">Обязателен для статуса paid</span></label>
+          </div>
+          <div class="modal-action">
+            <button type="button" class="btn" @click="closeEdit" :disabled="editLoading">Отмена</button>
+            <button type="submit" class="btn btn-primary" :class="{ loading: editLoading }" :disabled="editLoading">Сохранить</button>
+          </div>
+        </form>
+      </div>
+      <form method="dialog" class="modal-backdrop" @submit.prevent="closeEdit">
         <button>close</button>
       </form>
     </dialog>
