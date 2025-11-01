@@ -16,6 +16,11 @@ interface InvoiceServiceContract
      * Возвращает созданный инвойс или бросает исключение при отсутствии доступного адреса.
      */
     public function create(Currency $currency, Network $network, MoneyAmount $amount, ?string $externalInvoiceId = null, ?string $callbackUrl = null, ?string $tag = null, array $metadata = []): Invoice;
+
+    /**
+     * Пометить инвойс как просроченный, если он ещё активен.
+     */
+    public function expire(Invoice $invoice): void;
 }
 
 
