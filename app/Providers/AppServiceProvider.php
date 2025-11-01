@@ -5,6 +5,8 @@ namespace App\Providers;
 use App\Contracts\Address\AddressServiceContract;
 use App\Contracts\Blockchain\BlockchainServiceContract;
 use App\Mixins\ResponseMixins;
+use App\Contracts\Blockchain\ExplorerServiceContract;
+use App\Services\Blockchain\Explorer\ExplorerService;
 use App\Contracts\Money\MoneyServiceContract;
 use App\Services\Address\AddressService;
 use App\Services\Blockchain\BlockchainService;
@@ -25,6 +27,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(InvoiceServiceContract::class, InvoiceService::class);
         $this->app->singleton(MoneyServiceContract::class, MoneyService::class);
         $this->app->singleton(BlockchainServiceContract::class, BlockchainService::class);
+        $this->app->singleton(ExplorerServiceContract::class, ExplorerService::class);
     }
 
     /**

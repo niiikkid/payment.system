@@ -16,6 +16,7 @@ type Invoice = {
   network: string
   status: string
   txid: string | null
+  tx_explorer_url?: string | null
   amount_received: number
   confirmations: number
   expires_at: string | null
@@ -216,7 +217,12 @@ async function submitCreate() {
           <div class="grid gap-4 md:grid-cols-2">
             <div class="grid gap-2">
               <div class="text-xs opacity-60">TXID</div>
-              <div class="font-mono break-all" v-if="selected.txid">{{ selected.txid }}</div>
+              <div class="flex items-center gap-2" v-if="selected.txid">
+                <span class="font-mono break-all">{{ selected.txid }}</span>
+                <a v-if="selected.status === 'paid' && selected.tx_explorer_url" :href="selected.tx_explorer_url" target="_blank" rel="noopener noreferrer" class="link link-primary">
+                  Открыть в обозревателе
+                </a>
+              </div>
               <div class="opacity-60" v-else>—</div>
             </div>
             <div class="grid gap-2">
