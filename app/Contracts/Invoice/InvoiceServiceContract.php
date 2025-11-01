@@ -21,6 +21,13 @@ interface InvoiceServiceContract
      * Пометить инвойс как просроченный, если он ещё активен.
      */
     public function expire(Invoice $invoice): void;
+
+    /**
+     * Найти точный входящий платёж для указанного инвойса в блокчейне.
+     * Совпадение по: сети, валюте, адресу назначения, точной сумме и временному окну [created_at..expires_at].
+     * Возвращает массив данных транзакции или null, если платёж не найден.
+     */
+    public function findExactIncomingPayment(Invoice $invoice): ?array;
 }
 
 
