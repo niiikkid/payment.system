@@ -54,6 +54,10 @@ async function refresh() {
         clearInterval(timer);
         timer = null;
       }
+      if (countdownTimer) {
+        clearInterval(countdownTimer);
+        countdownTimer = null;
+      }
     }
   } catch {}
 }
@@ -85,23 +89,13 @@ const statusText = computed(() => {
   return 'Ожидаем оплату';
 });
 
-function parseMoscowLocalDateTimeToMs(s: string | null): number | null {
+function parseIsoToMs(s: string | null): number | null {
   if (!s) return null;
-  const parts = s.trim().split(' ');
-  if (parts.length !== 2) return null;
-  const [d, t] = parts;
-  const dParts = d.split('-').map(n => parseInt(n, 10));
-  const tParts = t.split(':').map(n => parseInt(n, 10));
-  if (dParts.length !== 3 || tParts.length < 2) return null;
-  const [year, month, day] = dParts;
-  const [hours, minutes] = tParts;
-  const seconds = tParts[2] ?? 0;
-  // Трактуем строку как Московское время (UTC+3) и конвертируем в UTC-миллисекунды
-  const utcMs = Date.UTC(year, (month - 1), day, (hours - 3), minutes, seconds, 0);
-  return Number.isFinite(utcMs) ? utcMs : null;
+  const ms = Date.parse(s);
+  return Number.isFinite(ms) ? ms : null;
 }
 
-const expiresAtMs = computed(() => parseMoscowLocalDateTimeToMs(invoice.value.expires_at));
+const expiresAtMs = computed(() => parseIsoToMs(invoice.value.expires_at));
 const remainingSeconds = ref(0);
 const hh = computed(() => Math.floor(remainingSeconds.value / 3600));
 const mm = computed(() => Math.floor((remainingSeconds.value % 3600) / 60));
@@ -114,6 +108,10 @@ function tickCountdown() {
   }
   const diff = Math.max(0, Math.floor((expiresAtMs.value - Date.now()) / 1000));
   remainingSeconds.value = diff;
+  if (diff === 0 && countdownTimer) {
+    clearInterval(countdownTimer);
+    countdownTimer = null;
+  }
 }
 
 function startCountdown() {
