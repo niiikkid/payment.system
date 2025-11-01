@@ -18,12 +18,6 @@ enum InvoiceStatus: string
     /** Время оплаты вышло, средств не поступило. */
     case EXPIRED = 'expired';
 
-    /** Пришло меньше, чем нужно. */
-    case UNDERPAID = 'underpaid';
-
-    /** Пришло больше, чем нужно. */
-    case OVERPAID = 'overpaid';
-
     /** Отменён вручную или API. */
     case CANCELLED = 'cancelled';
 
@@ -42,8 +36,6 @@ enum InvoiceStatus: string
         return [
             self::PAID->value,
             self::EXPIRED->value,
-            self::UNDERPAID->value,
-            self::OVERPAID->value,
             self::CANCELLED->value,
         ];
     }
