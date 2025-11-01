@@ -52,7 +52,6 @@ function toggleAddress(id: number, nextActive: boolean) {
     <AppSidebarLayout :breadcrumbs="[{ title: 'Главная', href: '/' }, { title: 'Адреса', href: '/addresses' }]">
         <div class="flex items-center justify-between gap-4">
             <h1 class="text-xl font-semibold">Адреса</h1>
-            <Link href="/dashboard" class="btn btn-ghost btn-sm">На дашборд</Link>
         </div>
 
         <div class="mt-6 grid gap-6 lg:grid-cols-[380px_1fr]">

@@ -5,6 +5,8 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\AddressController;
 use App\Http\Controllers\InvoiceController;
+use App\Http\Controllers\CallbackLogController;
+use App\Http\Controllers\Dev\CallbackSandboxController;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
@@ -27,6 +29,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('invoices', [InvoiceController::class, 'store'])->name('invoices.store');
     Route::get('invoices/{invoice}', [InvoiceController::class, 'show'])->name('invoices.show');
     Route::patch('invoices/{invoice}', [InvoiceController::class, 'update'])->name('invoices.update');
+
+    // Callback Logs
+    Route::get('callback-logs', [CallbackLogController::class, 'index'])->name('callback-logs.index');
 });
 
 require __DIR__.'/settings.php';
+
+if (app()->environment(['local', 'development', 'dev'])) {
+    Route::post('/dev/callback-sandbox', CallbackSandboxController::class)->name('dev.callback.sandbox');
+}

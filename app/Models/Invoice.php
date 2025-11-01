@@ -8,11 +8,15 @@ use App\Casts\MoneyAmountCast;
 use App\Enums\Currency;
 use App\Enums\InvoiceStatus;
 use App\Enums\Network;
+use App\Observers\InvoiceObserver;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 
+#[ObservedBy([InvoiceObserver::class])]
 class Invoice extends Model
 {
     use HasFactory;
@@ -55,6 +59,11 @@ class Invoice extends Model
     public function address(): BelongsTo
     {
         return $this->belongsTo(Address::class);
+    }
+
+    public function callbackLogs(): HasMany
+    {
+        return $this->hasMany(InvoiceCallbackLog::class);
     }
 }
 

@@ -157,7 +157,6 @@ function toIso(input: string | null | undefined): string {
       <h1 class="text-xl font-semibold">Инвойсы</h1>
       <div class="flex items-center gap-2">
         <button class="btn btn-primary btn-sm" @click="showCreate = true">Создать инвойс</button>
-        <Link href="/dashboard" class="btn btn-ghost btn-sm">На дашборд</Link>
       </div>
     </div>
 
@@ -312,10 +311,24 @@ function toIso(input: string | null | undefined): string {
 
           <div class="divider my-0"></div>
 
-          <div class="grid gap-3">
-            <div class="text-xs opacity-60">Метаданные</div>
-            <div class="mockup-code">
-              <pre><code>{{ JSON.stringify(selected.metadata || {}, null, 2) }}</code></pre>
+          <div class="grid gap-4 md:grid-cols-1">
+            <div class="grid gap-3">
+              <div class="text-xs opacity-60">Callback URL</div>
+              <div>
+                <template v-if="selected.callback_url">
+                  <div class="flex items-center gap-2">
+                    <span class="badge badge-outline">POST</span>
+                    <span class="break-all font-mono">{{ selected.callback_url }}</span>
+                  </div>
+                </template>
+                <template v-else>—</template>
+              </div>
+            </div>
+            <div class="grid gap-3">
+              <div class="text-xs opacity-60">Метаданные</div>
+              <div class="mockup-code">
+                <pre><code>{{ JSON.stringify(selected.metadata || {}, null, 2) }}</code></pre>
+              </div>
             </div>
           </div>
         </div>

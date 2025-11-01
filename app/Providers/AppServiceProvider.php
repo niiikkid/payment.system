@@ -13,6 +13,8 @@ use App\Services\Blockchain\BlockchainService;
 use App\Services\Money\MoneyService;
 use App\Contracts\Invoice\InvoiceServiceContract;
 use App\Services\Invoice\InvoiceService;
+use App\Contracts\Invoice\InvoiceCallbackServiceContract;
+use App\Services\Invoice\InvoiceCallbackService;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\ServiceProvider;
 
@@ -25,6 +27,7 @@ class AppServiceProvider extends ServiceProvider
     {
         $this->app->bind(AddressServiceContract::class, AddressService::class);
         $this->app->bind(InvoiceServiceContract::class, InvoiceService::class);
+        $this->app->bind(InvoiceCallbackServiceContract::class, InvoiceCallbackService::class);
         $this->app->singleton(MoneyServiceContract::class, MoneyService::class);
         $this->app->singleton(BlockchainServiceContract::class, BlockchainService::class);
         $this->app->singleton(ExplorerServiceContract::class, ExplorerService::class);
