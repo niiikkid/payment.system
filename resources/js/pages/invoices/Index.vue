@@ -116,7 +116,6 @@ async function submitCreate() {
                   <th>Адрес</th>
                   <th>Сумма</th>
                   <th>Валюта</th>
-                  <th>Сеть</th>
                   <th>Статус</th>
                   <th>Создан</th>
                   <th></th>
@@ -132,7 +131,7 @@ async function submitCreate() {
                     <span v-else class="opacity-60">#{{ inv.address_id }}</span>
                   </td>
                   <td>{{ inv.amount }}</td>
-                  <td colspan="2">
+                  <td>
                     <CurrencyNetworkBadge :currency-label="inv.currency_label || inv.currency" :network-label="inv.network_label || inv.network" />
                   </td>
                   <td>

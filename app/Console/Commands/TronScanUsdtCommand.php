@@ -39,12 +39,14 @@ class TronScanUsdtCommand extends Command
         }
         $this->info("Запрос баланса: сеть={$network->value}, валюта={$currency->value}, адрес={$address}");
 
+        $txh = $blockchain->getTransactionInfoByHash($network, $currency, '0d909d4b975c0da67f5cd39ce2337c0f3a7fa4937f3ea09488ec01f3426eeb80');
+        dump($txh);
         $balance = $blockchain->getAddressBalance($network, $currency, $address);
         $this->line('Баланс: ' . $money->format($balance) . ' ' . $currency->value);
         $balance = $blockchain->getAddressBalance($network, Currency::TRX, $address);
         $this->line('Баланс: ' . $money->format($balance) . ' ' . Currency::TRX->value);
-        //$transactions = $blockchain->getIncomingTransactions($network, $currency, $address);
-       // dump($transactions);
+        $transactions = $blockchain->getIncomingTransactions($network, $currency, $address);
+        dump($transactions);
 
         return self::SUCCESS;
     }

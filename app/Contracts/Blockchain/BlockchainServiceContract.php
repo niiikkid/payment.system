@@ -15,6 +15,9 @@ interface BlockchainServiceContract
 
     /** Получить входящие транзакции для адреса (без пагинации) */
     public function getIncomingTransactions(Network $network, Currency $currency, string $address): array;
+
+    /** Получить информацию о транзакции по TX-хэшу */
+    public function getTransactionInfoByHash(Network $network, Currency $currency, string $txid): array;
 }
 
 
