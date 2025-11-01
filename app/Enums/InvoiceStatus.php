@@ -6,12 +6,25 @@ namespace App\Enums;
 
 enum InvoiceStatus: string
 {
+    /** Создан, ждёт оплаты. */
     case PENDING = 'pending';
+
+    /** Транзакция найдена, но подтверждений ещё мало. */
     case PROCESSING = 'processing';
+
+    /** Полностью оплачен, достаточно подтверждений. */
     case PAID = 'paid';
+
+    /** Время оплаты вышло, средств не поступило. */
     case EXPIRED = 'expired';
+
+    /** Пришло меньше, чем нужно. */
     case UNDERPAID = 'underpaid';
+
+    /** Пришло больше, чем нужно. */
     case OVERPAID = 'overpaid';
+
+    /** Отменён вручную или API. */
     case CANCELLED = 'cancelled';
 
     /** Статусы, при которых инвойс считается активным (ожидает оплату/подтверждение). */

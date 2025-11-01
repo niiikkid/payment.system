@@ -23,11 +23,17 @@ interface InvoiceServiceContract
     public function expire(Invoice $invoice): void;
 
     /**
-     * Найти точный входящий платёж для указанного инвойса в блокчейне.
-     * Совпадение по: сети, валюте, адресу назначения, точной сумме и временному окну [created_at..expires_at].
-     * Возвращает массив данных транзакции или null, если платёж не найден.
+     * Найти точный входящий платёж для инвойса и прикрепить его к инвойсу
+     * (txid, amount_received, confirmations) со сменой статуса на PROCESSING.
+     * Возвращает обновлённый инвойс или null, если платёж не найден.
      */
-    public function findExactIncomingPayment(Invoice $invoice): ?array;
+    public function attachExactIncomingPayment(Invoice $invoice): ?Invoice;
+
+    /**
+     * Обновить подтверждения по прикреплённой транзакции и, если их >= минимального порога,
+     * финализировать инвойс как PAID. Возвращает true, если инвойс был финализирован.
+     */
+    public function finalizeIfConfirmed(Invoice $invoice, int $minConfirmations = 10): bool;
 }
 
 

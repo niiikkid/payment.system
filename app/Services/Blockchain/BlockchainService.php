@@ -71,7 +71,7 @@ class BlockchainService implements BlockchainServiceContract
             ->get($url, [
                 'contract_address' => self::TRON_USDT_CONTRACT,
                 'only_confirmed' => true,
-                'limit' => 200,
+                'limit' => 30,
             ]);
 
         if (!$response->successful()) {

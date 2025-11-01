@@ -9,6 +9,8 @@ use App\Contracts\Address\AddressServiceContract;
 use App\Contracts\Money\MoneyServiceContract;
 use App\Contracts\Blockchain\BlockchainServiceContract;
 use App\Jobs\ExpireInvoiceJob;
+use App\Jobs\AttachIncomingPaymentJob;
+use App\Jobs\ConfirmInvoicePaymentJob;
 use App\Enums\Currency;
 use App\Enums\InvoiceStatus;
 use App\Enums\Network;
@@ -48,6 +50,9 @@ class InvoiceService implements InvoiceServiceContract
         // Планируем асинхронную экспирацию ровно через 30 минут
         ExpireInvoiceJob::dispatch($invoice->id)->delay($expiresAt);
 
+        // Запускаем периодический поиск точной входящей транзакции раз в минуту
+        AttachIncomingPaymentJob::dispatch($invoice->id);
+
         return $invoice;
     }
 
@@ -58,19 +63,80 @@ class InvoiceService implements InvoiceServiceContract
     {
         $invoice->refresh();
 
-        if ($invoice->status->isFinal()) {
+        // Просрочка допустима только из статуса PENDING
+        if ($invoice->status !== InvoiceStatus::PENDING) {
             return;
         }
 
-        // Если уже оплачен/финализирован конкурентно, выходим, иначе просрочим
         $invoice->status = InvoiceStatus::EXPIRED;
         $invoice->save();
+    }
+
+    public function attachExactIncomingPayment(Invoice $invoice): ?Invoice
+    {
+        if ($invoice->status->isFinal()) {
+            return $invoice; // уже финализирован
+        }
+
+        $tx = $this->findExactIncomingPayment($invoice);
+        if ($tx === null) {
+            return null;
+        }
+
+        // Обновляем поля инвойса
+        $txid = (string) ($tx['txid'] ?? '');
+        $amountStr = (string) ($tx['amount'] ?? '0');
+        $confirmations = (int) ($tx['confirmations'] ?? 0);
+
+        $invoice->txid = $txid;
+        $invoice->amount_received = $this->money->parse($amountStr, $invoice->currency);
+        $invoice->confirmations = $confirmations;
+        $invoice->status = InvoiceStatus::PROCESSING; // обнаружен точный платёж, ожидаем финализацию
+        $invoice->save();
+
+        return $invoice;
+    }
+
+    /**
+     * Обновить подтверждения по прикреплённой транзакции и, если их достаточно, финализировать инвойс как PAID.
+     */
+    public function finalizeIfConfirmed(Invoice $invoice, int $minConfirmations = 10): bool
+    {
+        $invoice->refresh();
+
+        if ($invoice->status->isFinal()) {
+            return true; // уже финализирован
+        }
+
+        if ($invoice->status !== InvoiceStatus::PROCESSING) {
+            return false; // нет прикреплённой транзакции или неверный статус
+        }
+
+        $txid = (string) ($invoice->txid ?? '');
+        if ($txid === '') {
+            return false;
+        }
+
+        // Получаем актуальные данные по транзакции
+        $info = $this->blockchain->getTransactionInfoByHash($invoice->network, $invoice->currency, $txid);
+        $confirmations = (int) ($info['confirmations'] ?? 0);
+
+        $invoice->confirmations = $confirmations;
+        $invoice->save();
+
+        if ($confirmations >= $minConfirmations) {
+            $invoice->status = InvoiceStatus::PAID;
+            $invoice->save();
+            return true;
+        }
+
+        return false;
     }
 
     /**
      * Найти точный входящий платёж в блокчейне для инвойса в пределах его окна оплаты.
      */
-    public function findExactIncomingPayment(Invoice $invoice): ?array
+    protected function findExactIncomingPayment(Invoice $invoice): ?array
     {
         $invoice->loadMissing('address');
         $address = $invoice->address?->address;
