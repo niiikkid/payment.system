@@ -3,12 +3,15 @@ import { computed, ref } from 'vue';
 
 interface Props {
     uid: string;
+    size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 }
 
 const props = defineProps<Props>();
 
 const tooltipText = ref('Скопировать');
 let resetTimer: number | undefined;
+
+const sizeClass = computed(() => `text-${props.size ?? 'xs'}`);
 
 const shortened = computed(() => {
     const src = (props.uid ?? '').trim();
@@ -43,7 +46,8 @@ function onKeydown(e: KeyboardEvent) {
     <div class="tooltip" :data-tip="tooltipText">
         <button
             type="button"
-            class="btn btn-ghost btn-xs font-mono text-xs"
+            class="btn btn-ghost btn-xs font-mono"
+            :class="sizeClass"
             :title="props.uid"
             @click="copyToClipboard"
             @keydown="onKeydown"

@@ -32,7 +32,6 @@ const formattedNetworkLabel = computed(() => {
         <span :class="currencyClass">{{ props.currencyLabel }}</span>
         <span :class="networkBadgeClass">{{ formattedNetworkLabel }}</span>
     </span>
-
 </template>
 
 
