@@ -32,12 +32,12 @@ class InvoiceResource extends JsonResource
             'tx_explorer_url' => $this->txid ? app(ExplorerServiceContract::class)->getTransactionUrl($this->network, $this->currency, $this->txid) : null,
             'amount_received' => app(MoneyServiceContract::class)->format($this->amount_received),
             'confirmations' => $this->confirmations,
-            'expires_at' => optional($this->expires_at)?->toDateTimeString(),
+            'expires_at' => optional($this->expires_at)?->toISOString(),
             'callback_url' => $this->callback_url,
             'tag' => $this->tag,
             'metadata' => $this->metadata,
-            'created_at' => $this->created_at?->toDateTimeString(),
-            'updated_at' => $this->updated_at?->toDateTimeString(),
+            'created_at' => $this->created_at?->toISOString(),
+            'updated_at' => $this->updated_at?->toISOString(),
         ];
     }
 }

@@ -6,6 +6,7 @@ import axios from 'axios';
 import CurrencyNetworkBadge from '@/components/ui/CurrencyNetworkBadge.vue';
 import AddressCopy from '@/components/ui/AddressCopy.vue';
 import UidCopy from '@/components/ui/UidCopy.vue';
+import DateTimeFormat from '@/components/ui/DateTimeFormat.vue';
 
 type Invoice = {
   id: string
@@ -140,6 +141,14 @@ async function submitCreate() {
   }
 }
 
+function toIso(input: string | null | undefined): string {
+  if (!input) return '';
+  if (typeof input !== 'string') return '';
+  if (input.includes('T')) return input; // уже ISO
+  // Преобразуем 'YYYY-MM-DD HH:mm:ss' -> 'YYYY-MM-DDTHH:mm:ssZ'
+  return `${input.replace(' ', 'T')}Z`;
+}
+
 </script>
 
 <template>
@@ -187,10 +196,12 @@ async function submitCreate() {
                     <span class="badge" :class="{
                       'badge-warning': statuses.active.includes(inv.status),
                       'badge-success': inv.status === 'paid',
-                      'badge-ghost': statuses.final.includes(inv.status) && inv.status !== 'paid',
+                      'badge-error': statuses.final.includes(inv.status) && inv.status !== 'paid',
                     }">{{ inv.status }}</span>
                   </td>
-                  <td>{{ inv.created_at }}</td>
+                  <td>
+                    <DateTimeFormat :value="toIso(inv.created_at)" />
+                  </td>
                   <td class="flex items-center gap-2">
                     <button class="btn btn-sm" @click="openDetails(inv)">Подробнее</button>
                     <Link :href="`/pay/${inv.id}`" target="_blank" rel="noopener" class="btn btn-ghost btn-sm" title="Открыть платёжную страницу">
@@ -258,7 +269,7 @@ async function submitCreate() {
                   <span class="badge" :class="{
                     'badge-warning': statuses.active.includes(selected.status),
                     'badge-success': selected.status === 'paid',
-                    'badge-ghost': statuses.final.includes(selected.status) && selected.status !== 'paid',
+                    'badge-error': statuses.final.includes(selected.status) && selected.status !== 'paid',
                   }">{{ selected.status }}</span>
                 </div>
               </div>
@@ -284,11 +295,18 @@ async function submitCreate() {
             </div>
             <div class="grid gap-2">
               <div class="text-xs opacity-60">Истекает</div>
-              <div>{{ selected.expires_at || '—' }}</div>
+              <div>
+                <template v-if="selected.expires_at">
+                  <DateTimeFormat :value="toIso(selected.expires_at)" />
+                </template>
+                <template v-else>—</template>
+              </div>
             </div>
             <div class="grid gap-2">
               <div class="text-xs opacity-60">Создан</div>
-              <div>{{ selected.created_at }}</div>
+              <div>
+                <DateTimeFormat :value="toIso(selected.created_at)" />
+              </div>
             </div>
           </div>
 
