@@ -5,8 +5,10 @@ import { edit as editProfile } from '@/routes/profile';
 // import { show } from '@/routes/two-factor'; // временно скрыто
 import { edit as editPassword } from '@/routes/user-password';
 import { type NavItem } from '@/types';
-import { Link, usePage } from '@inertiajs/vue3';
-import { computed } from 'vue';
+import { Link, router, usePage } from '@inertiajs/vue3';
+import { computed, ref } from 'vue';
+import ConfirmDialog from '@/components/ui/ConfirmDialog.vue';
+import { logout as logoutRoute } from '@/routes';
 
 const sidebarNavItems: NavItem[] = [
     { title: 'Профиль', href: editProfile() },
@@ -17,6 +19,24 @@ const sidebarNavItems: NavItem[] = [
 
 const page = usePage();
 const currentPath = computed(() => page.url);
+
+const isLogoutDialogOpen = ref(false);
+const isLogoutProcessing = ref(false);
+
+function requestLogout() {
+    isLogoutDialogOpen.value = true;
+}
+
+function confirmLogout() {
+    if (isLogoutProcessing.value) return;
+    isLogoutProcessing.value = true;
+    router.post(logoutRoute().url, {}, {
+        onFinish: () => {
+            isLogoutProcessing.value = false;
+            isLogoutDialogOpen.value = false;
+        },
+    });
+}
 </script>
 
 <template>
@@ -39,6 +59,20 @@ const currentPath = computed(() => page.url);
                         {{ item.title }}
                     </Link>
                 </nav>
+                <div class="divider my-4"></div>
+                <button type="button" class="btn btn-error w-full" @click="requestLogout">
+                    Выйти
+                </button>
+                <ConfirmDialog
+                    v-model="isLogoutDialogOpen"
+                    :loading="isLogoutProcessing"
+                    title="Выйти из аккаунта"
+                    message="Вы действительно хотите выйти?"
+                    confirm-text="Выйти"
+                    cancel-text="Отмена"
+                    :danger="true"
+                    @confirm="confirmLogout"
+                />
             </aside>
 
             <div class="divider my-6 lg:hidden"></div>
