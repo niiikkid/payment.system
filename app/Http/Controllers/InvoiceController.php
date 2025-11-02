@@ -18,6 +18,7 @@ use Inertia\Inertia;
 use Inertia\Response;
 use Endroid\QrCode\QrCode;
 use Endroid\QrCode\Writer\PngWriter;
+use App\Contracts\Invoice\InvoiceCallbackServiceContract;
 
 class InvoiceController extends Controller
 {
@@ -126,6 +127,16 @@ class InvoiceController extends Controller
         $updated = $service->updateStatusManually($invoice, $status, $txid);
 
         return (new InvoiceResource($updated))->resolve();
+    }
+
+    public function sendCallback(Invoice $invoice, InvoiceCallbackServiceContract $callbackService)
+    {
+        // Отправляем колбэк только если указан callback_url (сервис внутри сам проверит)
+        $callbackService->send($invoice, 'manual');
+
+        return response()->json([
+            'success' => true,
+        ]);
     }
 }
 

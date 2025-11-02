@@ -30,8 +30,8 @@ class CallbackSandboxController
         }
 
         $response = [
-            'ok' => $status >= 200 && $status < 300,
-            'status' => $status,
+            'ok' => true,
+            'status' => 200,
             'received_at' => now()->toISOString(),
             'delay_ms' => $delayMs,
             'request' => [

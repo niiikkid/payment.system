@@ -40,6 +40,9 @@ const selected: any = ref<Invoice | null>(null);
 const showModal = ref(false);
 const showCreate = ref(false);
 const showEdit = ref(false);
+const sendLoading = ref(false);
+const sendError = ref<string | null>(null);
+const sendSuccess = ref(false);
 
 const editPayload = ref<{ status: string; txid: string | null }>({ status: '', txid: null });
 const editLoading = ref(false);
@@ -94,6 +97,22 @@ async function submitEdit() {
     editError.value = e?.response?.data?.message || e?.response?.data?.errors?.txid?.[0] || e?.message || 'Ошибка при обновлении инвойса';
   } finally {
     editLoading.value = false;
+  }
+}
+
+async function sendCallback() {
+  if (!selected.value) return;
+  if (!selected.value.callback_url) return;
+  sendError.value = null;
+  sendSuccess.value = false;
+  sendLoading.value = true;
+  try {
+    await axios.post(`/invoices/${selected.value.id}/send-callback`);
+    sendSuccess.value = true;
+  } catch (e: any) {
+    sendError.value = e?.response?.data?.message || e?.message || 'Ошибка при отправке колбэка';
+  } finally {
+    sendLoading.value = false;
   }
 }
 
@@ -324,6 +343,12 @@ function toIso(input: string | null | undefined): string {
                 <template v-else>—</template>
               </div>
             </div>
+            <div v-if="sendError" class="alert alert-error">
+              <span>{{ sendError }}</span>
+            </div>
+            <div v-if="sendSuccess" class="alert alert-success">
+              <span>Колбэк отправлен</span>
+            </div>
             <div class="grid gap-3">
               <div class="text-xs opacity-60">Метаданные</div>
               <div class="mockup-code">
@@ -335,6 +360,13 @@ function toIso(input: string | null | undefined): string {
 
         <div class="modal-action">
           <button class="btn" @click="openEdit">Редактировать</button>
+          <button
+            v-if="selected?.callback_url"
+            class="btn btn-primary"
+            :class="{ loading: sendLoading }"
+            :disabled="sendLoading"
+            @click="sendCallback"
+          >Отправить колбэк</button>
           <button class="btn btn-ghost" @click="closeDetails">Закрыть</button>
         </div>
       </div>
