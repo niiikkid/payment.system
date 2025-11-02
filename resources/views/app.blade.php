@@ -1,8 +1,21 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}"  data-theme="light">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}"  data-theme="dark">
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <script>
+            (function() {
+                try {
+                    var saved = localStorage.getItem('theme');
+                    if (saved) {
+                        document.documentElement.setAttribute('data-theme', saved);
+                    }
+                } catch (e) {
+                    // silent
+                }
+            })();
+        </script>
 
         {{-- Inline style to set the HTML background color based on our theme in app.css --}}
         <style>

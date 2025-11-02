@@ -2,19 +2,21 @@
 import { toUrl, urlIsActive } from '@/lib/utils';
 import { edit as editAppearance } from '@/routes/appearance';
 import { edit as editProfile } from '@/routes/profile';
-import { show } from '@/routes/two-factor';
+// import { show } from '@/routes/two-factor'; // временно скрыто
 import { edit as editPassword } from '@/routes/user-password';
 import { type NavItem } from '@/types';
-import { Link } from '@inertiajs/vue3';
+import { Link, usePage } from '@inertiajs/vue3';
+import { computed } from 'vue';
 
 const sidebarNavItems: NavItem[] = [
     { title: 'Профиль', href: editProfile() },
     { title: 'Пароль', href: editPassword() },
-    { title: 'Двухфакторная защита', href: show() },
+    // { title: 'Двухфакторная защита', href: show() }, // временно скрыто
     { title: 'Внешний вид', href: editAppearance() },
 ];
 
-const currentPath = typeof window !== undefined ? window.location.pathname : '';
+const page = usePage();
+const currentPath = computed(() => page.url);
 </script>
 
 <template>
@@ -32,7 +34,7 @@ const currentPath = typeof window !== undefined ? window.location.pathname : '';
                         :key="toUrl(item.href)"
                         :href="item.href"
                         class="btn btn-ghost justify-start w-full"
-                        :class="{ 'bg-base-200': urlIsActive(item.href, currentPath) }"
+                        :class="urlIsActive(item.href, currentPath) ? 'btn-active' : ''"
                     >
                         {{ item.title }}
                     </Link>

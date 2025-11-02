@@ -6,5 +6,5 @@
 @source "../../storage/framework/views/*.php";
 
 @plugin "daisyui" {
-    themes: dim, light;
+    themes: dim, light, dark;
 }
