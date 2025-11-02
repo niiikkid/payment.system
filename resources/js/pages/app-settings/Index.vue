@@ -33,7 +33,7 @@ const submit = () => {
 };
 
 const breadcrumbs = computed(() => [
-    { title: 'Панель управления', href: '/dashboard' },
+    { title: 'Главная', href: '/dashboard' },
     { title: 'App Settings' },
 ]);
 </script>
