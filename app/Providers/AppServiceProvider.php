@@ -15,6 +15,8 @@ use App\Contracts\Invoice\InvoiceServiceContract;
 use App\Services\Invoice\InvoiceService;
 use App\Contracts\Invoice\InvoiceCallbackServiceContract;
 use App\Services\Invoice\InvoiceCallbackService;
+use App\Contracts\AppSettings\AppSettingsServiceContract;
+use App\Services\AppSettings\AppSettingsService;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\ServiceProvider;
 
@@ -31,6 +33,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->singleton(MoneyServiceContract::class, MoneyService::class);
         $this->app->singleton(BlockchainServiceContract::class, BlockchainService::class);
         $this->app->singleton(ExplorerServiceContract::class, ExplorerService::class);
+        $this->app->singleton(AppSettingsServiceContract::class, AppSettingsService::class);
     }
 
     /**

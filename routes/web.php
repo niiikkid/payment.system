@@ -32,6 +32,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Callback Logs
     Route::get('callback-logs', [CallbackLogController::class, 'index'])->name('callback-logs.index');
+
+    // App Settings (глобальные настройки проекта)
+    Route::get('app-settings', [\App\Http\Controllers\AppSettingsController::class, 'index'])->name('app-settings.index');
+    Route::put('app-settings', [\App\Http\Controllers\AppSettingsController::class, 'update'])->name('app-settings.update');
 });
 
 require __DIR__.'/settings.php';

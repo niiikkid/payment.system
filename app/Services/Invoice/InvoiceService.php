@@ -7,7 +7,9 @@ namespace App\Services\Invoice;
 use App\Contracts\Invoice\InvoiceServiceContract;
 use App\Contracts\Address\AddressServiceContract;
 use App\Contracts\Money\MoneyServiceContract;
+use App\Contracts\AppSettings\AppSettingsServiceContract;
 use App\Contracts\Blockchain\BlockchainServiceContract;
+use App\Exceptions\Invoice\InvoiceAmountOutOfRangeException;
 use App\Jobs\ExpireInvoiceJob;
 use App\Jobs\AttachIncomingPaymentJob;
 use App\Jobs\ConfirmInvoicePaymentJob;
@@ -24,11 +26,26 @@ class InvoiceService implements InvoiceServiceContract
         private readonly AddressServiceContract $addresses,
         private readonly MoneyServiceContract $money,
         private readonly BlockchainServiceContract $blockchain,
+        private readonly AppSettingsServiceContract $appSettings,
     ) {
     }
 
     public function create(Currency $currency, Network $network, MoneyAmount $amount, ?string $externalInvoiceId = null, ?string $callbackUrl = null, ?string $tag = null, array $metadata = []): Invoice
     {
+        // Проверка суммы по глобальным App Settings
+        $settings = $this->appSettings->get($currency);
+        if ($settings !== null) {
+            $min = $this->money->fromMinor($settings->min_invoice_amount_minor, $currency);
+            $max = $this->money->fromMinor($settings->max_invoice_amount_minor, $currency);
+
+            if ($this->money->compare($amount, $min) < 0) {
+                throw new InvoiceAmountOutOfRangeException('Сумма ниже минимально допустимой.');
+            }
+            if ($this->money->compare($amount, $max) > 0) {
+                throw new InvoiceAmountOutOfRangeException('Сумма выше максимально допустимой.');
+            }
+        }
+
         $address = $this->addresses->pickForPayment($currency, $network, $amount);
         $amountMinor = $this->money->toMinor($amount);
 
