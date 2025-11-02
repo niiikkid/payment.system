@@ -6,7 +6,9 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\AddressController;
 use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\CallbackLogController;
+use App\Http\Controllers\ApiController;
 use App\Http\Controllers\Dev\CallbackSandboxController;
+use Inertia\Inertia;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
@@ -37,6 +39,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // App Settings (глобальные настройки проекта)
     Route::get('app-settings', [\App\Http\Controllers\AppSettingsController::class, 'index'])->name('app-settings.index');
     Route::put('app-settings', [\App\Http\Controllers\AppSettingsController::class, 'update'])->name('app-settings.update');
+
+    // API Docs & Playground (не в настройках)
+    Route::get('api', ApiController::class)->name('api.docs');
 });
 
 require __DIR__.'/settings.php';

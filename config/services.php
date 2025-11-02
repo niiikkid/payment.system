@@ -40,4 +40,9 @@ return [
         'api_key' => env('TRONGRID_API_KEY'),
     ],
 
+    // Публичный API для мерчантов
+    'public_api' => [
+        'key' => env('PUBLIC_API_KEY', ''),
+    ],
+
 ];
