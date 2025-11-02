@@ -22,6 +22,7 @@ class InvoiceResource extends JsonResource
             'external_invoice_id' => $this->external_invoice_id,
             'address_id' => $this->address_id,
             'address' => $this->whenLoaded('address', fn () => $this->address?->address),
+            'payment_url' => route('invoices.public', $this->resource),
             'amount' => app(MoneyServiceContract::class)->format($this->amount),
             'currency' => $this->currency->value,
             'currency_label' => strtoupper($this->currency->value),
