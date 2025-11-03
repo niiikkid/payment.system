@@ -17,7 +17,8 @@ use App\Exceptions\Blockchain\TokenContractNotFoundException;
 
 class BlockchainService implements BlockchainServiceContract
 {
-    private const TRON_USDT_CONTRACT = 'TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t';
+    // Все URL/контракты берутся из конфигурации services.trongrid.* с
+    // автопереключением Mainnet/Nile через ENV (см. config/services.php)
 
     public function getTransactionInfoByHash(Network $network, Currency $currency, string $txid): array
     {
@@ -29,11 +30,7 @@ class BlockchainService implements BlockchainServiceContract
             return $this->getTrc20TransactionByHash($txid);
         }
 
-        if ($currency === Currency::TRX) {
-            return $this->getTrxTransactionByHash($txid);
-        }
-
-        throw new UnsupportedCurrencyException('Currency is not supported.');
+        throw new UnsupportedCurrencyException('Only USDT (TRC20) is supported for this operation.');
     }
 
     public function getAddressBalance(Network $network, Currency $currency, string $address): MoneyAmount
@@ -47,12 +44,8 @@ class BlockchainService implements BlockchainServiceContract
             $minor = $this->getTrc20BalanceMinorByContract($address);
             return $money->fromMinor($minor, Currency::USDT);
         }
-        if ($currency === Currency::TRX) {
-            $minor = $this->getTrxBalanceMinor($address);
-            return $money->fromMinor($minor, Currency::TRX);
-        }
 
-        throw new UnsupportedCurrencyException('Currency is not supported.');
+        throw new UnsupportedCurrencyException('Only USDT (TRC20) is supported for this operation.');
     }
 
     public function getIncomingTransactions(Network $network, Currency $currency, string $address): array
@@ -64,12 +57,12 @@ class BlockchainService implements BlockchainServiceContract
             throw new UnsupportedCurrencyException('Only USDT (TRC20) is supported for this operation.');
         }
 
-        $url = rtrim($this->getBaseUrl(), '/') . "/v1/accounts/{$address}/transactions/trc20";
+        $url = rtrim($this->getApiBaseUrl(), '/') . "/v1/accounts/{$address}/transactions/trc20";
 
         $response = Http::withHeaders($this->buildHeaders())
             ->acceptJson()
             ->get($url, [
-                'contract_address' => self::TRON_USDT_CONTRACT,
+                'contract_address' => $this->getUsdtContractAddress(),
                 'only_confirmed' => true,
                 'limit' => 30,
             ]);
@@ -113,15 +106,15 @@ class BlockchainService implements BlockchainServiceContract
 
     private function getTrc20TransactionByHash(string $txid): array
     {
-        $base = rtrim($this->getBaseUrl(), '/');
-        $eventsUrl = $base . "/v1/transactions/{$txid}/events";
-        $txUrl = $base . "/v1/transactions/{$txid}";
+        $api = rtrim($this->getApiBaseUrl(), '/');
+        $eventsUrl = $api . "/v1/transactions/{$txid}/events";
+        $txUrl = $api . "/v1/transactions/{$txid}";
 
         $eventsResponse = Http::withHeaders($this->buildHeaders())
             ->acceptJson()
             ->get($eventsUrl, [
                 'only_confirmed' => true,
-                'contract_address' => self::TRON_USDT_CONTRACT,
+                'contract_address' => $this->getUsdtContractAddress(),
                 'limit' => 50,
             ]);
 
@@ -142,7 +135,7 @@ class BlockchainService implements BlockchainServiceContract
             }
             $name = (string) ($event['event_name'] ?? '');
             $contractAddr = (string) ($event['contract_address'] ?? '');
-            if (strcasecmp($name, 'Transfer') === 0 && strcasecmp($contractAddr, self::TRON_USDT_CONTRACT) === 0) {
+            if (strcasecmp($name, 'Transfer') === 0 && strcasecmp($contractAddr, $this->getUsdtContractAddress()) === 0) {
                 $transferEvent = $event;
                 break;
             }
@@ -177,71 +170,12 @@ class BlockchainService implements BlockchainServiceContract
         ];
     }
 
-    private function getTrxTransactionByHash(string $txid): array
-    {
-        $base = rtrim($this->getBaseUrl(), '/');
-        $txUrl = $base . "/v1/transactions/{$txid}";
-
-        $txResponse = Http::withHeaders($this->buildHeaders())
-            ->acceptJson()
-            ->get($txUrl);
-
-        $from = '';
-        $to = '';
-        $amountMinor = '0';
-        $timestamp = 0;
-        $blockNumber = 0;
-
-        if ($txResponse->successful()) {
-            $payload = $txResponse->json();
-            if (!is_array($payload)) {
-                throw new ApiRequestException('Malformed TronGrid transaction response: not an object');
-            }
-            $txData = $payload['data'][0] ?? null;
-            if (is_array($txData)) {
-                $timestamp = (int) ($txData['block_timestamp'] ?? 0);
-                $blockNumber = (int) ($txData['block'] ?? ($txData['blockNumber'] ?? ($txData['block_number'] ?? 0)));
-                $contractList = $txData['raw_data']['contract'] ?? [];
-                $firstContract = is_array($contractList) ? ($contractList[0] ?? []) : [];
-                $type = (string) ($firstContract['type'] ?? '');
-                $param = is_array($firstContract) ? ($firstContract['parameter']['value'] ?? []) : [];
-                if (strcasecmp($type, 'TransferContract') === 0 && is_array($param)) {
-                    $from = (string) ($param['owner_address'] ?? '');
-                    $to = (string) ($param['to_address'] ?? '');
-                    $amountMinor = (string) ($param['amount'] ?? '0'); // in SUN
-                }
-            }
-        } elseif ($txResponse->status() !== 404) {
-            throw ApiRequestException::forHttpStatus($txResponse->status(), $txUrl, $txResponse->body());
-        }
-
-        // Fallback: если не удалось получить номер блока из TronGrid
-        if ($blockNumber <= 0) {
-            $blockNumber = $this->getTransactionBlockNumber($txid);
-        }
-
-        $currentBlock = $this->getCurrentBlockNumber();
-
-        $confirmations = $blockNumber > 0 && $currentBlock > 0 ? max(0, $currentBlock - $blockNumber) : 0;
-
-        $money = app(MoneyServiceContract::class);
-
-        return [
-            'txid' => $txid,
-            'from' => $from,
-            'to' => $to,
-            'amount' => $money->format($money->fromMinor($amountMinor, Currency::TRX)),
-            'timestamp' => $timestamp,
-            'block' => $blockNumber,
-            'current_block' => $currentBlock,
-            'confirmations' => $confirmations,
-        ];
-    }
+    
 
     private function getTransactionBlockNumber(string $txid): int
     {
-        $base = rtrim($this->getBaseUrl(), '/');
-        $txUrl = $base . "/v1/transactions/{$txid}";
+        $api = rtrim($this->getApiBaseUrl(), '/');
+        $txUrl = $api . "/v1/transactions/{$txid}";
         $resp = Http::withHeaders($this->buildHeaders())
             ->acceptJson()
             ->get($txUrl);
@@ -258,6 +192,7 @@ class BlockchainService implements BlockchainServiceContract
         }
 
         // Fallback: Tron wallet RPC
+        $base = rtrim($this->getBaseUrl(), '/');
         $walletUrl = $base . '/wallet/gettransactioninfobyid';
         $walletResp = Http::withHeaders($this->buildHeaders())
             ->acceptJson()
@@ -293,51 +228,12 @@ class BlockchainService implements BlockchainServiceContract
 
     private function getTrc20BalanceMinorByContract(string $address): string
     {
-        $url = 'https://apilist.tronscan.org/api/account';
-        $response = Http::acceptJson()->get($url, [
-            'address' => $address,
-            'includeToken' => true,
-        ]);
-        if (!$response->successful()) {
-            throw ApiRequestException::forHttpStatus($response->status(), $url, $response->body());
-        }
+        $api = rtrim($this->getApiBaseUrl(), '/');
+        $url = $api . "/v1/accounts/{$address}";
 
-        $payload = $response->json();
-        if (!is_array($payload)) {
-            throw new ApiRequestException('Malformed Tronscan response: not an object');
-        }
-
-        $tokens = $payload['trc20token_balances'] ?? [];
-        if (!is_array($tokens)) {
-            throw new ApiRequestException('Malformed Tronscan response: trc20token_balances is not an array');
-        }
-
-        foreach ($tokens as $token) {
-            if (!is_array($token)) {
-                continue;
-            }
-            $name = (string) ($token['tokenName'] ?? '');
-            $abbr = (string) ($token['tokenAbbr'] ?? '');
-            if (strcasecmp($name, 'Tether USD') === 0 || strcasecmp($abbr, 'USDT') === 0) {
-                $raw = $token['balance'] ?? '0'; // minor units
-                return is_string($raw) ? $raw : (string) $raw;
-            }
-        }
-
-        throw TokenContractNotFoundException::forAddress($address, self::TRON_USDT_CONTRACT);
-    }
-
-    private function getTrxBalanceMinor(string $address): string
-    {
-        // Tron wallet RPC: returns balance in SUN (1 TRX = 1_000_000 SUN)
-        $url = rtrim($this->getBaseUrl(), '/') . '/wallet/getaccount';
         $response = Http::withHeaders($this->buildHeaders())
             ->acceptJson()
-            ->asJson()
-            ->post($url, [
-                'address' => $address,
-                'visible' => true,
-            ]);
+            ->get($url);
 
         if (!$response->successful()) {
             throw ApiRequestException::forHttpStatus($response->status(), $url, $response->body());
@@ -345,11 +241,35 @@ class BlockchainService implements BlockchainServiceContract
 
         $payload = $response->json();
         if (!is_array($payload)) {
-            throw new ApiRequestException('Malformed Tron wallet response: not an object');
+            throw new ApiRequestException('Malformed TronGrid account response: not an object');
         }
-        $balance = $payload['balance'] ?? 0; // in SUN
-        return is_string($balance) ? $balance : (string) $balance;
+
+        $data = $payload['data'][0] ?? null;
+        if (!is_array($data)) {
+            throw new TokenContractNotFoundException('Account data not found.');
+        }
+
+        $trc20 = $data['trc20'] ?? [];
+        if (!is_array($trc20)) {
+            throw new ApiRequestException('Malformed TronGrid account response: trc20 is not an array');
+        }
+
+        $configuredContract = strtolower(trim($this->getUsdtContractAddress()));
+        foreach ($trc20 as $entry) {
+            if (!is_array($entry)) {
+                continue;
+            }
+            foreach ($entry as $contract => $balance) {
+                if ($configuredContract !== '' && strcasecmp(strtolower((string) $contract), $configuredContract) === 0) {
+                    return is_string($balance) ? $balance : (string) $balance;
+                }
+            }
+        }
+
+        throw TokenContractNotFoundException::forAddress($address, $this->getUsdtContractAddress());
     }
+
+    
 
     private function buildHeaders(): array
     {
@@ -375,6 +295,37 @@ class BlockchainService implements BlockchainServiceContract
             }
         }
         return $base;
+    }
+
+    private function getApiBaseUrl(): string
+    {
+        $base = $this->getBaseUrl();
+        $host = parse_url($base, PHP_URL_HOST) ?: '';
+        $scheme = parse_url($base, PHP_URL_SCHEME) ?: 'https';
+
+        // Если это Nile — используем основной хост nile.trongrid.io для /v1
+        if (str_contains($host, 'nile.trongrid.io')) {
+            return 'https://nile.trongrid.io';
+        }
+
+        // Если уже api.* — используем как есть
+        if ($host !== '' && str_starts_with($host, 'api.')) {
+            return $scheme . '://' . $host;
+        }
+
+        // Для основного домена — api.trongrid.io
+        if (str_ends_with($host, 'trongrid.io')) {
+            return 'https://api.trongrid.io';
+        }
+
+        // Фолбек
+        return $base;
+    }
+
+    private function getUsdtContractAddress(): string
+    {
+        $address = (string) (config('services.trongrid.usdt_contract') ?? 'TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t');
+        return trim($address);
     }
 }
 

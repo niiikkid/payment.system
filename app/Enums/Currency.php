@@ -7,7 +7,7 @@ namespace App\Enums;
 enum Currency: string
 {
     case USDT = 'USDT';
-    case TRX = 'TRX';
+    #case TRX = 'TRX';
 
     /** Доступные сети для данной валюты */
     public function availableNetworks(): array

@@ -1,5 +1,8 @@
 <?php
 
+$trongridNetwork = env('TRONGRID_NETWORK', env('APP_ENV', 'local') === 'production' ? 'mainnet' : 'nile');
+$isMainnet = strtolower((string) $trongridNetwork) === 'mainnet';
+
 return [
 
     /*
@@ -36,8 +39,20 @@ return [
     ],
 
     'trongrid' => [
-        'base_url' => env('TRONGRID_BASE_URL', 'https://api.trongrid.io'),
+        // Автовыбор сети: через TRONGRID_NETWORK=mainnet|nile, иначе по APP_ENV
+        // Можно переопределить конкретными переменными TRONGRID_BASE_URL/USDT_CONTRACT
+        'base_url' => env(
+            'TRONGRID_BASE_URL',
+            $isMainnet ? 'https://api.trongrid.io' : env('TRONGRID_TESTNET_BASE_URL', 'https://api.nile.trongrid.io')
+        ),
+
         'api_key' => env('TRONGRID_API_KEY'),
+
+        // Контракт USDT: для mainnet дефолт стандартный; для nile — из TRONGRID_TESTNET_USDT_CONTRACT
+        'usdt_contract' => env(
+            'TRONGRID_USDT_CONTRACT',
+            $isMainnet ? 'TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t' : env('TRONGRID_TESTNET_USDT_CONTRACT', '')
+        ),
     ],
 
     // Публичный API для мерчантов

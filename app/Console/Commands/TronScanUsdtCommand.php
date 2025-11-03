@@ -42,8 +42,6 @@ class TronScanUsdtCommand extends Command
         $this->info("Запрос баланса: сеть={$network->value}, валюта={$currency->value}, адрес={$address}");
 
 
-        app(InvoiceServiceContract::class)->confirmPaymentIfExists(Invoice::find('01k8ydjj0sa110eynbx3h7rvta'));
-        dd('stop');
 
         $balance = $blockchain->getAddressBalance($network, $currency, $address);
         $this->line('Баланс: ' . $money->format($balance) . ' ' . $currency->value);
