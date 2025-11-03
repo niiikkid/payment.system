@@ -8,13 +8,13 @@ final class NetworkCurrency
 {
     /** @var array<string, array<int, Currency>> */
     private const NETWORK_TO_CURRENCIES = [
-        Network::TRON->value => [Currency::USDT, Currency::TRX],
+        Network::TRON->value => [Currency::USDT/*, Currency::TRX*/],
     ];
 
     /** @var array<string, array<int, Network>> */
     private const CURRENCY_TO_NETWORKS = [
         Currency::USDT->value => [Network::TRON],
-        Currency::TRX->value => [Network::TRON],
+        /*Currency::TRX->value => [Network::TRON],*/
     ];
 
     /**

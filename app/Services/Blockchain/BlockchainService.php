@@ -170,7 +170,7 @@ class BlockchainService implements BlockchainServiceContract
         ];
     }
 
-    
+
 
     private function getTransactionBlockNumber(string $txid): int
     {
@@ -266,10 +266,11 @@ class BlockchainService implements BlockchainServiceContract
             }
         }
 
-        throw TokenContractNotFoundException::forAddress($address, $this->getUsdtContractAddress());
+        // Если по адресу нет записей по нужному контракту — считаем баланс 0
+        return '0';
     }
 
-    
+
 
     private function buildHeaders(): array
     {
