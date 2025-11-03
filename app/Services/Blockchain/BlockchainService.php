@@ -294,6 +294,11 @@ class BlockchainService implements BlockchainServiceContract
                 $base = rtrim(substr($trimmed, 0, -3), '/');
             }
         }
+        // Нормализация для Nile: RPC доступен на nile.trongrid.io
+        $host = parse_url($base, PHP_URL_HOST) ?: '';
+        if ($host !== '' && str_contains($host, 'nile.trongrid.io')) {
+            return 'https://nile.trongrid.io';
+        }
         return $base;
     }
 
