@@ -14,7 +14,7 @@ class ExplorerService implements ExplorerServiceContract
     {
         // В дальнейшем расширим маппинги по сетям/валютам.
         return match (true) {
-            $network === Network::TRON && $currency === Currency::USDT => "https://tronscan.org/#/transaction/{$txid}",
+            $network === Network::TRON && $currency === Currency::USDT => config('services.tronscan.base_url')."/#/transaction/{$txid}",
             default => null,
         };
     }

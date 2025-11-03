@@ -54,6 +54,12 @@ return [
             $isMainnet ? 'TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t' : env('TRONGRID_TESTNET_USDT_CONTRACT', '')
         ),
     ],
+    'tronscan' => [
+        'base_url' => env(
+            'BASE_URL',
+            $isMainnet ? 'https://tronscan.org' : env('TRONSCAN_TESTNET_BASE_URL', 'https://nile.tronscan.org')
+        ),
+    ],
 
     // Публичный API для мерчантов
     'public_api' => [
