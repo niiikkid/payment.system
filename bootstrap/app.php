@@ -16,6 +16,8 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
+        // Доверяем прокси (например, Cloudflare/Nginx), чтобы корректно определялась схема HTTPS
+        $middleware->trustProxies(at: '*');
         $middleware->encryptCookies(except: ['appearance', 'sidebar_state']);
 
         // Отключаем CSRF для dev callback sandbox
