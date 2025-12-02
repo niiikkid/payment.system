@@ -3,6 +3,9 @@ import AppSidebarLayout from '@/layouts/app/AppSidebarLayout.vue';
 import { useForm, router } from '@inertiajs/vue3';
 import { computed } from 'vue';
 import type { BreadcrumbItem } from '@/types';
+import FormControl from '@/components/form/FormControl.vue';
+import Label from '@/components/form/Label.vue';
+import Input from '@/components/form/Input.vue';
 
 interface SettingItem {
     id?: number;
@@ -49,19 +52,27 @@ const breadcrumbs = computed<BreadcrumbItem[]>(() => [
                             <h2 class="card-title">{{ item.currency }}</h2>
                         </div>
 
-                        <div class="form-control">
-                            <label class="label" :for="`min-${item.currency}`">
-                                <span class="label-text">Минимальная сумма ({{ item.currency }})</span>
-                            </label>
-                            <input :id="`min-${item.currency}`" type="number" step="0.000001" min="0" class="input input-bordered" v-model.number="form.settings[idx].min_invoice_amount" />
-                        </div>
+                        <FormControl>
+                            <Label :for="`min-${item.currency}`">Минимальная сумма ({{ item.currency }})</Label>
+                            <Input
+                                :id="`min-${item.currency}`"
+                                v-model="form.settings[idx].min_invoice_amount"
+                                type="number"
+                                step="0.000001"
+                                min="0"
+                            />
+                        </FormControl>
 
-                        <div class="form-control mt-4">
-                            <label class="label" :for="`max-${item.currency}`">
-                                <span class="label-text">Максимальная сумма ({{ item.currency }})</span>
-                            </label>
-                            <input :id="`max-${item.currency}`" type="number" step="0.000001" min="0" class="input input-bordered" v-model.number="form.settings[idx].max_invoice_amount" />
-                        </div>
+                        <FormControl class="mt-4">
+                            <Label :for="`max-${item.currency}`">Максимальная сумма ({{ item.currency }})</Label>
+                            <Input
+                                :id="`max-${item.currency}`"
+                                v-model="form.settings[idx].max_invoice_amount"
+                                type="number"
+                                step="0.000001"
+                                min="0"
+                            />
+                        </FormControl>
                     </div>
                 </div>
             </div>

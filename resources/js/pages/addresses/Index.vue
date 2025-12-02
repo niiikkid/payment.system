@@ -99,7 +99,7 @@ function toggleAddress(id: number, nextActive: boolean) {
                 <div class="card-body">
                     <h2 class="card-title">Список адресов</h2>
                     <div class="overflow-x-auto">
-                        <table class="table w-full">
+                        <table class="table table-sm w-full">
                             <thead>
                                 <tr>
                                     <th>ID</th>
