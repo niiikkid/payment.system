@@ -5,6 +5,7 @@ import AddressCopy from '@/components/ui/AddressCopy.vue'
 import UidCopy from '@/components/ui/UidCopy.vue'
 import DateTimeFormat from '@/components/ui/DateTimeFormat.vue'
 import Alert from '@/components/ui/Alert.vue'
+import TxidCopy from '@/components/ui/TxidCopy.vue';
 
 type Invoice = {
     id: string
@@ -82,7 +83,7 @@ function toIso(input: string | null | undefined): string {
     >
         <template v-if="invoice">
             <div class="grid gap-4">
-                <div class="grid gap-3 grid-cols-1">
+                <div class="grid gap-3 grid-cols-4">
                     <div class="card bg-base-200 shadow-sm">
                         <div class="card-body p-4">
                             <div class="text-xs opacity-60">ID</div>
@@ -103,19 +104,16 @@ function toIso(input: string | null | undefined): string {
                     <div class="card bg-base-200 shadow-sm">
                         <div class="card-body p-4">
                             <div class="text-xs opacity-60">Сумма</div>
-                            <div class="font-mono">{{ invoice.amount }}</div>
+                            <div class="flex items-center gap-2">
+                                <div class="font-mono">{{ invoice.amount }}</div>
+                                <CurrencyNetworkBadge
+                                    :currency-label="invoice.currency_label || invoice.currency"
+                                    :network-label="invoice.network_label || invoice.network"
+                                />
+                            </div>
                         </div>
                     </div>
                     <div class="card bg-base-200 shadow-sm">
-                        <div class="card-body p-4">
-                            <div class="text-xs opacity-60">Валюта / Сеть</div>
-                            <CurrencyNetworkBadge
-                                :currency-label="invoice.currency_label || invoice.currency"
-                                :network-label="invoice.network_label || invoice.network"
-                            />
-                        </div>
-                    </div>
-                    <div class="card bg-base-200 shadow-sm md:col-span-2">
                         <div class="card-body p-4">
                             <div class="text-xs opacity-60">Статус</div>
                             <div>
@@ -138,7 +136,9 @@ function toIso(input: string | null | undefined): string {
                     <div class="grid gap-2">
                         <div class="text-xs opacity-60">TXID</div>
                         <div class="flex items-center gap-2" v-if="invoice.txid">
-                            <span class="font-mono break-all">{{ invoice.txid }}</span>
+                            <span class="font-mono break-all">
+                                <TxidCopy :txid="invoice.txid"/>
+                            </span>
                             <a
                                 v-if="invoice.status === 'paid' && invoice.tx_explorer_url"
                                 :href="invoice.tx_explorer_url"
@@ -146,7 +146,9 @@ function toIso(input: string | null | undefined): string {
                                 rel="noopener noreferrer"
                                 class="link link-primary"
                             >
-                                Открыть в обозревателе
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 0 0 3 8.25v10.5A2.25 2.25 0 0 0 5.25 21h10.5A2.25 2.25 0 0 0 18 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
+                                </svg>
                             </a>
                         </div>
                         <div class="opacity-60" v-else>—</div>
@@ -187,8 +189,6 @@ function toIso(input: string | null | undefined): string {
                             <template v-else>—</template>
                         </div>
                     </div>
-                    <Alert v-if="sendError" type="error" :message="sendError" />
-                    <Alert v-if="sendSuccess" type="success" message="Колбэк отправлен" />
                     <div class="grid gap-3">
                         <div class="text-xs opacity-60">Метаданные</div>
                         <div class="mockup-code">
@@ -196,6 +196,8 @@ function toIso(input: string | null | undefined): string {
                         </div>
                     </div>
                 </div>
+                <Alert v-if="sendError" type="error" :message="sendError" />
+                <Alert v-if="sendSuccess" type="success" message="Колбэк отправлен" />
             </div>
         </template>
 
