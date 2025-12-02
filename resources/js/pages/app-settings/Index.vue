@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import AppSidebarLayout from '@/layouts/app/AppSidebarLayout.vue';
+import AppLayout from '@/layouts/AppLayout.vue';
 import { useForm, router } from '@inertiajs/vue3';
 import { computed } from 'vue';
 import type { BreadcrumbItem } from '@/types';
@@ -43,7 +43,7 @@ const breadcrumbs = computed<BreadcrumbItem[]>(() => [
 </script>
 
 <template>
-    <AppSidebarLayout :breadcrumbs="breadcrumbs">
+    <AppLayout :breadcrumbs="breadcrumbs">
         <form class="space-y-6" @submit.prevent="submit">
             <div class="grid grid-cols-1 gap-6 lg:grid-cols-2 xl:grid-cols-3">
                 <div v-for="(item, idx) in form.settings" :key="item.currency" class="card bg-base-100 shadow">
@@ -83,7 +83,7 @@ const breadcrumbs = computed<BreadcrumbItem[]>(() => [
                 </button>
             </div>
         </form>
-    </AppSidebarLayout>
+    </AppLayout>
 
 </template>
 

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { dashboard } from '@/routes';
 import { type BreadcrumbItem } from '@/types';
-import AppSidebarLayout from '@/layouts/app/AppSidebarLayout.vue';
+import AppLayout from '@/layouts/AppLayout.vue';
 
 const props = defineProps<{
     stats: {
@@ -23,7 +23,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 </script>
 
 <template>
-    <AppSidebarLayout :breadcrumbs="breadcrumbs">
+    <AppLayout :breadcrumbs="breadcrumbs">
         <div
             class="mt-6 flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl bg-base-200"
         >
@@ -47,5 +47,5 @@ const breadcrumbs: BreadcrumbItem[] = [
                 </div>
             </div>
         </div>
-    </AppSidebarLayout>
+    </AppLayout>
 </template>

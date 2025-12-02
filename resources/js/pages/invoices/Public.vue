@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import SimpleLayout from '@/layouts/app/SimpleLayout.vue';
+import PaymentFormLayout from '@/layouts/PaymentFormLayout.vue';
 import CurrencyNetworkBadge from '@/components/ui/CurrencyNetworkBadge.vue';
 import { usePage } from '@inertiajs/vue3';
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue';
@@ -168,7 +168,7 @@ function onAddressKeydown(e: KeyboardEvent) {
 </script>
 
 <template>
-  <SimpleLayout>
+  <PaymentFormLayout>
     <div class="min-h-screen flex items-center">
         <div class="mx-auto max-w-7xl py-6 grid gap-4">
             <div class="flex items-center justify-between gap-4">
@@ -326,7 +326,7 @@ function onAddressKeydown(e: KeyboardEvent) {
             </div>
         </div>
     </div>
-  </SimpleLayout>
+  </PaymentFormLayout>
 
 </template>
 

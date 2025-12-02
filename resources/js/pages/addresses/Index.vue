@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue';
-import AppSidebarLayout from '@/layouts/app/AppSidebarLayout.vue';
+import AppLayout from '@/layouts/AppLayout.vue';
 import { Link, useForm, router } from '@inertiajs/vue3';
 import axios from 'axios';
 import CurrencyNetworkBadge from '@/components/ui/CurrencyNetworkBadge.vue';
@@ -87,7 +87,7 @@ function toggleAddress(id: number, nextActive: boolean) {
 </script>
 
 <template>
-    <AppSidebarLayout :breadcrumbs="[{ title: 'Главная', href: '/' }, { title: 'Адреса', href: '/addresses' }]">
+    <AppLayout :breadcrumbs="[{ title: 'Главная', href: '/' }, { title: 'Адреса', href: '/addresses' }]">
         <template #header-actions>
             <div class="flex items-center gap-2">
                 <button class="btn btn-primary btn-sm" @click="showCreate = true">Создать адрес</button>
@@ -149,7 +149,7 @@ function toggleAddress(id: number, nextActive: boolean) {
             @submit="submitCreate"
             @close="closeCreate"
         />
-    </AppSidebarLayout>
+    </AppLayout>
 </template>
 
 

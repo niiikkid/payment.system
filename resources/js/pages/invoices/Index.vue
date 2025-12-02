@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import AppSidebarLayout from '@/layouts/app/AppSidebarLayout.vue';
+import AppLayout from '@/layouts/AppLayout.vue';
 import { Link, usePage, router } from '@inertiajs/vue3';
 import { ref, computed } from 'vue';
 import axios from 'axios';
@@ -191,7 +191,7 @@ function toIso(input: string | null | undefined): string {
 </script>
 
 <template>
-  <AppSidebarLayout :breadcrumbs="[{ title: 'Главная', href: '/' }, { title: 'Invoices', href: '/invoices' }]">
+  <AppLayout :breadcrumbs="[{ title: 'Главная', href: '/' }, { title: 'Invoices', href: '/invoices' }]">
     <template #header-actions>
       <div class="flex items-center gap-2">
         <button class="btn btn-primary btn-sm" @click="showCreate = true">Создать инвойс</button>
@@ -295,7 +295,7 @@ function toIso(input: string | null | undefined): string {
       @close="closeCreate"
     />
 
-  </AppSidebarLayout>
+  </AppLayout>
 </template>
 
 

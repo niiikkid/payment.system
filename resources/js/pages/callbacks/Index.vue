@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import AppSidebarLayout from '@/layouts/app/AppSidebarLayout.vue';
+import AppLayout from '@/layouts/AppLayout.vue';
 import { Link, usePage } from '@inertiajs/vue3';
 import { computed, ref } from 'vue';
 import DateTimeFormat from '@/components/ui/DateTimeFormat.vue';
@@ -43,7 +43,7 @@ function toIso(input: string | null | undefined): string {
 </script>
 
 <template>
-  <AppSidebarLayout :breadcrumbs="[{ title: 'Главная', href: '/' }, { title: 'Callback логи', href: '/callback-logs' }]">
+  <AppLayout :breadcrumbs="[{ title: 'Главная', href: '/' }, { title: 'Callback логи', href: '/callback-logs' }]">
     <div class="grid gap-6">
       <div class="card bg-base-100 shadow">
         <div class="card-body">
@@ -105,7 +105,7 @@ function toIso(input: string | null | undefined): string {
       @close="closeDetails"
     />
 
-  </AppSidebarLayout>
+  </AppLayout>
 
 </template>
 

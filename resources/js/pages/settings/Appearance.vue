@@ -90,7 +90,7 @@ onMounted(() => {
             </div>
         </SettingsLayout>
     </AppLayout>
-    
+
 </template>
 
 
