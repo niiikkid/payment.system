@@ -4,6 +4,7 @@ import { Link, usePage } from '@inertiajs/vue3';
 import { computed, ref } from 'vue';
 import DateTimeFormat from '@/components/ui/DateTimeFormat.vue';
 import CallbackDetailsModal from '@/components/modals/callbacks/CallbackDetailsModal.vue';
+import UidCopy from '@/components/ui/UidCopy.vue';
 
 type CallbackLog = {
   id: string
@@ -62,8 +63,12 @@ function toIso(input: string | null | undefined): string {
               </thead>
               <tbody>
                 <tr v-for="log in logs.data" :key="log.id">
-                  <td class="font-mono text-xs">{{ log.id }}</td>
-                  <td class="font-mono text-xs">{{ log.invoice_id }}</td>
+                  <td class="font-mono text-xs">
+                      <UidCopy :uid="log.id"/>
+                  </td>
+                  <td class="font-mono text-xs">
+                      <UidCopy :uid="log.invoice_id"/>
+                  </td>
                   <td>
                     <span class="badge badge-outline">{{ log.event }}</span>
                   </td>
