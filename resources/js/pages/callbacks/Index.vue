@@ -40,6 +40,12 @@ function toIso(input: string | null | undefined): string {
   if (input.includes('T')) return input;
   return `${input.replace(' ', 'T')}Z`;
 }
+
+function formatDuration(ms: number | null | undefined): string {
+  if (ms === null || ms === undefined) return '—';
+  const seconds = ms / 1000;
+  return seconds.toFixed(3);
+}
 </script>
 
 <template>
@@ -57,7 +63,7 @@ function toIso(input: string | null | undefined): string {
                   <th>Событие</th>
                   <th>HTTP</th>
                   <th>Время</th>
-                  <th>Длит., мс</th>
+                  <th>Длит., сек</th>
                   <th></th>
                 </tr>
               </thead>
@@ -80,7 +86,7 @@ function toIso(input: string | null | undefined): string {
                   <td>
                     <DateTimeFormat :value="toIso(log.created_at)" />
                   </td>
-                  <td>{{ log.duration_ms ?? '—' }}</td>
+                  <td>{{ formatDuration(log.duration_ms) }}</td>
                   <td>
                     <button class="btn btn-sm" @click="openDetails(log)">Подробнее</button>
                   </td>
