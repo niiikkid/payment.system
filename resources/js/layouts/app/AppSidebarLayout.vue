@@ -30,12 +30,16 @@ const userEmail = computed(() => (page.props as any)?.auth?.user?.email ?? '');
     <div class="drawer lg:drawer-open bg-base-200 min-h-screen">
         <input id="app-drawer" type="checkbox" class="drawer-toggle" />
         <div class="drawer-content overflow-x-hidden">
-<!--            <div class="sticky top-0 z-10 border-b border-base-200 bg-base-100/60 px-4 py-3 backdrop-blur supports-[backdrop-filter]:bg-base-100/60 lg:px-6">
-                <div class="navbar">
+            <div class="lg:hidden sticky top-0 z-10 border-b border-base-200 bg-base-100/60 px-4 py-3 backdrop-blur supports-[backdrop-filter]:bg-base-100/60 lg:px-6">
+                <div class="flex justify-between items-center navbar">
                     <div class="navbar-start">
-                        <label for="app-drawer" class="btn btn-ghost btn-sm lg:hidden">☰</label>
+                        <label for="app-drawer" class="btn btn-ghost btn-md lg:hidden">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-7">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+                            </svg>
+                        </label>
                     </div>
-                    <div class="navbar-center w-full">
+<!--                    <div class="navbar-center w-full">
                         <div class="breadcrumbs text-sm truncate">
                             <ul>
                                 <li v-for="(bc, idx) in breadcrumbs" :key="idx">
@@ -45,9 +49,19 @@ const userEmail = computed(() => (page.props as any)?.auth?.user?.email ?? '');
                             </ul>
                         </div>
                     </div>
-                    <div class="navbar-end"></div>
+                    <div class="navbar-end"></div>-->
+                    <div>
+                        <Link href="/settings/profile" :class="{ 'menu-active': isProfileSettingsActive, active: isProfileSettingsActive }" class="btn btn-ghost btn-md w-full justify-start">
+                        <span class="flex items-center gap-3 truncate text-base font-semibold">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-7 opacity-30">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
+                            </svg>
+                            <span class="truncate" v-text="userEmail || 'Профиль'" />
+                        </span>
+                        </Link>
+                    </div>
                 </div>
-            </div>-->
+            </div>
             <div class="p-4 lg:p-6">
                 <slot />
             </div>
@@ -125,7 +139,7 @@ const userEmail = computed(() => (page.props as any)?.auth?.user?.email ?? '');
                         </ul>
                     </div>
                 </div>
-                <div class="mt-auto border-t border-base-200 p-2 mb-2">
+                <div class="hidden lg:block mt-auto border-t border-base-200 p-2 mb-2">
                     <Link href="/settings/profile" :class="{ 'menu-active': isProfileSettingsActive, active: isProfileSettingsActive }" class="btn btn-ghost btn-md w-full justify-start">
                         <span class="flex items-center gap-3 truncate text-base font-semibold">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6 opacity-30">

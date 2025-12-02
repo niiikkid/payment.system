@@ -2,8 +2,7 @@
 import AppLayout from '@/layouts/AppLayout.vue';
 import SettingsLayout from '@/layouts/settings/Layout.vue';
 import { edit, update as updateProfile } from '@/routes/profile';
-import { send as resendVerification } from '@/routes/verification';
-import { Head, Link, useForm, usePage } from '@inertiajs/vue3';
+import { Head, useForm, usePage } from '@inertiajs/vue3';
 import type { BreadcrumbItem } from '@/types';
 
 interface Props {
@@ -55,18 +54,6 @@ const breadcrumbs: BreadcrumbItem[] = [
                         <label for="email" class="label"><span class="label-text">E‑mail</span></label>
                         <input id="email" name="email" type="email" class="input input-bordered w-full" v-model="form.email" placeholder="email@example.com" />
                         <p v-if="form.errors.email" class="text-error text-sm">{{ form.errors.email }}</p>
-                    </div>
-
-                    <div v-if="mustVerifyEmail && !user?.email_verified_at">
-                        <p class="-mt-1 text-sm text-base-content/70">
-                            Ваш e‑mail не подтверждён.
-                            <Link :href="resendVerification().url" as="button" class="link link-hover">
-                                Отправить письмо повторно
-                            </Link>
-                        </p>
-                        <div v-if="status === 'verification-link-sent'" class="mt-2 text-sm text-success">
-                            Ссылка подтверждения отправлена на ваш e‑mail.
-                        </div>
                     </div>
 
                     <div class="flex items-center gap-4">
