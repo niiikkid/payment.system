@@ -3,6 +3,11 @@ import AppSidebarLayout from '@/layouts/app/AppSidebarLayout.vue';
 import { Link, useForm, usePage } from '@inertiajs/vue3';
 import CurrencyNetworkBadge from '@/components/ui/CurrencyNetworkBadge.vue';
 import AddressCopy from '@/components/ui/AddressCopy.vue';
+import Alert from '@/components/ui/Alert.vue';
+import FormControl from '@/components/form/FormControl.vue';
+import Label from '@/components/form/Label.vue';
+import Input from '@/components/form/Input.vue';
+import Select from '@/components/form/Select.vue';
 
 interface AddressItem {
     id: number;
@@ -34,6 +39,7 @@ const createForm = useForm({
 });
 
 function submitCreate() {
+    createForm.address = createForm.address.trim();
     createForm.post('/addresses', {
         preserveScroll: true,
         onSuccess: () => {
@@ -55,35 +61,42 @@ function toggleAddress(id: number, nextActive: boolean) {
                 <div class="card-body">
                     <h2 class="card-title">Добавить новый адрес</h2>
                     <form @submit.prevent="submitCreate" class="grid gap-4">
-                        <div v-if="page.props.flash?.error" class="alert alert-error">
-                            <span>{{ page.props.flash.error }}</span>
-                        </div>
-                        <div v-if="Object.keys(createForm.errors).length" class="alert alert-error">
-                            <span>
-                                {{ createForm.errors.address || createForm.errors.network || createForm.errors.currency || 'Ошибка при добавлении адреса' }}
-                            </span>
-                        </div>
-                        <div class="form-control">
-                            <label class="label"><span class="label-text">Валюта</span></label>
-                            <select v-model="createForm.currency" class="select select-bordered" required>
-                                <option value="" disabled>Выберите валюту</option>
-                                <option v-for="opt in props.currencyOptions" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
-                            </select>
-                            <label v-if="createForm.errors.currency" class="label"><span class="label-text-alt text-error">{{ createForm.errors.currency }}</span></label>
-                        </div>
-                        <div class="form-control">
-                            <label class="label"><span class="label-text">Сеть</span></label>
-                            <select v-model="createForm.network" class="select select-bordered" required>
-                                <option value="" disabled>Выберите сеть</option>
-                                <option v-for="opt in props.networkOptions" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
-                            </select>
-                            <label v-if="createForm.errors.network" class="label"><span class="label-text-alt text-error">{{ createForm.errors.network }}</span></label>
-                        </div>
-                        <div class="form-control">
-                            <label class="label"><span class="label-text">Адрес</span></label>
-                            <input v-model.trim="createForm.address" type="text" class="input input-bordered" placeholder="Например: T..." required />
-                            <label v-if="createForm.errors.address" class="label"><span class="label-text-alt text-error">{{ createForm.errors.address }}</span></label>
-                        </div>
+                        <Alert v-if="page.props.flash?.error" type="error" :message="page.props.flash.error" />
+                        <Alert
+                            v-if="Object.keys(createForm.errors).length"
+                            type="error"
+                            :message="createForm.errors.address || createForm.errors.network || createForm.errors.currency || 'Ошибка при добавлении адреса'"
+                        />
+                        <FormControl :error="createForm.errors.currency">
+                            <Label for="currency" required>Валюта</Label>
+                            <Select
+                                id="currency"
+                                v-model="createForm.currency"
+                                :options="props.currencyOptions"
+                                placeholder="Выберите валюту"
+                                required
+                            />
+                        </FormControl>
+                        <FormControl :error="createForm.errors.network">
+                            <Label for="network" required>Сеть</Label>
+                            <Select
+                                id="network"
+                                v-model="createForm.network"
+                                :options="props.networkOptions"
+                                placeholder="Выберите сеть"
+                                required
+                            />
+                        </FormControl>
+                        <FormControl :error="createForm.errors.address">
+                            <Label for="address" required>Адрес</Label>
+                            <Input
+                                id="address"
+                                v-model="createForm.address"
+                                type="text"
+                                placeholder="Например: T..."
+                                required
+                            />
+                        </FormControl>
                         <div class="form-control mt-2">
                             <button class="btn btn-primary" :disabled="createForm.processing">Добавить</button>
                         </div>

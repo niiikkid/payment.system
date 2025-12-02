@@ -7,7 +7,7 @@ import { edit as editPassword } from '@/routes/user-password';
 import { type NavItem } from '@/types';
 import { Link, router, usePage } from '@inertiajs/vue3';
 import { computed, ref } from 'vue';
-import ConfirmDialog from '@/components/ui/ConfirmDialog.vue';
+import ConfirmDialog from '@/components/ui/modal/ConfirmDialog.vue';
 import { logout as logoutRoute } from '@/routes';
 
 const sidebarNavItems: NavItem[] = [

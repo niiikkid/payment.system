@@ -3,6 +3,7 @@ import AppSidebarLayout from '@/layouts/app/AppSidebarLayout.vue';
 import { Link, usePage } from '@inertiajs/vue3';
 import { computed, ref } from 'vue';
 import DateTimeFormat from '@/components/ui/DateTimeFormat.vue';
+import CallbackDetailsModal from '@/components/modals/callbacks/CallbackDetailsModal.vue';
 
 type CallbackLog = {
   id: string
@@ -93,81 +94,14 @@ function toIso(input: string | null | undefined): string {
       </div>
     </div>
 
-    <!-- Details Modal -->
-    <dialog class="modal modal-bottom md:modal-middle" :open="showModal">
-      <div class="modal-box max-w-3xl">
-        <h3 class="font-bold text-lg">Детали коллбэка</h3>
-        <p class="text-sm opacity-70 mt-1">Полная информация по выбранной записи</p>
+    <CallbackDetailsModal
+      v-model="showModal"
+      :log="selected"
+      @close="closeDetails"
+    />
 
-        <div v-if="selected" class="mt-5 grid gap-4">
-          <div class="grid gap-3">
-            <div class="text-xs opacity-60">ID</div>
-            <div class="font-mono break-all">{{ selected.id }}</div>
-          </div>
-
-          <div class="grid gap-2 md:grid-cols-2">
-            <div class="grid gap-1">
-              <div class="text-xs opacity-60">Invoice</div>
-              <div class="font-mono break-all">{{ selected.invoice_id }}</div>
-            </div>
-            <div class="grid gap-1">
-              <div class="text-xs opacity-60">Событие</div>
-              <div><span class="badge badge-outline">{{ selected.event }}</span></div>
-            </div>
-            <div class="grid gap-1 md:col-span-2">
-              <div class="text-xs opacity-60">URL</div>
-              <div class="flex items-center gap-2">
-                <span class="badge badge-outline">POST</span>
-                <span class="break-all font-mono">{{ selected.url }}</span>
-              </div>
-            </div>
-            <div class="grid gap-1">
-              <div class="text-xs opacity-60">HTTP статус</div>
-              <div>
-                <span class="badge" :class="{ 'badge-success': (selected.response_status||0) >= 200 && (selected.response_status||0) < 300, 'badge-error': (selected.response_status||0) >= 400 }">
-                  {{ selected.response_status ?? '—' }}
-                </span>
-              </div>
-            </div>
-            <div class="grid gap-1">
-              <div class="text-xs opacity-60">Длительность, мс</div>
-              <div>{{ selected.duration_ms ?? '—' }}</div>
-            </div>
-          </div>
-
-          <div class="divider my-0"></div>
-
-          <div class="grid gap-3">
-            <div class="text-xs opacity-60">Запрос (payload)</div>
-            <div class="mockup-code">
-              <pre><code>{{ JSON.stringify(selected.request_payload || {}, null, 2) }}</code></pre>
-            </div>
-          </div>
-
-          <div class="grid gap-3">
-            <div class="text-xs opacity-60">Ответ (body)</div>
-            <div class="mockup-code">
-              <pre><code>{{ selected.response_body || '' }}</code></pre>
-            </div>
-          </div>
-
-          <div class="grid gap-3" v-if="selected.error_message">
-            <div class="text-xs opacity-60">Ошибка</div>
-            <div class="alert alert-warning">
-              <span class="break-all">{{ selected.error_message }}</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="modal-action">
-          <button class="btn btn-ghost" @click="closeDetails">Закрыть</button>
-        </div>
-      </div>
-      <form method="dialog" class="modal-backdrop" @submit.prevent="closeDetails">
-        <button>close</button>
-      </form>
-    </dialog>
   </AppSidebarLayout>
+
 </template>
 
 
