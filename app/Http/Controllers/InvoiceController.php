@@ -78,7 +78,7 @@ class InvoiceController extends Controller
     {
         $invoice->load('address');
 
-        return Inertia::render('invoices/Public', [
+        return Inertia::render('PaymentForm/Index', [
             'invoice' => (new InvoiceResource($invoice))->resolve(),
             'appName' => config('app.name'),
             'statuses' => [
