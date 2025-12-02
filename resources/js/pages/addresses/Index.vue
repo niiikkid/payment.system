@@ -112,9 +112,9 @@ function toggleAddress(id: number, nextActive: boolean) {
                             <thead>
                                 <tr>
                                     <th>ID</th>
-                                    <th>Валюта</th>
                                     <th>Адрес</th>
                                     <th>Баланс</th>
+                                    <th>Валюта</th>
                                     <th>Активен</th>
                                     <th></th>
                                 </tr>
@@ -122,13 +122,13 @@ function toggleAddress(id: number, nextActive: boolean) {
                             <tbody>
                                 <tr v-for="addr in props.addresses" :key="addr.id">
                                     <td>{{ addr.id }}</td>
-                                    <td>
-                                        <CurrencyNetworkBadge :currency-label="addr.currency_label" :network-label="addr.network_label" />
-                                    </td>
                                     <td class="font-mono text-xs">
                                         <AddressCopy :address="addr.address" />
                                     </td>
                                     <td>{{ addr.balance }}</td>
+                                    <td>
+                                        <CurrencyNetworkBadge :currency-label="addr.currency_label" :network-label="addr.network_label" />
+                                    </td>
                                     <td>
                                         <div class="flex items-center gap-2">
                                             <input type="checkbox" class="toggle" :class="{'toggle-success': addr.is_active}" :checked="addr.is_active" @change="toggleAddress(addr.id, !addr.is_active)" />
