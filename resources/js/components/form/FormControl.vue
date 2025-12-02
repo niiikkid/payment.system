@@ -8,7 +8,7 @@ const props = defineProps<Props>();
 </script>
 
 <template>
-    <div class="form-control">
+    <div class="form-control flex flex-col">
         <slot />
         <label v-if="props.error || props.hint" class="label">
             <span v-if="props.error" class="label-text-alt text-error">{{ props.error }}</span>

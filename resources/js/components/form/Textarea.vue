@@ -32,7 +32,7 @@ function handleInput(event: Event) {
         :required="props.required"
         :disabled="props.disabled"
         :rows="props.rows"
-        class="textarea textarea-bordered"
+        class="textarea textarea-bordered w-full"
         @input="handleInput"
     />
 </template>

@@ -34,7 +34,7 @@ function handleChange(event: Event) {
         :value="props.modelValue"
         :required="props.required"
         :disabled="props.disabled"
-        class="select select-bordered"
+        class="select select-bordered w-full"
         @change="handleChange"
     >
         <option v-if="props.placeholder" value="" disabled>{{ props.placeholder }}</option>

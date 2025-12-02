@@ -42,7 +42,7 @@ function handleInput(event: Event) {
         :step="props.step"
         :min="props.min"
         :max="props.max"
-        class="input input-bordered"
+        class="input input-bordered w-full"
         @input="handleInput"
     />
 </template>

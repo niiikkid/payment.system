@@ -1,14 +1,12 @@
 <script setup lang="ts">
+import { ref } from 'vue';
 import AppSidebarLayout from '@/layouts/app/AppSidebarLayout.vue';
-import { Link, useForm, usePage } from '@inertiajs/vue3';
+import { Link, useForm, router } from '@inertiajs/vue3';
+import axios from 'axios';
 import CurrencyNetworkBadge from '@/components/ui/CurrencyNetworkBadge.vue';
 import AddressCopy from '@/components/ui/AddressCopy.vue';
 import Pagination from '@/components/ui/Pagination.vue';
-import Alert from '@/components/ui/Alert.vue';
-import FormControl from '@/components/form/FormControl.vue';
-import Label from '@/components/form/Label.vue';
-import Input from '@/components/form/Input.vue';
-import Select from '@/components/form/Select.vue';
+import AddressCreateModal, { type AddressCreateForm } from '@/components/modals/addresses/AddressCreateModal.vue';
 
 interface AddressItem {
     id: number;
@@ -42,22 +40,44 @@ interface Props {
 
 const props = defineProps<Props>();
 
-const page = usePage();
-
-const createForm = useForm({
+const showCreate = ref(false);
+const createPayload = ref<AddressCreateForm>({
     currency: '',
     network: '',
     address: '',
 });
+const createLoading = ref(false);
+const createError = ref<string | null>(null);
 
-function submitCreate() {
-    createForm.address = createForm.address.trim();
-    createForm.post('/addresses', {
-        preserveScroll: true,
-        onSuccess: () => {
-            createForm.reset();
-        },
-    });
+function closeCreate() {
+    showCreate.value = false;
+}
+
+function updateCreatePayload(payload: AddressCreateForm) {
+    createPayload.value = payload;
+}
+
+function resetCreatePayload() {
+    createPayload.value = { currency: '', network: '', address: '' };
+}
+
+async function submitCreate() {
+    createError.value = null;
+    createLoading.value = true;
+    try {
+        await axios.post('/addresses', {
+            currency: createPayload.value.currency,
+            network: createPayload.value.network,
+            address: createPayload.value.address.trim(),
+        });
+        showCreate.value = false;
+        router.reload({ only: ['addresses'] });
+        resetCreatePayload();
+    } catch (e: any) {
+        createError.value = e?.response?.data?.message || e?.response?.data?.errors?.address?.[0] || e?.response?.data?.errors?.network?.[0] || e?.response?.data?.errors?.currency?.[0] || e?.message || 'Ошибка при добавлении адреса';
+    } finally {
+        createLoading.value = false;
+    }
 }
 
 function toggleAddress(id: number, nextActive: boolean) {
@@ -68,54 +88,13 @@ function toggleAddress(id: number, nextActive: boolean) {
 
 <template>
     <AppSidebarLayout :breadcrumbs="[{ title: 'Главная', href: '/' }, { title: 'Адреса', href: '/addresses' }]">
-        <div class="grid gap-6 lg:grid-cols-[380px_1fr]">
-            <div class="card bg-base-100 shadow">
-                <div class="card-body">
-                    <h2 class="card-title">Добавить новый адрес</h2>
-                    <form @submit.prevent="submitCreate" class="grid gap-4">
-                        <Alert v-if="page.props.flash?.error" type="error" :message="page.props.flash.error" />
-                        <Alert
-                            v-if="Object.keys(createForm.errors).length"
-                            type="error"
-                            :message="createForm.errors.address || createForm.errors.network || createForm.errors.currency || 'Ошибка при добавлении адреса'"
-                        />
-                        <FormControl :error="createForm.errors.currency">
-                            <Label for="currency" required>Валюта</Label>
-                            <Select
-                                id="currency"
-                                v-model="createForm.currency"
-                                :options="props.currencyOptions"
-                                placeholder="Выберите валюту"
-                                required
-                            />
-                        </FormControl>
-                        <FormControl :error="createForm.errors.network">
-                            <Label for="network" required>Сеть</Label>
-                            <Select
-                                id="network"
-                                v-model="createForm.network"
-                                :options="props.networkOptions"
-                                placeholder="Выберите сеть"
-                                required
-                            />
-                        </FormControl>
-                        <FormControl :error="createForm.errors.address">
-                            <Label for="address" required>Адрес</Label>
-                            <Input
-                                id="address"
-                                v-model="createForm.address"
-                                type="text"
-                                placeholder="Например: T..."
-                                required
-                            />
-                        </FormControl>
-                        <div class="form-control mt-2">
-                            <button class="btn btn-primary" :disabled="createForm.processing">Добавить</button>
-                        </div>
-                    </form>
-                </div>
+        <template #header-actions>
+            <div class="flex items-center gap-2">
+                <button class="btn btn-primary btn-sm" @click="showCreate = true">Создать адрес</button>
             </div>
+        </template>
 
+        <div class="grid gap-6">
             <div class="card bg-base-100 shadow">
                 <div class="card-body">
                     <h2 class="card-title">Список адресов</h2>
@@ -158,6 +137,18 @@ function toggleAddress(id: number, nextActive: boolean) {
                 </div>
             </div>
         </div>
+
+        <AddressCreateModal
+            v-model="showCreate"
+            :form="createPayload"
+            :currency-options="props.currencyOptions"
+            :network-options="props.networkOptions"
+            :error="createError"
+            :loading="createLoading"
+            @update:form="updateCreatePayload"
+            @submit="submitCreate"
+            @close="closeCreate"
+        />
     </AppSidebarLayout>
 </template>
 
