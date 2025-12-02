@@ -7,6 +7,7 @@ import CurrencyNetworkBadge from '@/components/ui/CurrencyNetworkBadge.vue';
 import AddressCopy from '@/components/ui/AddressCopy.vue';
 import UidCopy from '@/components/ui/UidCopy.vue';
 import DateTimeFormat from '@/components/ui/DateTimeFormat.vue';
+import Pagination from '@/components/ui/Pagination.vue';
 import InvoiceDetailsModal from '@/components/modals/invoices/InvoiceDetailsModal.vue';
 import InvoiceEditModal, { type InvoiceEditForm } from '@/components/modals/invoices/InvoiceEditModal.vue';
 import InvoiceCreateModal, { type InvoiceCreateForm } from '@/components/modals/invoices/InvoiceCreateModal.vue';
@@ -254,9 +255,7 @@ function toIso(input: string | null | undefined): string {
             </table>
           </div>
 
-          <div class="mt-4 flex gap-2 flex-wrap">
-            <Link v-for="l in invoices.links" :key="l.url || l.label" :href="l.url || '#'" class="btn btn-sm" :class="{ 'btn-disabled': !l.url, 'btn-active': l.active }" v-html="l.label" />
-          </div>
+          <Pagination :links="invoices.links" />
         </div>
       </div>
     </div>

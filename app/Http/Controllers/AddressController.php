@@ -27,9 +27,10 @@ class AddressController extends Controller
      */
     public function index(): Response
     {
-        $addresses = AddressResource::collection(
-            Address::query()->latest('id')->get()
-        )->resolve();
+        $paginator = Address::query()
+            ->latest('id')
+            ->paginate(20)
+            ->through(fn ($address) => (new AddressResource($address))->resolve());
 
         $currencyOptions = array_map(static function (Currency $c) {
             $value = $c->value;
@@ -48,7 +49,7 @@ class AddressController extends Controller
         }, Network::cases());
 
         return Inertia::render('addresses/Index', [
-            'addresses' => $addresses,
+            'addresses' => $paginator,
             'currencyOptions' => $currencyOptions,
             'networkOptions' => $networkOptions,
         ]);

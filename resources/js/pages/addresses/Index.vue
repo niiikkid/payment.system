@@ -3,6 +3,7 @@ import AppSidebarLayout from '@/layouts/app/AppSidebarLayout.vue';
 import { Link, useForm, usePage } from '@inertiajs/vue3';
 import CurrencyNetworkBadge from '@/components/ui/CurrencyNetworkBadge.vue';
 import AddressCopy from '@/components/ui/AddressCopy.vue';
+import Pagination from '@/components/ui/Pagination.vue';
 import Alert from '@/components/ui/Alert.vue';
 import FormControl from '@/components/form/FormControl.vue';
 import Label from '@/components/form/Label.vue';
@@ -22,8 +23,19 @@ interface AddressItem {
     created_at: string | null;
 }
 
+interface PaginationLinks {
+    url: string | null;
+    label: string;
+    active: boolean;
+}
+
+interface PaginatedAddresses {
+    data: AddressItem[];
+    links: PaginationLinks[];
+}
+
 interface Props {
-    addresses: AddressItem[];
+    addresses: PaginatedAddresses;
     currencyOptions: { value: string; label: string }[];
     networkOptions: { value: string; label: string }[];
 }
@@ -120,7 +132,7 @@ function toggleAddress(id: number, nextActive: boolean) {
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr v-for="addr in props.addresses" :key="addr.id">
+                                <tr v-for="addr in props.addresses.data" :key="addr.id">
                                     <td>{{ addr.id }}</td>
                                     <td class="font-mono text-xs">
                                         <AddressCopy :address="addr.address" />
@@ -135,12 +147,14 @@ function toggleAddress(id: number, nextActive: boolean) {
                                         </div>
                                     </td>
                                 </tr>
-                                <tr v-if="props.addresses.length === 0">
+                                <tr v-if="props.addresses.data.length === 0">
                                     <td colspan="6" class="text-center text-sm opacity-70 py-6">Пока нет адресов</td>
                                 </tr>
                             </tbody>
                         </table>
                     </div>
+
+                    <Pagination :links="props.addresses.links" />
                 </div>
             </div>
         </div>
