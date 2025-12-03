@@ -98,7 +98,7 @@ function submit() {
                     required
                 />
             </FormControl>
-            <FormControl hint="Выберите соответствующую сеть для валюты">
+            <FormControl hint="Выберите сеть для валюты">
                 <Label for="network" required>Сеть</Label>
                 <Select
                     id="network"
