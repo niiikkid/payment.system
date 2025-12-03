@@ -50,9 +50,9 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <div class="grid gap-2" v-if="props.expiresAt">
-    <div class="text-base opacity-60">Осталось времени</div>
-    <span class="countdown font-mono text-xl">
+  <div class="grid gap-1" v-if="props.expiresAt">
+    <div class="text-md opacity-60">Осталось времени</div>
+    <span class="countdown font-mono text-md">
       <span :style="`--value:${hh};`" :aria-label="String(hh)" aria-live="polite">{{ hh }}</span>
       :
       <span :style="`--value:${mm}; --digits: 2;`" :aria-label="String(mm)" aria-live="polite">{{ String(mm).padStart(2,'0') }}</span>

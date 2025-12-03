@@ -90,10 +90,10 @@ const statusText = computed(() => {
 
 <template>
   <PaymentFormLayout>
-    <div class="min-h-screen flex items-center">
+    <div class="min-h-screen flex items-center mx-4">
         <div class="mx-auto max-w-7xl py-6 grid gap-4">
-            <div class="flex items-center justify-between gap-4">
-                <h1 class="text-xl font-semibold flex items-center">Платёж ID: <UidCopy v-if="invoice?.id" :uid="invoice.id" size="xl" class="text-primary" /></h1>
+            <div class="sm:flex items-center justify-between gap-4">
+                <h1 class="text-xl font-semibold flex items-center gap-2">Платёж ID: <UidCopy v-if="invoice?.id" :uid="invoice.id" size="xl" class="text-primary" /></h1>
                 <div class="badge" :class="statusBadgeClass">{{ statusText }}</div>
             </div>
 
@@ -105,8 +105,15 @@ const statusText = computed(() => {
             <div v-else class="card bg-base-100 shadow">
                 <div class="card-body p-4 lg:p-6">
                     <div class="grid gap-6 md:grid-cols-1">
-
                         <div class="grid gap-4">
+                            <div class="flex items-center gap-2">
+                                <span class="text-error">
+                                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" />
+                                  </svg>
+                                </span>
+                                <span class="text-base-content text-xs sm:text-sm lg:text-base">Важно: переведите сумму точно до копейки, чтобы мы автоматически зачли ваш платёж.</span>
+                            </div>
                             <PaymentQrSection
                                 :qr-url="qrUrl"
                                 :currency-label="invoice.currency_label"
