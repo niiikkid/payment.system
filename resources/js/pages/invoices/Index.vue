@@ -102,6 +102,7 @@ async function submitEdit() {
     showEdit.value = false;
     router.reload({ only: ['invoices'] });
   } catch (e: any) {
+    showEdit.value = true;
     editError.value = e?.response?.data?.message || e?.response?.data?.errors?.txid?.[0] || e?.message || 'Ошибка при обновлении инвойса';
   } finally {
     editLoading.value = false;
@@ -171,9 +172,11 @@ async function submitCreate() {
       router.reload({ only: ['invoices'] });
       resetCreatePayload();
     } else {
+      showCreate.value = true;
       createError.value = res.data?.message || 'Ошибка при создании инвойса';
     }
   } catch (e: any) {
+    showCreate.value = true;
     createError.value = e?.response?.data?.message || e?.message || 'Ошибка при создании инвойса';
   } finally {
     createLoading.value = false;

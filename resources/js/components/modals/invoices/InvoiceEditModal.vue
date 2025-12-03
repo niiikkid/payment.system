@@ -98,12 +98,12 @@ function submit() {
                     required
                 />
             </FormControl>
-
-            <div class="modal-action">
-                <button type="button" class="btn" @click="close" :disabled="loading">Отмена</button>
-                <button type="submit" class="btn btn-primary" :class="{ loading }" :disabled="loading">Сохранить</button>
-            </div>
         </form>
+
+        <template #actions>
+            <button type="button" class="btn" @click="close" :disabled="loading">Отмена</button>
+            <button type="button" class="btn btn-primary" :class="{ loading }" :disabled="loading" @click="submit">Сохранить</button>
+        </template>
     </ModalDialog>
 </template>
 

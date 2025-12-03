@@ -151,12 +151,12 @@ function submit() {
                     :rows="4"
                 />
             </FormControl>
-
-            <div class="modal-action">
-                <button type="button" class="btn" @click="close" :disabled="loading">Отмена</button>
-                <button type="submit" class="btn btn-primary" :class="{ loading }" :disabled="loading">Создать</button>
-            </div>
         </form>
+
+        <template #actions>
+            <button type="button" class="btn" @click="close" :disabled="loading">Отмена</button>
+            <button type="button" class="btn btn-primary" :class="{ loading }" :disabled="loading" @click="submit">Создать</button>
+        </template>
     </ModalDialog>
 </template>
 
