@@ -137,7 +137,8 @@ function toIso(input: string | null | undefined): string {
                         <div class="flex flex-col sm:flex-row sm:items-center gap-2">
                             <div class="text-xs text-base-content/60 sm:w-32 flex-shrink-0">External ID</div>
                             <div class="flex-1 flex items-center gap-2 flex-wrap">
-                                <UidCopy :uid="invoice.external_invoice_id"/>
+                                <UidCopy v-if="invoice.external_invoice_id" :uid="invoice.external_invoice_id" />
+                                <span v-else class="text-base-content/60">—</span>
                             </div>
                         </div>
                         <div class="flex flex-col sm:flex-row sm:items-center gap-2">
