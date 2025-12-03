@@ -5,6 +5,7 @@ import { Link, useForm, router } from '@inertiajs/vue3';
 import axios from 'axios';
 import CurrencyNetworkBadge from '@/components/ui/CurrencyNetworkBadge.vue';
 import AddressCopy from '@/components/ui/AddressCopy.vue';
+import DateTimeFormat from '@/components/ui/DateTimeFormat.vue';
 import Pagination from '@/components/ui/Pagination.vue';
 import AddressCreateModal, { type AddressCreateForm } from '@/components/modals/addresses/AddressCreateModal.vue';
 
@@ -84,6 +85,14 @@ function toggleAddress(id: number, nextActive: boolean) {
     const form = useForm({ is_active: nextActive });
     form.patch(`/addresses/${id}`, { preserveScroll: true });
 }
+
+function toIso(input: string | null | undefined): string {
+    if (!input) return '';
+    if (typeof input !== 'string') return '';
+    if (input.includes('T')) return input; // уже ISO
+    // Преобразуем 'YYYY-MM-DD HH:mm:ss' -> 'YYYY-MM-DDTHH:mm:ssZ'
+    return `${input.replace(' ', 'T')}Z`;
+}
 </script>
 
 <template>
@@ -95,10 +104,13 @@ function toggleAddress(id: number, nextActive: boolean) {
         </template>
 
         <div class="grid gap-6">
-            <div class="card bg-base-100 shadow">
-                <div class="card-body">
-                    <h2 class="card-title">Список адресов</h2>
-                    <div class="overflow-x-auto">
+            <div class="lg:card lg:bg-base-100 lg:shadow">
+                <div class="lg:card-body">
+                    <h2 class="hidden lg:block card-title">Список адресов</h2>
+                    <h2 class="lg:hidden card-title mb-3">Список адресов</h2>
+
+                    <!-- Desktop Table View (lg and above) -->
+                    <div class="hidden lg:block overflow-x-auto">
                         <table class="table table-sm w-full">
                             <thead>
                                 <tr>
@@ -131,6 +143,102 @@ function toggleAddress(id: number, nextActive: boolean) {
                                 </tr>
                             </tbody>
                         </table>
+                    </div>
+
+                    <!-- Mobile Card View (sm to lg) -->
+                    <div class="hidden sm:block lg:hidden space-y-3">
+                        <div v-for="addr in props.addresses.data" :key="addr.id" class="card bg-base-100 shadow-sm">
+                            <div class="card-body p-4">
+                                <!-- Header: ID and Date -->
+                                <div class="flex items-center justify-between mb-3">
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-xs opacity-70">ID:</span>
+                                        <span class="text-sm font-semibold">{{ addr.id }}</span>
+                                    </div>
+                                    <div class="flex items-center gap-1.5 text-xs opacity-70" v-if="addr.created_at">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-3.5">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5" />
+                                        </svg>
+                                        <DateTimeFormat :value="toIso(addr.created_at)" />
+                                    </div>
+                                </div>
+
+                                <!-- Main Content Row -->
+                                <div class="grid grid-cols-[auto_1fr_1fr_auto] items-center gap-3">
+                                    <div class="flex min-w-0">
+                                        <div class="font-mono text-xs opacity-70 truncate">
+                                            <AddressCopy :address="addr.address" />
+                                        </div>
+                                    </div>
+
+                                    <div class="flex justify-center min-w-0">
+                                        <CurrencyNetworkBadge :currency-label="addr.currency_label" :network-label="addr.network_label" />
+                                    </div>
+
+                                    <div class="flex items-center gap-2 whitespace-nowrap">
+                                        <span class="text-xs opacity-70">Баланс:</span>
+                                        <span class="text-sm font-semibold">{{ addr.balance }}</span>
+                                    </div>
+
+                                    <div class="flex items-center gap-2">
+                                        <input type="checkbox" class="toggle toggle-sm" :class="{'toggle-success': addr.is_active}" :checked="addr.is_active" @change="toggleAddress(addr.id, !addr.is_active)" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div v-if="!props.addresses.data.length" class="text-center text-sm opacity-70 py-6">
+                            Пока нет адресов
+                        </div>
+                    </div>
+
+                    <!-- Small Mobile Card View (below sm) -->
+                    <div class="sm:hidden space-y-3">
+                        <div v-for="addr in props.addresses.data" :key="addr.id" class="card bg-base-100 shadow-sm">
+                            <div class="card-body p-4">
+                                <!-- Header: ID and Date -->
+                                <div class="flex items-center justify-between mb-3">
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-xs opacity-70">ID:</span>
+                                        <span class="text-sm font-semibold">{{ addr.id }}</span>
+                                    </div>
+                                    <div class="flex items-center gap-1.5 text-xs opacity-70" v-if="addr.created_at">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-3.5">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5" />
+                                        </svg>
+                                        <DateTimeFormat :value="toIso(addr.created_at)" short-year hide-seconds />
+                                    </div>
+                                </div>
+
+                                <!-- Main Content Row -->
+                                <div class="flex justify-between items-center gap-3">
+                                    <!-- Balance and Currency -->
+                                    <div class="flex items-center gap-2">
+                                        <div class="font-mono text-xs text-center">
+                                            <AddressCopy :address="addr.address" />
+                                        </div>
+                                    </div>
+
+                                    <!-- Right Side: Active Toggle -->
+                                    <div>
+                                        <input type="checkbox" class="toggle toggle-sm" :class="{'toggle-success': addr.is_active}" :checked="addr.is_active" @change="toggleAddress(addr.id, !addr.is_active)" />
+                                    </div>
+                                </div>
+
+                                <!-- Footer -->
+                                <div class="flex items-center justify-between mt-3">
+                                    <div>
+                                        <CurrencyNetworkBadge :currency-label="addr.currency_label" :network-label="addr.network_label" />
+                                    </div>
+                                    <div class="inline-flex items-center gap-2">
+                                        <span class="text-xs opacity-70">Баланс:</span>
+                                        <div class="text-sm font-semibold">{{ addr.balance }}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div v-if="!props.addresses.data.length" class="text-center text-sm opacity-70 py-6">
+                            Пока нет адресов
+                        </div>
                     </div>
 
                     <Pagination :links="props.addresses.links" />
