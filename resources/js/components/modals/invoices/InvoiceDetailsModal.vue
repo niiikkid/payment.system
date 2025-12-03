@@ -82,40 +82,18 @@ function toIso(input: string | null | undefined): string {
         @close="close"
     >
         <template v-if="invoice">
-            <div class="grid gap-4">
-                <div class="grid gap-3 grid-cols-4">
-                    <div class="card bg-base-200 shadow-sm">
-                        <div class="card-body p-4">
-                            <div class="text-xs opacity-60">ID</div>
-                            <div class="font-mono break-all">
+            <div class="space-y-6">
+                <!-- Основная информация -->
+                <div class="space-y-4">
+                    <div class="flex flex-wrap gap-4">
+                        <div class="flex-1 min-w-[200px]">
+                            <div class="text-xs text-base-content/60 mb-1">ID</div>
+                            <div class="text-base">
                                 <UidCopy v-if="invoice.id" :uid="invoice.id" />
                             </div>
                         </div>
-                    </div>
-                    <div class="card bg-base-200 shadow-sm">
-                        <div class="card-body p-4">
-                            <div class="text-xs opacity-60">Адрес</div>
-                            <div class="font-mono">
-                                <AddressCopy v-if="invoice.address" :address="invoice.address" />
-                                <span v-else class="opacity-60">#{{ invoice.address_id }}</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="card bg-base-200 shadow-sm">
-                        <div class="card-body p-4">
-                            <div class="text-xs opacity-60">Сумма</div>
-                            <div class="flex items-center gap-2">
-                                <div class="font-mono">{{ invoice.amount }}</div>
-                                <CurrencyNetworkBadge
-                                    :currency-label="invoice.currency_label || invoice.currency"
-                                    :network-label="invoice.network_label || invoice.network"
-                                />
-                            </div>
-                        </div>
-                    </div>
-                    <div class="card bg-base-200 shadow-sm">
-                        <div class="card-body p-4">
-                            <div class="text-xs opacity-60">Статус</div>
+                        <div class="flex-1 min-w-[200px]">
+                            <div class="text-xs text-base-content/60 mb-1">Статус</div>
                             <div>
                                 <span
                                     class="badge"
@@ -128,82 +106,133 @@ function toIso(input: string | null | undefined): string {
                             </div>
                         </div>
                     </div>
-                </div>
 
-                <div class="divider my-0"></div>
-
-                <div class="grid gap-4 md:grid-cols-2">
-                    <div class="grid gap-2">
-                        <div class="text-xs opacity-60">TXID</div>
-                        <div class="flex items-center gap-2" v-if="invoice.txid">
-                            <span class="font-mono break-all">
-                                <TxidCopy :txid="invoice.txid"/>
-                            </span>
-                            <a
-                                v-if="invoice.status === 'paid' && invoice.tx_explorer_url"
-                                :href="invoice.tx_explorer_url"
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                class="link link-primary"
-                            >
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 0 0 3 8.25v10.5A2.25 2.25 0 0 0 5.25 21h10.5A2.25 2.25 0 0 0 18 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
-                                </svg>
-                            </a>
+                    <div class="flex flex-wrap gap-4">
+                        <div class="flex-1 min-w-[200px]">
+                            <div class="text-xs text-base-content/60 mb-1">Сумма</div>
+                            <div class="flex items-center gap-2 flex-wrap">
+                                <span class="text-lg font-semibold">{{ invoice.amount }}</span>
+                                <CurrencyNetworkBadge
+                                    :currency-label="invoice.currency_label || invoice.currency"
+                                    :network-label="invoice.network_label || invoice.network"
+                                />
+                            </div>
                         </div>
-                        <div class="opacity-60" v-else>—</div>
-                    </div>
-                    <div class="grid gap-2">
-                        <div class="text-xs opacity-60">Получено / Подтв.</div>
-                        <div class="font-mono">{{ invoice.amount_received }} / {{ invoice.confirmations }}</div>
-                    </div>
-                    <div class="grid gap-2">
-                        <div class="text-xs opacity-60">Истекает</div>
-                        <div>
-                            <template v-if="invoice.expires_at">
-                                <DateTimeFormat :value="toIso(invoice.expires_at)" />
-                            </template>
-                            <template v-else>—</template>
-                        </div>
-                    </div>
-                    <div class="grid gap-2">
-                        <div class="text-xs opacity-60">Создан</div>
-                        <div>
-                            <DateTimeFormat :value="toIso(invoice.created_at)" />
+                        <div class="flex-1 min-w-[200px]">
+                            <div class="text-xs text-base-content/60 mb-1">Адрес</div>
+                            <div>
+                                <AddressCopy v-if="invoice.address" :address="invoice.address" />
+                                <span v-else class="text-base-content/60">#{{ invoice.address_id }}</span>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="divider my-0"></div>
+                <div class="divider"></div>
 
-                <div class="grid gap-4 md:grid-cols-1">
-                    <div class="grid gap-3">
-                        <div class="text-xs opacity-60">Callback URL</div>
-                        <div>
-                            <template v-if="invoice.callback_url">
-                                <div class="flex items-center gap-2">
-                                    <span class="badge badge-outline">POST</span>
-                                    <span class="break-all font-mono">{{ invoice.callback_url }}</span>
+                <!-- Детали платежа -->
+                <div class="space-y-4">
+                    <h3 class="text-sm font-semibold text-base-content/80">Детали платежа</h3>
+                    <div class="space-y-3">
+                        <div class="flex flex-col sm:flex-row sm:items-center gap-2">
+                            <div class="text-xs text-base-content/60 sm:w-32 flex-shrink-0">External ID</div>
+                            <div class="flex-1 flex items-center gap-2 flex-wrap">
+                                <UidCopy :uid="invoice.external_invoice_id"/>
+                            </div>
+                        </div>
+                        <div class="flex flex-col sm:flex-row sm:items-center gap-2">
+                            <div class="text-xs text-base-content/60 sm:w-32 flex-shrink-0">TXID</div>
+                            <div class="flex-1 flex items-center gap-2 flex-wrap">
+                                <TxidCopy v-if="invoice.txid" :txid="invoice.txid" />
+                                <a
+                                    v-if="invoice.status === 'paid' && invoice.tx_explorer_url"
+                                    :href="invoice.tx_explorer_url"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    class="btn btn-ghost btn-xs btn-circle"
+                                    title="Открыть в эксплорере"
+                                >
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 0 0 3 8.25v10.5A2.25 2.25 0 0 0 5.25 21h10.5A2.25 2.25 0 0 0 18 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
+                                    </svg>
+                                </a>
+                                <span v-if="!invoice.txid" class="text-base-content/60">—</span>
+                            </div>
+                        </div>
+                        <div class="flex flex-col sm:flex-row sm:items-center gap-2">
+                            <div class="text-xs text-base-content/60 sm:w-32 flex-shrink-0">Получено / Подтв.</div>
+                            <div class="flex-1">
+                                <span class="font-mono">{{ invoice.amount_received }} / {{ invoice.confirmations }}</span>
+                            </div>
+                        </div>
+                        <div class="flex flex-col sm:flex-row sm:items-center gap-2">
+                            <div class="text-xs text-base-content/60 sm:w-32 flex-shrink-0">Истекает</div>
+                            <div class="flex-1">
+                                <DateTimeFormat v-if="invoice.expires_at" :value="toIso(invoice.expires_at)" />
+                                <span v-else class="text-base-content/60">—</span>
+                            </div>
+                        </div>
+                        <div class="flex flex-col sm:flex-row sm:items-center gap-2">
+                            <div class="text-xs text-base-content/60 sm:w-32 flex-shrink-0">Создан</div>
+                            <div class="flex-1">
+                                <DateTimeFormat :value="toIso(invoice.created_at)" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="divider"></div>
+
+                <!-- Дополнительная информация -->
+                <div class="space-y-4">
+                    <h3 class="text-sm font-semibold text-base-content/80">Дополнительная информация</h3>
+                    <div class="space-y-3">
+                        <div class="grid grid-cols-1 gap-2">
+                            <div class="text-xs text-base-content/60 sm:w-32 flex-shrink-0">Callback URL</div>
+                            <div class="flex-1">
+                                <div v-if="invoice.callback_url" class="flex items-center gap-2 flex-wrap">
+                                    <span class="badge badge-outline badge-sm">POST</span>
+                                    <span class="break-all font-mono text-sm">{{ invoice.callback_url }}</span>
                                 </div>
-                            </template>
-                            <template v-else>—</template>
+                                <span v-else class="text-base-content/60">—</span>
+                            </div>
                         </div>
-                    </div>
-                    <div class="grid gap-3">
-                        <div class="text-xs opacity-60">Метаданные</div>
-                        <div class="mockup-code">
-                            <pre><code>{{ JSON.stringify(invoice.metadata || {}, null, 2) }}</code></pre>
-                        </div>
+<!--      Временно не отображаем -->
+<!--                        <div class="grid grid-cols-1 gap-2">
+                            <div class="text-xs text-base-content/60 sm:w-32 flex-shrink-0">Метаданные</div>
+                            <div class="flex-1">
+                                <div class="mockup-code text-xs">
+                                    <pre><code>{{ JSON.stringify(invoice.metadata || {}, null, 2) }}</code></pre>
+                                </div>
+                            </div>
+                        </div>-->
                     </div>
                 </div>
-                <Alert v-if="sendError" type="error" :message="sendError" />
-                <Alert v-if="sendSuccess" type="success" message="Колбэк отправлен" />
+
+                <!-- Уведомления -->
+                <div class="space-y-2">
+                    <Alert v-if="sendError" type="error" :message="sendError" />
+                    <Alert v-if="sendSuccess" type="success" message="Колбэк отправлен" />
+                </div>
             </div>
         </template>
 
         <template #actions>
+            <button class="btn btn-ghost" @click="close">
+                <span class="hidden sm:inline">Закрыть</span>
+                <span class="inline sm:hidden">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+                    </svg>
+                </span>
+            </button>
             <button class="btn" :disabled="!invoice" @click="emit('edit')">
-                Редактировать
+                <span class="hidden sm:inline">Редактировать</span>
+                <span class="inline sm:hidden">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
+                    </svg>
+                </span>
             </button>
             <button
                 v-if="invoice?.callback_url"
@@ -212,10 +241,12 @@ function toIso(input: string | null | undefined): string {
                 :disabled="sendLoading"
                 @click="emit('send-callback')"
             >
-                Отправить колбэк
-            </button>
-            <button class="btn btn-ghost" @click="close">
-                Закрыть
+                <span class="hidden sm:inline">Отправить колбэк</span>
+                <span class="inline sm:hidden">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 12 3.269 3.125A59.769 59.769 0 0 1 21.485 12 59.768 59.768 0 0 1 3.27 20.875L5.999 12Zm0 0h7.5" />
+                    </svg>
+                </span>
             </button>
         </template>
     </ModalDialog>
