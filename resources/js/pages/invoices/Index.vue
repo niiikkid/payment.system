@@ -200,10 +200,13 @@ function toIso(input: string | null | undefined): string {
 
     <div class="grid gap-6">
       <!-- List -->
-      <div class="card bg-base-100 shadow">
-        <div class="card-body">
-          <h2 class="card-title">Список инвойсов</h2>
-          <div class="overflow-x-auto">
+      <div class="lg:card lg:bg-base-100 lg:shadow">
+        <div class="lg:card-body">
+          <h2 class="hidden lg:block card-title">Список инвойсов</h2>
+          <h2 class="lg:hidden card-title mb-3">Список инвойсов</h2>
+
+          <!-- Desktop Table View (lg and above) -->
+          <div class="hidden lg:block overflow-x-auto">
             <table class="table table-sm w-full">
               <thead>
                 <tr>
@@ -230,18 +233,22 @@ function toIso(input: string | null | undefined): string {
                     <CurrencyNetworkBadge :currency-label="inv.currency_label || inv.currency" :network-label="inv.network_label || inv.network" />
                   </td>
                   <td>
-                    <span class="badge" :class="{
+                    <span class="badge badge-sm" :class="{
                       'badge-warning': statuses.active.includes(inv.status),
                       'badge-success': inv.status === 'paid',
                       'badge-error': statuses.final.includes(inv.status) && inv.status !== 'paid',
                     }">{{ inv.status }}</span>
                   </td>
-                  <td>
+                  <td class="text-xs font-mono">
                     <DateTimeFormat :value="toIso(inv.created_at)" />
                   </td>
                   <td class="flex items-center gap-2">
-                    <button class="btn btn-sm" @click="openDetails(inv)">Подробнее</button>
-                    <Link :href="`/pay/${inv.id}`" target="_blank" rel="noopener" class="btn btn-ghost btn-sm" title="Открыть платёжную страницу">
+                    <button class="btn btn-xs" @click="openDetails(inv)">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25" />
+                        </svg>
+                    </button>
+                    <Link :href="`/pay/${inv.id}`" target="_blank" rel="noopener" class="btn btn-ghost btn-xs" title="Открыть платёжную страницу">
                       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 0 0 3 8.25v10.5A2.25 2.25 0 0 0 5.25 21h10.5A2.25 2.25 0 0 0 18 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
                       </svg>
@@ -254,6 +261,140 @@ function toIso(input: string | null | undefined): string {
               </tbody>
             </table>
           </div>
+
+          <!-- Mobile Card View (sm to lg) -->
+          <div class="hidden sm:block lg:hidden space-y-3">
+            <div v-for="inv in invoices.data" :key="inv.id" class="card bg-base-100 shadow-sm">
+              <div class="card-body p-4">
+                <!-- Header: UUID and Date -->
+                <div class="flex items-center justify-between mb-3">
+                  <div class="flex items-center gap-2">
+                    <span class="text-xs opacity-70">UUID:</span>
+                    <UidCopy :uid="inv.id" />
+                  </div>
+                  <div class="flex items-center gap-1.5 text-xs opacity-70">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-3.5">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5" />
+                    </svg>
+                    <DateTimeFormat :value="toIso(inv.created_at)" />
+                  </div>
+                </div>
+
+                <!-- Main Content Row -->
+                <div class="grid grid-cols-[auto_1fr_auto] items-center gap-3">
+                  <!-- Amounts -->
+                  <div class="flex items-center gap-2">
+                    <div class="text-sm font-semibold">{{ inv.amount }}</div>
+                    <div>
+                      <CurrencyNetworkBadge :currency-label="inv.currency_label || inv.currency" :network-label="inv.network_label || inv.network" />
+                    </div>
+                  </div>
+
+                  <!-- Middle Info - Centered -->
+                  <div class="flex justify-center min-w-0">
+                    <div class="font-mono text-xs opacity-70 truncate text-center">
+                      <AddressCopy v-if="inv.address" :address="inv.address" />
+                      <span v-else class="opacity-60">#{{ inv.address_id }}</span>
+                    </div>
+                  </div>
+
+                  <!-- Right Side: Status and Actions -->
+                  <div class="flex items-center gap-2">
+                    <div>
+                      <span class="badge badge-sm" :class="{
+                        'badge-warning': statuses.active.includes(inv.status),
+                        'badge-success': inv.status === 'paid',
+                        'badge-error': statuses.final.includes(inv.status) && inv.status !== 'paid',
+                      }">
+                        {{ inv.status }}
+                      </span>
+                    </div>
+                    <button class="btn btn-xs" @click="openDetails(inv)">
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25" />
+                      </svg>
+                    </button>
+                    <Link :href="`/pay/${inv.id}`" target="_blank" rel="noopener" class="btn btn-ghost btn-xs" title="Открыть платёжную страницу">
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 0 0 3 8.25v10.5A2.25 2.25 0 0 0 5.25 21h10.5A2.25 2.25 0 0 0 18 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
+                      </svg>
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div v-if="!invoices.data.length" class="text-center text-sm opacity-70 py-6">
+              Пока нет инвойсов
+            </div>
+          </div>
+
+          <!-- Small Mobile Card View (below sm) -->
+            <div class="sm:hidden space-y-3">
+                <div v-for="inv in invoices.data" :key="inv.id" class="card bg-base-100 shadow-sm">
+                    <div class="card-body p-4">
+                        <!-- Header: UUID and Date -->
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="flex items-center gap-2">
+                                <span class="text-xs opacity-70">UUID:</span>
+                                <UidCopy :uid="inv.id" />
+                            </div>
+                            <div class="flex items-center gap-1.5 text-xs opacity-70">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-3.5">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5" />
+                                </svg>
+                                <DateTimeFormat :value="toIso(inv.created_at)" short-year hide-seconds />
+                            </div>
+                        </div>
+
+                        <!-- Main Content Row -->
+                        <div class="flex justify-between items-center gap-3">
+                            <!-- Amounts -->
+                            <div class="flex items-center gap-2">
+                                <div class="text-sm font-semibold">{{ inv.amount }}</div>
+                                <div>
+                                    <CurrencyNetworkBadge :currency-label="inv.currency_label || inv.currency" :network-label="inv.network_label || inv.network" />
+                                </div>
+                            </div>
+
+                            <!-- Right Side: Status and Actions -->
+                            <div>
+                                  <span class="badge badge-sm" :class="{
+                                    'badge-warning': statuses.active.includes(inv.status),
+                                    'badge-success': inv.status === 'paid',
+                                    'badge-error': statuses.final.includes(inv.status) && inv.status !== 'paid',
+                                  }">
+                                    {{ inv.status }}
+                                  </span>
+                            </div>
+                        </div>
+
+                        <!-- Footer -->
+                        <div class="flex items-center justify-between mt-3">
+                            <div class="flex items-center">
+                                <div class="font-mono text-xs opacity-70 truncate text-center">
+                                    <AddressCopy v-if="inv.address" :address="inv.address" />
+                                    <span v-else class="opacity-60">#{{ inv.address_id }}</span>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <button class="btn btn-xs" @click="openDetails(inv)">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25" />
+                                    </svg>
+                                </button>
+                                <Link :href="`/pay/${inv.id}`" target="_blank" rel="noopener" class="btn btn-ghost btn-xs" title="Открыть платёжную страницу">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 0 0 3 8.25v10.5A2.25 2.25 0 0 0 5.25 21h10.5A2.25 2.25 0 0 0 18 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
+                                    </svg>
+                                </Link>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div v-if="!invoices.data.length" class="text-center text-sm opacity-70 py-6">
+                    Пока нет инвойсов
+                </div>
+            </div>
 
           <Pagination :links="invoices.links" />
         </div>
