@@ -31,7 +31,7 @@ class StoreInvoiceRequest extends FormRequest
         return [
             'currency' => ['required', 'string'],
             'network' => ['required', 'string'],
-            'amount' => ['required'],
+            'amount' => ['required', 'numeric', 'min:1'],
             'external_invoice_id' => ['nullable', 'string', 'max:64'],
             'callback_url' => ['nullable', 'url', 'max:255'],
             'tag' => ['nullable', 'string', 'max:255'],

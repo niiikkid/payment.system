@@ -23,9 +23,67 @@ class UpdateAppSettingsRequest extends FormRequest
         return [
             'settings' => ['required', 'array', 'min:1'],
             'settings.*.currency' => ['required', 'string'],
-            'settings.*.min_invoice_amount' => ['required'],
-            'settings.*.max_invoice_amount' => ['required'],
+            'settings.*.min_invoice_amount' => ['required', 'numeric', 'min:0'],
+            'settings.*.max_invoice_amount' => ['required', 'numeric', 'min:0'],
         ];
+    }
+
+    public function withValidator($validator): void
+    {
+        $validator->after(function ($validator) {
+            $money = app(MoneyServiceContract::class);
+            $maxUsdtValue = $this->getMaxUsdtValueInMinor($money);
+            
+            foreach ($this->input('settings', []) as $index => $item) {
+                if (!isset($item['currency']) || !isset($item['min_invoice_amount']) || !isset($item['max_invoice_amount'])) {
+                    continue;
+                }
+                
+                try {
+                    $currency = Currency::from(strtoupper((string) $item['currency']));
+                    
+                    $min = $money->create($item['min_invoice_amount'], $currency);
+                    $max = $money->create($item['max_invoice_amount'], $currency);
+                    
+                    $minMinorStr = $money->toMinor($min);
+                    $maxMinorStr = $money->toMinor($max);
+                    
+                    if (!preg_match('/^-?\d+$/', $minMinorStr)) {
+                        $validator->errors()->add("settings.{$index}.min_invoice_amount", 'Минимальная сумма должна быть целым числом.');
+                        continue;
+                    }
+                    
+                    if (!preg_match('/^-?\d+$/', $maxMinorStr)) {
+                        $validator->errors()->add("settings.{$index}.max_invoice_amount", 'Максимальная сумма должна быть целым числом.');
+                        continue;
+                    }
+                    
+                    $minMinor = (int) $minMinorStr;
+                    $maxMinor = (int) $maxMinorStr;
+                    
+                    if ($minMinor < 0) {
+                        $validator->errors()->add("settings.{$index}.min_invoice_amount", 'Минимальная сумма не может быть меньше нуля.');
+                    }
+                    
+                    if ($maxMinor < 0) {
+                        $validator->errors()->add("settings.{$index}.max_invoice_amount", 'Максимальная сумма не может быть меньше нуля.');
+                    }
+                    
+                    if ($maxMinor > $maxUsdtValue) {
+                        $maxUsdtFormatted = $money->format($money->fromMinor($maxUsdtValue, Currency::USDT));
+                        $validator->errors()->add("settings.{$index}.max_invoice_amount", "Максимальная сумма не может превышать {$maxUsdtFormatted} USDT.");
+                    }
+                } catch (\Exception $e) {
+                    // Игнорируем ошибки конвертации, они будут обработаны другими правилами валидации
+                }
+            }
+        });
+    }
+
+    private function getMaxUsdtValueInMinor(MoneyServiceContract $money): int
+    {
+        $maxUsdt = $money->create('9223372036854775807', Currency::USDT);
+        return (int) $money->toMinor($maxUsdt);
     }
 
     /** Преобразовать входные суммы в минорные единицы по валютам */
