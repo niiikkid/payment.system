@@ -2,6 +2,8 @@
 import ModalDialog from '@/components/ui/modal/ModalDialog.vue'
 import DateTimeFormat from '@/components/ui/DateTimeFormat.vue'
 import Alert from '@/components/ui/Alert.vue'
+import UidCopy from '@/components/ui/UidCopy.vue';
+import LinkCopy from '@/components/ui/LinkCopy.vue';
 
 type CallbackLog = {
     id: string
@@ -48,7 +50,7 @@ function toIso(input: string | null | undefined): string {
         :model-value="modelValue"
         title="Детали коллбэка"
         description="Полная информация по выбранной записи"
-        size="3xl"
+        size="2xl"
         placement="bottom"
         @update:modelValue="emit('update:modelValue', $event)"
         @close="close"
@@ -57,13 +59,17 @@ function toIso(input: string | null | undefined): string {
             <div class="grid gap-4">
                 <div class="grid gap-3">
                     <div class="text-xs opacity-60">ID</div>
-                    <div class="font-mono break-all">{{ log.id }}</div>
+                    <div class="font-mono break-all">
+                        <UidCopy :uid="log.id"/>
+                    </div>
                 </div>
 
                 <div class="grid gap-2 md:grid-cols-2">
                     <div class="grid gap-1">
                         <div class="text-xs opacity-60">Invoice</div>
-                        <div class="font-mono break-all">{{ log.invoice_id }}</div>
+                        <div class="font-mono break-all">
+                            <UidCopy :uid="log.invoice_id"/>
+                        </div>
                     </div>
                     <div class="grid gap-1">
                         <div class="text-xs opacity-60">Событие</div>
@@ -73,7 +79,9 @@ function toIso(input: string | null | undefined): string {
                         <div class="text-xs opacity-60">URL</div>
                         <div class="flex items-center gap-2">
                             <span class="badge badge-outline">POST</span>
-                            <span class="break-all font-mono">{{ log.url }}</span>
+                            <span class="break-all font-mono">
+                                <LinkCopy :url="log.url"/>
+                            </span>
                         </div>
                     </div>
                     <div class="grid gap-1">

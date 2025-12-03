@@ -6,6 +6,7 @@ import UidCopy from '@/components/ui/UidCopy.vue'
 import DateTimeFormat from '@/components/ui/DateTimeFormat.vue'
 import Alert from '@/components/ui/Alert.vue'
 import TxidCopy from '@/components/ui/TxidCopy.vue';
+import LinkCopy from '@/components/ui/LinkCopy.vue';
 
 type Invoice = {
     id: string
@@ -193,7 +194,9 @@ function toIso(input: string | null | undefined): string {
                             <div class="flex-1">
                                 <div v-if="invoice.callback_url" class="flex items-center gap-2 flex-wrap">
                                     <span class="badge badge-outline badge-sm">POST</span>
-                                    <span class="break-all font-mono text-sm">{{ invoice.callback_url }}</span>
+                                    <span class="break-all font-mono text-sm">
+                                        <LinkCopy :url="invoice.callback_url"/>
+                                    </span>
                                 </div>
                                 <span v-else class="text-base-content/60">—</span>
                             </div>
