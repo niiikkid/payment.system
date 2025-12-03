@@ -45,7 +45,7 @@ const breadcrumbs = computed<BreadcrumbItem[]>(() => [
 <template>
     <AppLayout :breadcrumbs="breadcrumbs">
         <form class="space-y-6" @submit.prevent="submit">
-            <div class="grid grid-cols-1 gap-6 lg:grid-cols-2 xl:grid-cols-3">
+            <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
                 <div v-for="(item, idx) in form.settings" :key="item.currency" class="card bg-base-100 shadow">
                     <div class="card-body">
                         <div class="flex items-center justify-between">

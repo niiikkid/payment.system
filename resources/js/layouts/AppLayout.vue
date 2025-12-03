@@ -68,7 +68,7 @@ const pageIconPath = computed(() => {
     <div class="drawer lg:drawer-open bg-base-200 min-h-screen">
         <input id="app-drawer" type="checkbox" class="drawer-toggle" />
         <div class="drawer-content overflow-x-hidden">
-            <div class="lg:hidden sticky top-0 z-10 border-b border-base-200 bg-base-100/60 px-4 py-3 backdrop-blur supports-[backdrop-filter]:bg-base-100/60 lg:px-6">
+            <div class="lg:hidden sticky top-0 z-10 border-b border-base-200 bg-base-100/60 py-3 backdrop-blur supports-[backdrop-filter]:bg-base-100/60 lg:px-6">
                 <div class="flex justify-between items-center navbar">
                     <div class="navbar-start">
                         <label for="app-drawer" class="btn btn-ghost btn-md lg:hidden">
