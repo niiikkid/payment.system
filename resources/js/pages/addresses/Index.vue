@@ -75,6 +75,7 @@ async function submitCreate() {
         router.reload({ only: ['addresses'] });
         resetCreatePayload();
     } catch (e: any) {
+        showCreate.value = true;
         createError.value = e?.response?.data?.message || e?.response?.data?.errors?.address?.[0] || e?.response?.data?.errors?.network?.[0] || e?.response?.data?.errors?.currency?.[0] || e?.message || 'Ошибка при добавлении адреса';
     } finally {
         createLoading.value = false;

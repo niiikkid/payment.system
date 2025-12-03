@@ -109,7 +109,10 @@ function submit() {
 
             <div class="modal-action">
                 <button type="button" class="btn" @click="close" :disabled="loading">Отмена</button>
-                <button type="submit" class="btn btn-primary" :class="{ loading }" :disabled="loading">Добавить</button>
+                <button type="submit" class="btn btn-primary" :disabled="loading">
+                    <span v-if="loading" class="loading loading-spinner loading-sm mr-2" />
+                    Добавить
+                </button>
             </div>
         </form>
     </ModalDialog>

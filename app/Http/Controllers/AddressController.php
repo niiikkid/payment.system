@@ -12,13 +12,17 @@ use App\Services\Address\AddressService;
 use App\Enums\Currency;
 use App\Enums\Network;
 use App\Exceptions\Address\AddressNotFoundOnBlockchainException;
+use App\Exceptions\Address\AddressServiceException;
+use App\Exceptions\Address\CurrencyNetworkMismatchException;
 use App\Exceptions\Address\DuplicateAddressException;
 use App\Exceptions\Address\UnsupportedCurrencyException;
 use App\Exceptions\Address\UnsupportedNetworkException;
-use App\Exceptions\Address\CurrencyNetworkMismatchException;
-use Illuminate\Support\Str;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Inertia\Inertia;
 use Inertia\Response;
+use Symfony\Component\HttpFoundation\Response as HttpResponse;
+use Throwable;
 
 class AddressController extends Controller
 {
@@ -61,18 +65,59 @@ class AddressController extends Controller
     public function store(StoreAddressRequest $request, AddressService $addressService)
     {
         try {
-            $addressService->create(
+            $address = $addressService->create(
                 $request->string('currency')->toString(),
                 $request->string('network')->toString(),
                 $request->string('address')->toString(),
             );
 
-            return back()->with('success', 'Address added');
-        } catch (\Exception $e) {
-            return back()
-                ->with('error', 'Не удалось добавить адрес.')
-                ->onlyInput('currency', 'network', 'address');
+            return $this->storeSuccessResponse($request, $address);
+        } catch (AddressServiceException $exception) {
+            $message = $this->mapServiceException($exception);
+
+            return $this->storeErrorResponse($request, $message, HttpResponse::HTTP_UNPROCESSABLE_ENTITY);
+        } catch (Throwable $exception) {
+            report($exception);
+
+            return $this->storeErrorResponse($request, 'Не удалось добавить адрес.', HttpResponse::HTTP_INTERNAL_SERVER_ERROR);
         }
+    }
+
+    private function storeSuccessResponse(StoreAddressRequest $request, Address $address): JsonResponse|RedirectResponse
+    {
+        if ($request->expectsJson()) {
+            return response()->json([
+                'message' => 'Address added',
+                'address' => (new AddressResource($address))->resolve(),
+            ], HttpResponse::HTTP_CREATED);
+        }
+
+        return back()->with('success', 'Address added');
+    }
+
+    private function storeErrorResponse(StoreAddressRequest $request, string $message, int $status): JsonResponse|RedirectResponse
+    {
+        if ($request->expectsJson()) {
+            return response()->json([
+                'message' => $message,
+            ], $status);
+        }
+
+        return back()
+            ->with('error', $message)
+            ->onlyInput('currency', 'network', 'address');
+    }
+
+    private function mapServiceException(AddressServiceException $exception): string
+    {
+        return match (true) {
+            $exception instanceof AddressNotFoundOnBlockchainException => 'Указанный адрес не найден в блокчейне.',
+            $exception instanceof DuplicateAddressException => 'Адрес уже существует для выбранной сети и валюты.',
+            $exception instanceof UnsupportedCurrencyException => 'Неподдерживаемая валюта.',
+            $exception instanceof UnsupportedNetworkException => 'Неподдерживаемая сеть.',
+            $exception instanceof CurrencyNetworkMismatchException => 'Эта валюта недоступна в выбранной сети.',
+            default => $exception->getMessage() ?: 'Не удалось добавить адрес.',
+        };
     }
 
     /**
