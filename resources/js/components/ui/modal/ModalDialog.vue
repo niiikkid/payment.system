@@ -35,7 +35,13 @@ const sizeClassMap: Record<ModalSize, string> = {
     '3xl': 'max-w-3xl',
 }
 
-const modalBoxClass = computed(() => sizeClassMap[props.size])
+const modalBoxClass = computed(() => {
+    if (props.placement === 'bottom') {
+        const sizeClass = sizeClassMap[props.size]
+        return `w-full max-w-full md:w-auto md:${sizeClass}`
+    }
+    return `w-full ${sizeClassMap[props.size]}`
+})
 const modalPlacementClass = computed(() => props.placement === 'bottom' ? 'modal modal-bottom md:modal-middle' : 'modal')
 
 function close() {
@@ -48,7 +54,7 @@ function close() {
 <template>
     <teleport to="body">
         <dialog :open="modelValue" :class="modalPlacementClass">
-            <div class="modal-box w-full" :class="modalBoxClass">
+            <div class="modal-box" :class="modalBoxClass">
                 <div class="flex items-start justify-between gap-4">
                     <div class="space-y-1">
                         <h3 v-if="title" class="font-bold text-lg">{{ title }}</h3>
