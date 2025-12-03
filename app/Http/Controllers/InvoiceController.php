@@ -13,12 +13,14 @@ use App\Http\Requests\UpdateInvoiceRequest;
 use App\Http\Requests\StoreInvoiceRequest;
 use App\Http\Resources\InvoiceResource;
 use App\Models\Invoice;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Inertia\Inertia;
 use Inertia\Response;
 use Endroid\QrCode\QrCode;
 use Endroid\QrCode\Writer\PngWriter;
 use App\Contracts\Invoice\InvoiceCallbackServiceContract;
+use Throwable;
 
 class InvoiceController extends Controller
 {
@@ -44,7 +46,7 @@ class InvoiceController extends Controller
         ]);
     }
 
-    public function store(StoreInvoiceRequest $request, InvoiceServiceContract $service, MoneyServiceContract $money)
+    public function store(StoreInvoiceRequest $request, InvoiceServiceContract $service, MoneyServiceContract $money): JsonResponse|RedirectResponse
     {
         try {
             $invoice = $service->create(
@@ -57,15 +59,26 @@ class InvoiceController extends Controller
                 (array) $request->input('metadata', [])
             );
 
-            return response()->json([
-                'success' => true,
-                'invoice' => (new InvoiceResource($invoice))->resolve(),
-            ]);
-        } catch (\Throwable $e) {
-            return response()->json([
-                'success' => false,
-                'message' => $e->getMessage(),
-            ], 422);
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'invoice' => (new InvoiceResource($invoice))->resolve(),
+                ]);
+            }
+
+            return back()->with('success', 'Инвойс создан');
+        } catch (Throwable $e) {
+            report($e);
+            $message = $e->getMessage() ?: 'Не удалось создать инвойс.';
+
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $message,
+                ], 422);
+            }
+
+            return back()->with('error', $message);
         }
     }
 
@@ -119,14 +132,35 @@ class InvoiceController extends Controller
         ]);
     }
 
-    public function update(UpdateInvoiceRequest $request, Invoice $invoice, InvoiceServiceContract $service): array
+    public function update(UpdateInvoiceRequest $request, Invoice $invoice, InvoiceServiceContract $service): JsonResponse|RedirectResponse
     {
-        $status = InvoiceStatus::from($request->input('status'));
-        $txid = $request->input('txid');
+        try {
+            $status = InvoiceStatus::from($request->input('status'));
+            $txid = $request->input('txid');
 
-        $updated = $service->updateStatusManually($invoice, $status, $txid);
+            $updated = $service->updateStatusManually($invoice, $status, $txid);
 
-        return (new InvoiceResource($updated))->resolve();
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'invoice' => (new InvoiceResource($updated))->resolve(),
+                ]);
+            }
+
+            return back()->with('success', 'Инвойс обновлён');
+        } catch (Throwable $e) {
+            report($e);
+            $message = $e->getMessage() ?: 'Не удалось обновить инвойс.';
+
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $message,
+                ], 422);
+            }
+
+            return back()->with('error', $message);
+        }
     }
 
     public function sendCallback(Invoice $invoice, InvoiceCallbackServiceContract $callbackService)

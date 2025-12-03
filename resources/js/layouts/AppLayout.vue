@@ -2,6 +2,7 @@
 import type { BreadcrumbItemType } from '@/types';
 import { computed } from 'vue';
 import { Link, usePage } from '@inertiajs/vue3';
+import Alert from '@/components/ui/Alert.vue';
 
 interface Props {
     breadcrumbs?: BreadcrumbItemType[];
@@ -26,6 +27,8 @@ const isProfileSettingsActive = computed(() => page.url.startsWith('/settings/pr
 const isApiDocsActive = computed(() => page.url.startsWith('/api'));
 
 const userEmail = computed(() => (page.props as any)?.auth?.user?.email ?? '');
+const flashSuccess = computed(() => (page.props as any)?.flash?.success ?? null);
+const flashError = computed(() => (page.props as any)?.flash?.error ?? null);
 
 const pageTitle = computed(() => {
     if (props.title) return props.title;
@@ -112,6 +115,10 @@ const pageIconPath = computed(() => {
                         {{ pageTitle }}
                     </h1>
                     <slot name="header-actions" />
+                </div>
+                <div v-if="flashSuccess || flashError" class="mb-4 grid gap-2">
+                    <Alert v-if="flashSuccess" type="success" :message="flashSuccess" />
+                    <Alert v-if="flashError" type="error" :message="flashError" />
                 </div>
                 <slot />
             </div>

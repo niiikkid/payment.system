@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import ModalDialog from '@/components/ui/modal/ModalDialog.vue'
-import Alert from '@/components/ui/Alert.vue'
 import FormControl from '@/components/form/FormControl.vue'
 import Label from '@/components/form/Label.vue'
 import Input from '@/components/form/Input.vue'
@@ -14,20 +13,22 @@ export interface InvoiceEditForm {
     txid: string | null
 }
 
+type InvoiceEditErrors = Partial<Record<keyof InvoiceEditForm, string>>
+
 interface Props {
     modelValue: boolean
     form: InvoiceEditForm
     statusOptions: Option[]
-    error: string | null
+    errors: InvoiceEditErrors | null
     loading: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
     modelValue: false,
-    error: null,
     loading: false,
     form: () => ({ status: '', txid: null }),
     statusOptions: () => [],
+    errors: () => ({} as InvoiceEditErrors),
 })
 
 const emit = defineEmits<{
@@ -41,6 +42,8 @@ const form = computed({
     get: () => props.form,
     set: (value: InvoiceEditForm) => emit('update:form', value),
 })
+
+const fieldErrors = computed<InvoiceEditErrors>(() => props.errors ?? {})
 
 const txidInput = computed({
     get: () => form.value.txid || '',
@@ -77,9 +80,8 @@ function submit() {
         @update:modelValue="emit('update:modelValue', $event)"
         @close="close"
     >
-        <Alert v-if="error" type="error" :message="error" />
         <form class="mt-4 grid gap-4" @submit.prevent="submit">
-            <FormControl>
+            <FormControl :error="fieldErrors.status">
                 <Label for="status" required>Статус</Label>
                 <Select
                     id="status"
@@ -88,7 +90,7 @@ function submit() {
                     required
                 />
             </FormControl>
-            <FormControl v-if="form.status === 'paid'" hint="Обязателен для статуса paid">
+            <FormControl v-if="form.status === 'paid'" hint="Обязателен для статуса paid" :error="fieldErrors.txid">
                 <Label for="txid" required>TXID</Label>
                 <Input
                     id="txid"

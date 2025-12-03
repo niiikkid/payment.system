@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import ModalDialog from '@/components/ui/modal/ModalDialog.vue'
-import Alert from '@/components/ui/Alert.vue'
 import FormControl from '@/components/form/FormControl.vue'
 import Label from '@/components/form/Label.vue'
 import Input from '@/components/form/Input.vue'
@@ -15,18 +14,19 @@ export interface AddressCreateForm {
     address: string
 }
 
+type AddressCreateErrors = Partial<Record<keyof AddressCreateForm, string>>
+
 interface Props {
     modelValue: boolean
     form: AddressCreateForm
     currencyOptions: Option[]
     networkOptions: Option[]
-    error: string | null
+    errors: AddressCreateErrors | null
     loading: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
     modelValue: false,
-    error: null,
     loading: false,
     form: () => ({
         currency: '',
@@ -35,6 +35,7 @@ const props = withDefaults(defineProps<Props>(), {
     }),
     currencyOptions: () => [],
     networkOptions: () => [],
+    errors: () => ({} as AddressCreateErrors),
 })
 
 const emit = defineEmits<{
@@ -48,6 +49,8 @@ const form = computed({
     get: () => props.form,
     set: (value: AddressCreateForm) => emit('update:form', value),
 })
+
+const fieldErrors = computed<AddressCreateErrors>(() => props.errors ?? {})
 
 function close() {
     emit('update:modelValue', false)
@@ -74,9 +77,8 @@ function submit() {
         @update:modelValue="emit('update:modelValue', $event)"
         @close="close"
     >
-        <Alert v-if="error" type="error" :message="error" />
         <form class="mt-4 grid gap-4" @submit.prevent="submit">
-            <FormControl>
+            <FormControl :error="fieldErrors.currency">
                 <Label for="currency" required>Валюта</Label>
                 <Select
                     id="currency"
@@ -86,7 +88,7 @@ function submit() {
                     required
                 />
             </FormControl>
-            <FormControl>
+            <FormControl :error="fieldErrors.network">
                 <Label for="network" required>Сеть</Label>
                 <Select
                     id="network"
@@ -96,7 +98,7 @@ function submit() {
                     required
                 />
             </FormControl>
-            <FormControl>
+            <FormControl :error="fieldErrors.address">
                 <Label for="address" required>Адрес</Label>
                 <Input
                     id="address"

@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import ModalDialog from '@/components/ui/modal/ModalDialog.vue'
-import Alert from '@/components/ui/Alert.vue'
 import FormControl from '@/components/form/FormControl.vue'
 import Label from '@/components/form/Label.vue'
 import Input from '@/components/form/Input.vue'
@@ -20,18 +19,19 @@ export interface InvoiceCreateForm {
     metadata: string
 }
 
+type InvoiceCreateErrors = Partial<Record<keyof InvoiceCreateForm, string>>
+
 interface Props {
     modelValue: boolean
     form: InvoiceCreateForm
     currencyOptions: Option[]
     networkOptions: Option[]
-    error: string | null
+    errors: InvoiceCreateErrors | null
     loading: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
     modelValue: false,
-    error: null,
     loading: false,
     form: () => ({
         currency: '',
@@ -44,6 +44,7 @@ const props = withDefaults(defineProps<Props>(), {
     }),
     currencyOptions: () => [],
     networkOptions: () => [],
+    errors: () => ({} as InvoiceCreateErrors),
 })
 
 const emit = defineEmits<{
@@ -57,6 +58,8 @@ const form = computed({
     get: () => props.form,
     set: (value: InvoiceCreateForm) => emit('update:form', value),
 })
+
+const fieldErrors = computed<InvoiceCreateErrors>(() => props.errors ?? {})
 
 function close() {
     emit('update:modelValue', false)
@@ -86,9 +89,8 @@ function submit() {
         @update:modelValue="emit('update:modelValue', $event)"
         @close="close"
     >
-        <Alert v-if="error" type="error" :message="error" />
         <form class="mt-4 grid gap-4" @submit.prevent="submit">
-            <FormControl hint="Напр.: BTC, ETH, USDT">
+            <FormControl hint="Напр.: BTC, ETH, USDT" :error="fieldErrors.currency">
                 <Label for="currency" required>Валюта</Label>
                 <Select
                     id="currency"
@@ -98,7 +100,7 @@ function submit() {
                     required
                 />
             </FormControl>
-            <FormControl hint="Выберите сеть для валюты">
+            <FormControl hint="Выберите сеть для валюты" :error="fieldErrors.network">
                 <Label for="network" required>Сеть</Label>
                 <Select
                     id="network"
@@ -108,7 +110,7 @@ function submit() {
                     required
                 />
             </FormControl>
-            <FormControl hint="Десятичный формат">
+            <FormControl hint="Десятичный формат" :error="fieldErrors.amount">
                 <Label for="amount" required>Сумма</Label>
                 <Input
                     id="amount"
@@ -118,7 +120,7 @@ function submit() {
                     required
                 />
             </FormControl>
-            <FormControl>
+            <FormControl :error="fieldErrors.external_invoice_id">
                 <Label for="external_invoice_id">Внешний ID (опц.)</Label>
                 <Input
                     id="external_invoice_id"
@@ -126,7 +128,7 @@ function submit() {
                     type="text"
                 />
             </FormControl>
-            <FormControl>
+            <FormControl :error="fieldErrors.callback_url">
                 <Label for="callback_url">Callback URL (опц.)</Label>
                 <Input
                     id="callback_url"
@@ -134,7 +136,7 @@ function submit() {
                     type="url"
                 />
             </FormControl>
-            <FormControl>
+            <FormControl :error="fieldErrors.tag">
                 <Label for="tag">Тег (опц.)</Label>
                 <Input
                     id="tag"
@@ -142,7 +144,7 @@ function submit() {
                     type="text"
                 />
             </FormControl>
-            <FormControl>
+            <FormControl :error="fieldErrors.metadata">
                 <Label for="metadata">Metadata (JSON, опц.)</Label>
                 <Textarea
                     id="metadata"

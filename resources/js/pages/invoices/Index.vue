@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import AppLayout from '@/layouts/AppLayout.vue';
-import { Link, usePage, router } from '@inertiajs/vue3';
-import { ref, computed } from 'vue';
+import { Link, useForm, usePage } from '@inertiajs/vue3';
+import { ref, computed, watch } from 'vue';
 import axios from 'axios';
 import CurrencyNetworkBadge from '@/components/ui/CurrencyNetworkBadge.vue';
 import AddressCopy from '@/components/ui/AddressCopy.vue';
@@ -48,12 +48,11 @@ const sendLoading = ref(false);
 const sendError = ref<string | null>(null);
 const sendSuccess = ref(false);
 
-const editPayload = ref<InvoiceEditForm>({ status: '', txid: null });
-const editLoading = ref(false);
-const editError = ref<string | null>(null);
+const editForm = useForm<InvoiceEditForm>({ status: '', txid: null });
 
 function updateEditPayload(payload: InvoiceEditForm) {
-  editPayload.value = payload;
+  editForm.status = payload.status;
+  editForm.txid = payload.txid;
 }
 
 const allStatusOptions = computed(() => {
@@ -74,39 +73,28 @@ function closeDetails() {
 
 function openEdit() {
   if (!selected.value) return;
-  editError.value = null;
-  editPayload.value = {
-    status: selected.value.status,
-    txid: selected.value.txid || null,
-  };
+  editForm.clearErrors();
+  editForm.status = selected.value.status;
+  editForm.txid = selected.value.txid || null;
   showEdit.value = true;
 }
 
 function closeEdit() {
   showEdit.value = false;
+  editForm.clearErrors();
 }
 
 async function submitEdit() {
   if (!selected.value) return;
-  editError.value = null;
-  editLoading.value = true;
-  try {
-    const res = await axios.post(`/invoices/${selected.value.id}`, {
-      _method: 'PATCH',
-      status: editPayload.value.status,
-      txid: editPayload.value.status === 'paid' ? (editPayload.value.txid || '') : null,
-    });
-    const updated = res.data;
-    // Обновляем выбранный и список (перезагрузка только пропса invoices)
-    selected.value = updated;
-    showEdit.value = false;
-    router.reload({ only: ['invoices'] });
-  } catch (e: any) {
-    showEdit.value = true;
-    editError.value = e?.response?.data?.message || e?.response?.data?.errors?.txid?.[0] || e?.message || 'Ошибка при обновлении инвойса';
-  } finally {
-    editLoading.value = false;
-  }
+  editForm.patch(`/invoices/${selected.value.id}`, {
+    preserveScroll: true,
+    onSuccess: () => {
+      showEdit.value = false;
+    },
+    onError: () => {
+      showEdit.value = true;
+    },
+  });
 }
 
 async function sendCallback() {
@@ -125,7 +113,7 @@ async function sendCallback() {
   }
 }
 
-const createPayload = ref<InvoiceCreateForm>({
+const createForm = useForm<InvoiceCreateForm>({
   currency: '',
   network: '',
   amount: '',
@@ -134,53 +122,59 @@ const createPayload = ref<InvoiceCreateForm>({
   tag: '',
   metadata: '',
 });
-const createLoading = ref(false);
-const createError = ref<string | null>(null);
 
 function closeCreate() {
   showCreate.value = false;
+  createForm.clearErrors();
 }
 
 function updateCreatePayload(payload: InvoiceCreateForm) {
-  createPayload.value = payload;
+  createForm.currency = payload.currency;
+  createForm.network = payload.network;
+  createForm.amount = payload.amount;
+  createForm.external_invoice_id = payload.external_invoice_id;
+  createForm.callback_url = payload.callback_url;
+  createForm.tag = payload.tag;
+  createForm.metadata = payload.metadata;
 }
 
 function resetCreatePayload() {
-  createPayload.value = { currency: '', network: '', amount: '', external_invoice_id: '', callback_url: '', tag: '', metadata: '' };
+  createForm.reset();
+  createForm.clearErrors();
 }
 
-async function submitCreate() {
-  createError.value = null;
-  createLoading.value = true;
-  let metadataParsed: any = undefined;
-  if (createPayload.value.metadata) {
-    try { metadataParsed = JSON.parse(createPayload.value.metadata as string); } catch (e) { metadataParsed = undefined; }
-  }
-  try {
-    const res = await axios.post('/invoices', {
-      currency: createPayload.value.currency,
-      network: createPayload.value.network,
-      amount: createPayload.value.amount,
-      external_invoice_id: createPayload.value.external_invoice_id || null,
-      callback_url: createPayload.value.callback_url || null,
-      tag: createPayload.value.tag || null,
-      metadata: metadataParsed || {},
-    });
-    if (res.data?.success) {
-      showCreate.value = false;
-      // Обновим только список
-      router.reload({ only: ['invoices'] });
-      resetCreatePayload();
-    } else {
-      showCreate.value = true;
-      createError.value = res.data?.message || 'Ошибка при создании инвойса';
+function submitCreate() {
+  let metadataParsed: Record<string, unknown> | undefined;
+  if (createForm.metadata) {
+    try {
+      metadataParsed = JSON.parse(createForm.metadata as string);
+    } catch (e) {
+      createForm.setError('metadata', 'Некорректный JSON в metadata');
+      return;
     }
-  } catch (e: any) {
-    showCreate.value = true;
-    createError.value = e?.response?.data?.message || e?.message || 'Ошибка при создании инвойса';
-  } finally {
-    createLoading.value = false;
   }
+
+  createForm
+    .transform((data) => ({
+      ...data,
+      external_invoice_id: data.external_invoice_id || null,
+      callback_url: data.callback_url || null,
+      tag: data.tag || null,
+      metadata: metadataParsed ?? {},
+    }))
+    .post('/invoices', {
+      preserveScroll: true,
+      onSuccess: () => {
+        showCreate.value = false;
+        resetCreatePayload();
+      },
+      onError: () => {
+        showCreate.value = true;
+      },
+      onFinish: () => {
+        createForm.transform((data) => data);
+      },
+    });
 }
 
 function toIso(input: string | null | undefined): string {
@@ -190,6 +184,14 @@ function toIso(input: string | null | undefined): string {
   // Преобразуем 'YYYY-MM-DD HH:mm:ss' -> 'YYYY-MM-DDTHH:mm:ssZ'
   return `${input.replace(' ', 'T')}Z`;
 }
+
+watch(invoices, (collection: any) => {
+  if (!selected.value) return;
+  const fresh = collection?.data?.find((inv: Invoice) => inv.id === selected.value?.id);
+  if (fresh) {
+    selected.value = fresh;
+  }
+});
 
 </script>
 
@@ -418,10 +420,10 @@ function toIso(input: string | null | undefined): string {
 
     <InvoiceEditModal
       v-model="showEdit"
-      :form="editPayload"
+      :form="editForm"
       :status-options="allStatusOptions"
-      :error="editError"
-      :loading="editLoading"
+      :errors="editForm.errors"
+      :loading="editForm.processing"
       @update:form="updateEditPayload"
       @submit="submitEdit"
       @close="closeEdit"
@@ -429,11 +431,11 @@ function toIso(input: string | null | undefined): string {
 
     <InvoiceCreateModal
       v-model="showCreate"
-      :form="createPayload"
+      :form="createForm"
       :currency-options="currencyOptions"
       :network-options="networkOptions"
-      :error="createError"
-      :loading="createLoading"
+      :errors="createForm.errors"
+      :loading="createForm.processing"
       @update:form="updateCreatePayload"
       @submit="submitCreate"
       @close="closeCreate"

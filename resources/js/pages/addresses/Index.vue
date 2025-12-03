@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import AppLayout from '@/layouts/AppLayout.vue';
-import { Link, useForm, router } from '@inertiajs/vue3';
-import axios from 'axios';
+import { useForm } from '@inertiajs/vue3';
 import CurrencyNetworkBadge from '@/components/ui/CurrencyNetworkBadge.vue';
 import AddressCopy from '@/components/ui/AddressCopy.vue';
 import DateTimeFormat from '@/components/ui/DateTimeFormat.vue';
@@ -40,46 +39,40 @@ interface Props {
 }
 
 const props = defineProps<Props>();
-
 const showCreate = ref(false);
-const createPayload = ref<AddressCreateForm>({
+const createForm = useForm<AddressCreateForm>({
     currency: '',
     network: '',
     address: '',
 });
-const createLoading = ref(false);
-const createError = ref<string | null>(null);
 
 function closeCreate() {
     showCreate.value = false;
+    createForm.clearErrors();
 }
 
 function updateCreatePayload(payload: AddressCreateForm) {
-    createPayload.value = payload;
+    createForm.currency = payload.currency;
+    createForm.network = payload.network;
+    createForm.address = payload.address;
 }
 
 function resetCreatePayload() {
-    createPayload.value = { currency: '', network: '', address: '' };
+    createForm.reset();
+    createForm.clearErrors();
 }
 
-async function submitCreate() {
-    createError.value = null;
-    createLoading.value = true;
-    try {
-        await axios.post('/addresses', {
-            currency: createPayload.value.currency,
-            network: createPayload.value.network,
-            address: createPayload.value.address.trim(),
-        });
-        showCreate.value = false;
-        router.reload({ only: ['addresses'] });
-        resetCreatePayload();
-    } catch (e: any) {
-        showCreate.value = true;
-        createError.value = e?.response?.data?.message || e?.response?.data?.errors?.address?.[0] || e?.response?.data?.errors?.network?.[0] || e?.response?.data?.errors?.currency?.[0] || e?.message || 'Ошибка при добавлении адреса';
-    } finally {
-        createLoading.value = false;
-    }
+function submitCreate() {
+    createForm.post('/addresses', {
+        preserveScroll: true,
+        onSuccess: () => {
+            showCreate.value = false;
+            resetCreatePayload();
+        },
+        onError: () => {
+            showCreate.value = true;
+        },
+    });
 }
 
 function toggleAddress(id: number, nextActive: boolean) {
@@ -249,11 +242,11 @@ function toIso(input: string | null | undefined): string {
 
         <AddressCreateModal
             v-model="showCreate"
-            :form="createPayload"
+            :form="createForm"
             :currency-options="props.currencyOptions"
             :network-options="props.networkOptions"
-            :error="createError"
-            :loading="createLoading"
+            :errors="createForm.errors"
+            :loading="createForm.processing"
             @update:form="updateCreatePayload"
             @submit="submitCreate"
             @close="closeCreate"
