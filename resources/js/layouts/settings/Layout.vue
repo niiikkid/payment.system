@@ -2,7 +2,7 @@
 import { toUrl, urlIsActive } from '@/lib/utils';
 import { edit as editAppearance } from '@/routes/appearance';
 import { edit as editProfile } from '@/routes/profile';
-// import { show } from '@/routes/two-factor'; // временно скрыто
+import { show } from '@/routes/two-factor'; // временно скрыто
 import { edit as editPassword } from '@/routes/user-password';
 import { type NavItem } from '@/types';
 import { Link, router, usePage } from '@inertiajs/vue3';
@@ -13,7 +13,7 @@ import { logout as logoutRoute } from '@/routes';
 const sidebarNavItems: NavItem[] = [
     { title: 'Профиль', href: editProfile() },
     { title: 'Пароль', href: editPassword() },
-    // { title: 'Двухфакторная защита', href: show() }, // временно скрыто
+    { title: 'Двухфакторная защита', href: show() },
     { title: 'Внешний вид', href: editAppearance() },
 ];
 

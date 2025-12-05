@@ -1,18 +1,24 @@
 <script setup lang="ts">
 import AppLayout from '@/layouts/AppLayout.vue';
 import SettingsLayout from '@/layouts/settings/Layout.vue';
-import { disable, enable, show } from '@/routes/two-factor';
+import { useTwoFactorAuth } from '@/composables/useTwoFactorAuth';
+import { confirm, disable, enable, regenerateRecoveryCodes, show } from '@/routes/two-factor';
 import { Head, useForm } from '@inertiajs/vue3';
+import { computed, watch } from 'vue';
 import type { BreadcrumbItem } from '@/types';
 
 interface Props {
     requiresConfirmation?: boolean;
     twoFactorEnabled?: boolean;
+    hasUnconfirmedTwoFactor?: boolean;
+    status?: string | null;
 }
 
-withDefaults(defineProps<Props>(), {
+const props = withDefaults(defineProps<Props>(), {
     requiresConfirmation: false,
     twoFactorEnabled: false,
+    hasUnconfirmedTwoFactor: false,
+    status: null,
 });
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -21,14 +27,76 @@ const breadcrumbs: BreadcrumbItem[] = [
 
 const enableForm = useForm({});
 const disableForm = useForm({ _method: 'DELETE' });
+const confirmForm = useForm({ code: '' });
+const regenerateCodesForm = useForm({});
+
+const {
+    qrCodeSvg,
+    manualSetupKey,
+    recoveryCodesList,
+    errors,
+    hasSetupData,
+    clearTwoFactorAuthData,
+    fetchSetupData,
+    fetchRecoveryCodes,
+} = useTwoFactorAuth();
+
+const hasPendingConfirmation = computed<boolean>(
+    () => props.requiresConfirmation && props.hasUnconfirmedTwoFactor,
+);
+
+const showSetupBlock = computed<boolean>(
+    () => props.twoFactorEnabled || hasPendingConfirmation.value,
+);
+
+async function loadTwoFactorData() {
+    if (!showSetupBlock.value) {
+        clearTwoFactorAuthData();
+        return;
+    }
+
+    await fetchSetupData();
+    await fetchRecoveryCodes();
+}
 
 function submitEnable() {
-    enableForm.post(enable.url(), { preserveScroll: true });
+    enableForm.post(enable.url(), {
+        preserveScroll: true,
+        onSuccess: loadTwoFactorData,
+    });
 }
 
 function submitDisable() {
-    disableForm.post(disable.url(), { preserveScroll: true });
+    disableForm.post(disable.url(), {
+        preserveScroll: true,
+        onSuccess: clearTwoFactorAuthData,
+    });
 }
+
+function submitConfirm() {
+    confirmForm.post(confirm.url(), {
+        preserveScroll: true,
+        onSuccess: () => {
+            confirmForm.reset('code');
+            fetchRecoveryCodes();
+        },
+    });
+}
+
+function regenerateCodes() {
+    regenerateCodesForm.post(regenerateRecoveryCodes.url(), {
+        preserveScroll: true,
+        onSuccess: fetchRecoveryCodes,
+    });
+}
+
+watch(
+    () => [props.twoFactorEnabled, props.hasUnconfirmedTwoFactor],
+    () => {
+        loadTwoFactorData();
+    },
+    { immediate: true },
+);
 </script>
 
 <template>
@@ -41,30 +109,130 @@ function submitDisable() {
                     <p class="text-sm text-base-content/70">Управляйте настройками 2FA</p>
                 </div>
 
-                <div v-if="!twoFactorEnabled" class="flex flex-col items-start space-y-4">
-                    <div class="badge badge-error">Отключена</div>
-                    <p class="text-base-content/70">
-                        При включении 2FA во время входа потребуется одноразовый код из приложения-аутентификатора.
-                    </p>
-                    <button class="btn btn-primary" :disabled="enableForm.processing" @click="submitEnable">
-                        <span v-if="enableForm.processing" class="loading loading-spinner loading-sm mr-2" />
-                        Включить 2FA
-                    </button>
+                <div class="space-y-4">
+                    <div v-if="twoFactorEnabled" class="flex flex-col items-start space-y-4">
+                        <div class="badge badge-success">Включена</div>
+                        <p class="text-base-content/70">
+                            При включённой 2FA вход защищён одноразовым кодом из приложения-аутентификатора.
+                        </p>
+                        <button class="btn btn-error" :disabled="disableForm.processing" @click="submitDisable">
+                            <span v-if="disableForm.processing" class="loading loading-spinner loading-sm mr-2" />
+                            Отключить 2FA
+                        </button>
+                    </div>
+
+                    <div v-else-if="hasPendingConfirmation" class="flex flex-col items-start space-y-3">
+                        <div class="badge badge-warning text-warning-content">Ожидает подтверждения</div>
+                        <p class="text-base-content/70">
+                            Отсканируйте QR-код или введите ключ вручную, затем подтвердите кодом из приложения.
+                        </p>
+                        <div class="flex flex-wrap gap-3">
+                            <button class="btn btn-outline" :disabled="enableForm.processing" @click="loadTwoFactorData">
+                                Обновить данные
+                            </button>
+                            <button class="btn btn-error" :disabled="disableForm.processing" @click="submitDisable">
+                                <span v-if="disableForm.processing" class="loading loading-spinner loading-sm mr-2" />
+                                Отменить настройку
+                            </button>
+                        </div>
+                    </div>
+
+                    <div v-else class="flex flex-col items-start space-y-4">
+                        <div class="badge badge-error">Отключена</div>
+                        <p class="text-base-content/70">
+                            При включении 2FA во время входа потребуется одноразовый код из приложения-аутентификатора.
+                        </p>
+                        <button class="btn btn-primary" :disabled="enableForm.processing" @click="submitEnable">
+                            <span v-if="enableForm.processing" class="loading loading-spinner loading-sm mr-2" />
+                            Включить 2FA
+                        </button>
+                    </div>
                 </div>
 
-                <div v-else class="flex flex-col items-start space-y-4">
-                    <div class="badge badge-success">Включена</div>
-                    <p class="text-base-content/70">
-                        При включённой 2FA вход защищён одноразовым кодом из приложения-аутентификатора.
-                    </p>
-                    <button class="btn btn-error" :disabled="disableForm.processing" @click="submitDisable">
-                        <span v-if="disableForm.processing" class="loading loading-spinner loading-sm mr-2" />
-                        Отключить 2FA
-                    </button>
+                <div v-if="showSetupBlock" class="card border bg-base-100">
+                    <div class="card-body space-y-6">
+                        <div v-if="errors.length" class="alert alert-error">
+                            <span>Не удалось загрузить данные 2FA.</span>
+                        </div>
+
+                        <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+                            <div class="space-y-2">
+                                <h3 class="font-medium">QR-код</h3>
+                                <div v-if="qrCodeSvg" class="rounded-lg bg-base-200 p-4" v-html="qrCodeSvg" />
+                                <p v-else class="text-sm text-base-content/70">QR-код появится после получения данных.</p>
+                            </div>
+
+                            <div class="space-y-2">
+                                <h3 class="font-medium">Ручной ключ</h3>
+                                <div
+                                    v-if="manualSetupKey"
+                                    class="rounded-lg bg-base-200 p-3 font-mono text-lg tracking-widest"
+                                >
+                                    {{ manualSetupKey }}
+                                </div>
+                                <p v-else class="text-sm text-base-content/70">Ключ появится после загрузки данных.</p>
+                            </div>
+                        </div>
+
+                        <div class="space-y-2">
+                            <div class="flex items-center justify-between">
+                                <h3 class="font-medium">Резервные коды</h3>
+                                <button
+                                    class="btn btn-ghost btn-sm"
+                                    :disabled="regenerateCodesForm.processing"
+                                    @click="regenerateCodes"
+                                >
+                                    <span
+                                        v-if="regenerateCodesForm.processing"
+                                        class="loading loading-spinner loading-xs mr-2"
+                                    />
+                                    Обновить
+                                </button>
+                            </div>
+                            <div
+                                v-if="recoveryCodesList.length"
+                                class="grid grid-cols-1 gap-2 sm:grid-cols-2"
+                            >
+                                <div
+                                    v-for="code in recoveryCodesList"
+                                    :key="code"
+                                    class="rounded-lg border border-base-200 bg-base-200 px-3 py-2 font-mono text-sm"
+                                >
+                                    {{ code }}
+                                </div>
+                            </div>
+                            <p v-else class="text-sm text-base-content/70">
+                                Коды восстановления появятся после загрузки данных или генерации.
+                            </p>
+                        </div>
+
+                        <form v-if="hasPendingConfirmation && hasSetupData" class="space-y-3" @submit.prevent="submitConfirm">
+                            <div class="space-y-1">
+                                <label for="confirm-code" class="text-sm font-medium">Код из приложения</label>
+                                <input
+                                    id="confirm-code"
+                                    name="code"
+                                    type="text"
+                                    inputmode="numeric"
+                                    pattern="[0-9]*"
+                                    maxlength="6"
+                                    class="input input-bordered w-full md:w-64"
+                                    v-model="confirmForm.code"
+                                    placeholder="Введите 6 цифр"
+                                    required
+                                />
+                                <p v-if="confirmForm.errors.code" class="text-sm text-error">
+                                    {{ confirmForm.errors.code }}
+                                </p>
+                            </div>
+                            <button type="submit" class="btn btn-primary" :disabled="confirmForm.processing">
+                                <span v-if="confirmForm.processing" class="loading loading-spinner loading-sm mr-2" />
+                                Подтвердить включение
+                            </button>
+                        </form>
+                    </div>
                 </div>
             </div>
         </SettingsLayout>
     </AppLayout>
 </template>
-
-
