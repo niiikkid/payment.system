@@ -66,4 +66,9 @@ return [
         'key' => env('PUBLIC_API_KEY', ''),
     ],
 
+    'ipgeolocation' => [
+        'base_url' => env('IPGEOLOCATION_BASE_URL', 'https://api.ipgeolocation.io/v2'),
+        'api_key' => env('IPGEOLOCATION_API_KEY'),
+    ],
+
 ];

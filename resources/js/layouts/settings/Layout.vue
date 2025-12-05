@@ -4,6 +4,7 @@ import { edit as editAppearance } from '@/routes/appearance';
 import { edit as editProfile } from '@/routes/profile';
 import { show } from '@/routes/two-factor'; // временно скрыто
 import { edit as editPassword } from '@/routes/user-password';
+import { index as loginHistory } from '@/routes/login-history';
 import { type NavItem } from '@/types';
 import { Link, router, usePage } from '@inertiajs/vue3';
 import { computed, ref } from 'vue';
@@ -14,6 +15,7 @@ const sidebarNavItems: NavItem[] = [
     { title: 'Профиль', href: editProfile() },
     { title: 'Пароль', href: editPassword() },
     { title: '2FA авторизация', href: show() },
+    { title: 'История входов', href: loginHistory() },
     { title: 'Внешний вид', href: editAppearance() },
 ];
 

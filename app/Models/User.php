@@ -3,6 +3,7 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Models\UserLoginHistory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -66,6 +67,11 @@ class User extends Authenticatable implements LaratrustUser
     public function apiTokens(): HasMany
     {
         return $this->hasMany(ApiToken::class);
+    }
+
+    public function loginHistories(): HasMany
+    {
+        return $this->hasMany(UserLoginHistory::class);
     }
 
     public function canImpersonate(): bool
