@@ -17,6 +17,7 @@ use App\Enums\Currency;
 use App\Enums\InvoiceStatus;
 use App\Enums\Network;
 use App\Models\Invoice;
+use App\Models\User;
 use App\Services\Money\MoneyAmount;
 use Illuminate\Support\Carbon;
 
@@ -30,7 +31,7 @@ class InvoiceService implements InvoiceServiceContract
     ) {
     }
 
-    public function create(Currency $currency, Network $network, MoneyAmount $amount, ?string $externalInvoiceId = null, ?string $callbackUrl = null, ?string $tag = null, array $metadata = []): Invoice
+    public function create(User $user, Currency $currency, Network $network, MoneyAmount $amount, ?string $externalInvoiceId = null, ?string $callbackUrl = null, ?string $tag = null, array $metadata = []): Invoice
     {
         // Проверка суммы по глобальным App Settings
         $settings = $this->appSettings->get($currency);
@@ -46,12 +47,17 @@ class InvoiceService implements InvoiceServiceContract
             }
         }
 
-        $address = $this->addresses->pickForPayment($currency, $network, $amount);
+        $address = $this->addresses->pickForPayment($user, $currency, $network, $amount);
+
+        if ($address->user_id !== $user->id) {
+            throw new \RuntimeException('Address does not belong to the current user.');
+        }
         $amountMinor = $this->money->toMinor($amount);
 
         $expiresAt = now()->addMinutes(30);
 
         $invoice = Invoice::query()->create([
+            'user_id' => $user->id,
             'external_invoice_id' => $externalInvoiceId,
             'address_id' => $address->id,
             'amount' => $amountMinor,

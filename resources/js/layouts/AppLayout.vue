@@ -25,6 +25,7 @@ const isCallbackLogsActive = computed(() => page.url.startsWith('/callback-logs'
 const isAppSettingsActive = computed(() => page.url.startsWith('/app-settings'));
 const isProfileSettingsActive = computed(() => page.url.startsWith('/settings/profile'));
 const isApiDocsActive = computed(() => page.url.startsWith('/api'));
+const isAdminUsersActive = computed(() => page.url.startsWith('/admin/users'));
 
 const userEmail = computed(() => (page.props as any)?.auth?.user?.email ?? '');
 const flashSuccess = computed(() => (page.props as any)?.flash?.success ?? null);
@@ -38,6 +39,7 @@ const pageTitle = computed(() => {
     if (isCallbackLogsActive.value) return 'Callback логи';
     if (isAppSettingsActive.value) return 'Глобальные настройки';
     if (isApiDocsActive.value) return 'API и документация';
+    if (isAdminUsersActive.value) return 'Пользователи';
     return '';
 });
 
@@ -62,6 +64,9 @@ const pageIconPath = computed(() => {
     }
     if (isApiDocsActive.value) {
         return 'M8.25 3v1.5M4.5 8.25H3m18 0h-1.5M4.5 12H3m18 0h-1.5m-15 3.75H3m18 0h-1.5M8.25 19.5V21M12 3v1.5m0 15V21m3.75-18v1.5m0 15V21m-9-1.5h10.5a2.25 2.25 0 0 0 2.25-2.25V6.75a2.25 2.25 0 0 0-2.25-2.25H6.75A2.25 2.25 0 0 0 4.5 6.75v10.5a2.25 2.25 0 0 0 2.25 2.25Zm.75-12h9v9h-9v-9Z';
+    }
+    if (isAdminUsersActive.value) {
+        return 'M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.5 20.118a7.5 7.5 0 0 1 15 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.5-1.632Zm12.806-.873a9.771 9.771 0 0 0-2.888-.7A5.25 5.25 0 0 0 15.75 15a5.25 5.25 0 0 0-3-4.743A6.73 6.73 0 0 0 13.5 6a6.756 6.756 0 0 0-.22-1.688';
     }
     return null;
 });
@@ -169,6 +174,16 @@ const pageIconPath = computed(() => {
                                           <path stroke-linecap="round" stroke-linejoin="round" d="M20.25 8.511c.884.284 1.5 1.128 1.5 2.097v4.286c0 1.136-.847 2.1-1.98 2.193-.34.027-.68.052-1.02.072v3.091l-3-3c-1.354 0-2.694-.055-4.02-.163a2.115 2.115 0 0 1-.825-.242m9.345-8.334a2.126 2.126 0 0 0-.476-.095 48.64 48.64 0 0 0-8.048 0c-1.131.094-1.976 1.057-1.976 2.192v4.286c0 .837.46 1.58 1.155 1.951m9.345-8.334V6.637c0-1.621-1.152-3.026-2.76-3.235A48.455 48.455 0 0 0 11.25 3c-2.115 0-4.198.137-6.24.402-1.608.209-2.76 1.614-2.76 3.235v6.226c0 1.621 1.152 3.026 2.76 3.235.577.075 1.157.14 1.74.194V21l4.155-4.155" />
                                         </svg>
                                         Callback логи
+                                    </span>
+                                </Link>
+                            </li>
+                            <li v-if="(page.props as any)?.auth?.is_admin">
+                                <Link href="/admin/users" :class="{ 'menu-active': isAdminUsersActive, active: isAdminUsersActive }" aria-current="page">
+                                    <span class="flex items-center gap-2">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5 opacity-30">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.5 20.118a7.5 7.5 0 0 1 15 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.5-1.632Zm12.806-.873a9.771 9.771 0 0 0-2.888-.7A5.25 5.25 0 0 0 15.75 15a5.25 5.25 0 0 0-3-4.743A6.73 6.73 0 0 0 13.5 6a6.756 6.756 0 0 0-.22-1.688" />
+                                        </svg>
+                                        Пользователи
                                     </span>
                                 </Link>
                             </li>

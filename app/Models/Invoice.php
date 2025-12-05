@@ -24,6 +24,7 @@ class Invoice extends Model
 
     protected $fillable = [
         'id',
+        'user_id',
         'external_invoice_id',
         'address_id',
         'amount',
@@ -59,6 +60,11 @@ class Invoice extends Model
     public function address(): BelongsTo
     {
         return $this->belongsTo(Address::class);
+    }
+
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
     }
 
     public function callbackLogs(): HasMany

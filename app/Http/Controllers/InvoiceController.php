@@ -15,6 +15,7 @@ use App\Http\Resources\InvoiceResource;
 use App\Models\Invoice;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use Inertia\Response;
 use Endroid\QrCode\QrCode;
@@ -27,6 +28,7 @@ class InvoiceController extends Controller
     public function index(): Response
     {
         $paginator = Invoice::query()
+            ->where('user_id', Auth::id())
             ->with('address')
             ->latest('id')
             ->paginate(20)
@@ -50,6 +52,7 @@ class InvoiceController extends Controller
     {
         try {
             $invoice = $service->create(
+                $request->user(),
                 $request->toCurrencyEnum(),
                 $request->toNetworkEnum(),
                 $request->toMoneyAmount($money),
@@ -84,6 +87,8 @@ class InvoiceController extends Controller
 
     public function show(Invoice $invoice): array
     {
+        $this->authorizeInvoice($invoice);
+
         return (new InvoiceResource($invoice))->resolve();
     }
 
@@ -134,6 +139,8 @@ class InvoiceController extends Controller
 
     public function update(UpdateInvoiceRequest $request, Invoice $invoice, InvoiceServiceContract $service): JsonResponse|RedirectResponse
     {
+        $this->authorizeInvoice($invoice);
+
         try {
             $status = InvoiceStatus::from($request->input('status'));
             $txid = $request->input('txid');
@@ -165,12 +172,21 @@ class InvoiceController extends Controller
 
     public function sendCallback(Invoice $invoice, InvoiceCallbackServiceContract $callbackService)
     {
+        $this->authorizeInvoice($invoice);
+
         // Отправляем колбэк только если указан callback_url (сервис внутри сам проверит)
         $callbackService->send($invoice, 'manual');
 
         return response()->json([
             'success' => true,
         ]);
+    }
+
+    private function authorizeInvoice(Invoice $invoice): void
+    {
+        if ($invoice->user_id !== Auth::id()) {
+            abort(404);
+        }
     }
 }
 

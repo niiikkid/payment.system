@@ -10,6 +10,7 @@ use App\Enums\Network;
 use App\Enums\NetworkCurrency;
 use App\Models\Address;
 use App\Models\Invoice;
+use App\Models\User;
 use App\Contracts\Blockchain\BlockchainServiceContract;
 use App\Contracts\Money\MoneyServiceContract;
 use App\Services\Money\MoneyAmount;
@@ -32,7 +33,7 @@ class AddressService implements AddressServiceContract
     ) {
     }
 
-    public function create(string $currency, string $network, string $address): Address
+    public function create(User $user, string $currency, string $network, string $address): Address
     {
         $currencyEnum = Currency::tryFrom(strtoupper(trim($currency)));
         $networkEnum = Network::tryFrom(strtolower(trim($network)));
@@ -51,6 +52,7 @@ class AddressService implements AddressServiceContract
         }
 
         $exists = Address::query()
+            ->where('user_id', $user->id)
             ->where('currency', $currencyEnum->value)
             ->where('network', $networkEnum->value)
             ->where('address', $address)
@@ -70,6 +72,7 @@ class AddressService implements AddressServiceContract
         $balanceMinor = $this->money->toMinor($balance);
 
         return Address::query()->create([
+            'user_id' => $user->id,
             'currency' => $currencyEnum,
             'network' => $networkEnum,
             'address' => $address,
@@ -91,7 +94,7 @@ class AddressService implements AddressServiceContract
         return $address->refresh();
     }
 
-    public function pickForPayment(Currency $currency, Network $network, MoneyAmount $amount): Address
+    public function pickForPayment(User $user, Currency $currency, Network $network, MoneyAmount $amount): Address
     {
         if (!NetworkCurrency::isSupported($currency, $network)) {
             throw new CurrencyNetworkMismatchException('Currency ' . $currency->value . ' is not available on network ' . $network->value);
@@ -105,11 +108,13 @@ class AddressService implements AddressServiceContract
         $activeCountSub = Invoice::query()
             ->selectRaw('count(*)')
             ->whereColumn('invoices.address_id', 'addresses.id')
+            ->where('invoices.user_id', $user->id)
             ->whereIn('status', $activeStatuses);
 
         $candidate = Address::query()
             ->select('*')
             ->selectSub($activeCountSub, 'active_invoices_count')
+            ->where('user_id', $user->id)
             ->where('currency', $currency->value)
             ->where('network', $network->value)
             ->where('is_active', true)
@@ -117,6 +122,7 @@ class AddressService implements AddressServiceContract
                 $q->selectRaw('1')
                     ->from('invoices')
                     ->whereColumn('invoices.address_id', 'addresses.id')
+                    ->whereColumn('invoices.user_id', 'addresses.user_id')
                     ->whereIn('invoices.status', $activeStatuses)
                     ->where('invoices.amount', $amountMinor);
             })

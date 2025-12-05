@@ -19,6 +19,7 @@ use App\Exceptions\Address\UnsupportedCurrencyException;
 use App\Exceptions\Address\UnsupportedNetworkException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use Inertia\Response;
 use Symfony\Component\HttpFoundation\Response as HttpResponse;
@@ -31,7 +32,10 @@ class AddressController extends Controller
      */
     public function index(): Response
     {
+        $userId = Auth::id();
+
         $paginator = Address::query()
+            ->where('user_id', $userId)
             ->latest('id')
             ->paginate(20)
             ->through(fn ($address) => (new AddressResource($address))->resolve());
@@ -66,6 +70,7 @@ class AddressController extends Controller
     {
         try {
             $address = $addressService->create(
+                $request->user(),
                 $request->string('currency')->toString(),
                 $request->string('network')->toString(),
                 $request->string('address')->toString(),
@@ -125,6 +130,8 @@ class AddressController extends Controller
      */
     public function update(UpdateAddressStatusRequest $request, Address $address, AddressService $addressService)
     {
+        $this->authorizeAddress($address);
+
         $isActive = (bool) $request->boolean('is_active');
 
         if ($isActive) {
@@ -134,6 +141,13 @@ class AddressController extends Controller
         }
 
         return back()->with('success', 'Address updated');
+    }
+
+    private function authorizeAddress(Address $address): void
+    {
+        if ($address->user_id !== Auth::id()) {
+            abort(HttpResponse::HTTP_NOT_FOUND);
+        }
     }
 }
 

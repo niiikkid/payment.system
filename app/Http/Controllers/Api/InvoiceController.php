@@ -13,6 +13,7 @@ use App\Http\Resources\InvoiceResource;
 use App\Models\Invoice;
 use Endroid\QrCode\QrCode;
 use Endroid\QrCode\Writer\PngWriter;
+use Illuminate\Support\Facades\Auth;
 
 class InvoiceController extends Controller
 {
@@ -20,6 +21,7 @@ class InvoiceController extends Controller
     {
         try {
             $invoice = $service->create(
+                $request->user(),
                 $request->toCurrencyEnum(),
                 $request->toNetworkEnum(),
                 $request->toMoneyAmount($money),
@@ -39,11 +41,15 @@ class InvoiceController extends Controller
 
     public function show(Invoice $invoice): array
     {
+        $this->authorizeInvoice($invoice);
+
         return (new InvoiceResource($invoice))->resolve();
     }
 
     public function status(Invoice $invoice): array
     {
+        $this->authorizeInvoice($invoice);
+
         $data = (new InvoiceResource($invoice))->resolve();
 
         return [
@@ -59,6 +65,8 @@ class InvoiceController extends Controller
 
     public function public(Invoice $invoice): array
     {
+        $this->authorizeInvoice($invoice);
+
         $invoice->load('address');
 
         return (new InvoiceResource($invoice))->resolve();
@@ -66,6 +74,8 @@ class InvoiceController extends Controller
 
     public function qr(Invoice $invoice)
     {
+        $this->authorizeInvoice($invoice);
+
         $invoice->load('address');
 
         $address = $invoice->address?->address;
@@ -90,6 +100,8 @@ class InvoiceController extends Controller
 
     public function cancel(Invoice $invoice, InvoiceServiceContract $service)
     {
+        $this->authorizeInvoice($invoice);
+
         if ($invoice->status->isFinal()) {
             return response()->json([
                 'message' => 'Invoice already finalized',
@@ -105,6 +117,13 @@ class InvoiceController extends Controller
         $service->expire($invoice);
 
         return response()->json((new InvoiceResource($invoice->refresh()))->resolve());
+    }
+
+    private function authorizeInvoice(Invoice $invoice): void
+    {
+        if ($invoice->user_id !== Auth::id()) {
+            abort(404);
+        }
     }
 }
 

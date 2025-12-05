@@ -8,6 +8,7 @@ use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\CallbackLogController;
 use App\Http\Controllers\ApiController;
 use App\Http\Controllers\Dev\CallbackSandboxController;
+use App\Http\Controllers\Admin\UsersController;
 use Inertia\Inertia;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
@@ -43,6 +44,15 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // API Docs & Playground (не в настройках)
     Route::get('api', ApiController::class)->name('api.docs');
 });
+
+Route::middleware(['auth', 'verified', 'role:admin'])
+    ->prefix('admin')
+    ->as('admin.')
+    ->group(function () {
+        Route::get('users', [UsersController::class, 'index'])->name('users.index');
+        Route::post('users', [UsersController::class, 'store'])->name('users.store');
+        Route::patch('users/{user}', [UsersController::class, 'update'])->name('users.update');
+    });
 
 require __DIR__.'/settings.php';
 

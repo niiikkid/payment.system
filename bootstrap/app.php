@@ -35,6 +35,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'api.key' => ApiKeyAuth::class,
         ]);
     })
+    ->withEvents()
     ->withExceptions(function (Exceptions $exceptions) {
         //
     })->create();
