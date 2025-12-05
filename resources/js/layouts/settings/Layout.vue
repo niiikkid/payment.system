@@ -13,7 +13,7 @@ import { logout as logoutRoute } from '@/routes';
 const sidebarNavItems: NavItem[] = [
     { title: 'Профиль', href: editProfile() },
     { title: 'Пароль', href: editPassword() },
-    { title: 'Двухфакторная защита', href: show() },
+    { title: '2FA авторизация', href: show() },
     { title: 'Внешний вид', href: editAppearance() },
 ];
 

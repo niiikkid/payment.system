@@ -2,8 +2,8 @@
 import AppLayout from '@/layouts/AppLayout.vue';
 import SettingsLayout from '@/layouts/settings/Layout.vue';
 import { useTwoFactorAuth } from '@/composables/useTwoFactorAuth';
-import { confirm, disable, enable, regenerateRecoveryCodes, show } from '@/routes/two-factor';
-import { Head, useForm } from '@inertiajs/vue3';
+import { confirm, disable, enable, show } from '@/routes/two-factor';
+import { Head, router, useForm } from '@inertiajs/vue3';
 import { computed, watch } from 'vue';
 import type { BreadcrumbItem } from '@/types';
 
@@ -28,7 +28,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 const enableForm = useForm({});
 const disableForm = useForm({ _method: 'DELETE' });
 const confirmForm = useForm({ code: '' });
-const regenerateCodesForm = useForm({});
+const jsonHeaders = { Accept: 'application/json' };
 
 const {
     qrCodeSvg,
@@ -62,31 +62,34 @@ async function loadTwoFactorData() {
 function submitEnable() {
     enableForm.post(enable.url(), {
         preserveScroll: true,
-        onSuccess: loadTwoFactorData,
+        headers: jsonHeaders,
+        onSuccess: () => {
+            router.reload({
+                only: ['twoFactorEnabled', 'hasUnconfirmedTwoFactor', 'status'],
+                onSuccess: loadTwoFactorData,
+            });
+        },
     });
 }
 
 function submitDisable() {
     disableForm.post(disable.url(), {
         preserveScroll: true,
-        onSuccess: clearTwoFactorAuthData,
+        headers: jsonHeaders,
+        onSuccess: () => {
+            clearTwoFactorAuthData();
+        },
     });
 }
 
 function submitConfirm() {
     confirmForm.post(confirm.url(), {
         preserveScroll: true,
+        headers: jsonHeaders,
         onSuccess: () => {
             confirmForm.reset('code');
             fetchRecoveryCodes();
         },
-    });
-}
-
-function regenerateCodes() {
-    regenerateCodesForm.post(regenerateRecoveryCodes.url(), {
-        preserveScroll: true,
-        onSuccess: fetchRecoveryCodes,
     });
 }
 
@@ -127,9 +130,6 @@ watch(
                             Отсканируйте QR-код или введите ключ вручную, затем подтвердите кодом из приложения.
                         </p>
                         <div class="flex flex-wrap gap-3">
-                            <button class="btn btn-outline" :disabled="enableForm.processing" @click="loadTwoFactorData">
-                                Обновить данные
-                            </button>
                             <button class="btn btn-error" :disabled="disableForm.processing" @click="submitDisable">
                                 <span v-if="disableForm.processing" class="loading loading-spinner loading-sm mr-2" />
                                 Отменить настройку
@@ -158,7 +158,7 @@ watch(
                         <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
                             <div class="space-y-2">
                                 <h3 class="font-medium">QR-код</h3>
-                                <div v-if="qrCodeSvg" class="rounded-lg bg-base-200 p-4" v-html="qrCodeSvg" />
+                                <div v-if="qrCodeSvg" class="rounded-lg bg-base-200 p-4 flex justify-center" v-html="qrCodeSvg" />
                                 <p v-else class="text-sm text-base-content/70">QR-код появится после получения данных.</p>
                             </div>
 
@@ -166,7 +166,7 @@ watch(
                                 <h3 class="font-medium">Ручной ключ</h3>
                                 <div
                                     v-if="manualSetupKey"
-                                    class="rounded-lg bg-base-200 p-3 font-mono text-lg tracking-widest"
+                                    class="rounded-lg bg-base-200 p-3 font-mono text-sm sm:text-lg tracking-widest"
                                 >
                                     {{ manualSetupKey }}
                                 </div>
@@ -177,17 +177,6 @@ watch(
                         <div class="space-y-2">
                             <div class="flex items-center justify-between">
                                 <h3 class="font-medium">Резервные коды</h3>
-                                <button
-                                    class="btn btn-ghost btn-sm"
-                                    :disabled="regenerateCodesForm.processing"
-                                    @click="regenerateCodes"
-                                >
-                                    <span
-                                        v-if="regenerateCodesForm.processing"
-                                        class="loading loading-spinner loading-xs mr-2"
-                                    />
-                                    Обновить
-                                </button>
                             </div>
                             <div
                                 v-if="recoveryCodesList.length"
@@ -207,7 +196,7 @@ watch(
                         </div>
 
                         <form v-if="hasPendingConfirmation && hasSetupData" class="space-y-3" @submit.prevent="submitConfirm">
-                            <div class="space-y-1">
+                            <div class="space-y-1 grid">
                                 <label for="confirm-code" class="text-sm font-medium">Код из приложения</label>
                                 <input
                                     id="confirm-code"
