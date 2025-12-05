@@ -88,7 +88,6 @@ function statusBadge(login: LoginItem) {
                                         <th>IP</th>
                                         <th>Локация</th>
                                         <th>Устройство</th>
-                                        <th>Статус данных</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -127,11 +126,6 @@ function statusBadge(login: LoginItem) {
                                                 </span>
                                             </div>
                                         </td>
-                                        <td>
-                                            <div class="badge" :class="statusBadge(login).class">
-                                                {{ statusBadge(login).text }}
-                                            </div>
-                                        </td>
                                     </tr>
                                     <tr v-if="!props.logins.data.length">
                                         <td colspan="5" class="text-center text-sm opacity-70 py-6">Пока нет событий</td>
@@ -151,9 +145,6 @@ function statusBadge(login: LoginItem) {
                                     <div class="flex items-center justify-between">
                                         <div class="flex items-center gap-2 text-sm">
                                             <span class="font-mono text-xs">{{ login.ip_address || '—' }}</span>
-                                        </div>
-                                        <div class="badge badge-sm" :class="statusBadge(login).class">
-                                            {{ statusBadge(login).text }}
                                         </div>
                                     </div>
 

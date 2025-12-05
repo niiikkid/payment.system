@@ -26,12 +26,14 @@ final class IpGeolocationService implements IpGeolocationServiceContract
         $apiKey = $this->apiKey ?? config('services.ipgeolocation.api_key');
         $baseUrl = rtrim($this->baseUrl ?? (string) config('services.ipgeolocation.base_url', self::DEFAULT_BASE_URL), '/');
 
-        if (empty($ip) || filter_var($ip, FILTER_VALIDATE_IP) === false) {
+        $lookupIp = $this->prepareLookupIp($ip);
+
+        if ($lookupIp === null) {
             return new IpGeolocationResult(IpGeolocationResult::STATUS_SKIPPED, null);
         }
 
         if (empty($apiKey)) {
-            return new IpGeolocationResult(IpGeolocationResult::STATUS_SKIPPED, $ip);
+            return new IpGeolocationResult(IpGeolocationResult::STATUS_SKIPPED, $lookupIp);
         }
 
         $url = $baseUrl . '/ipgeo';
@@ -41,9 +43,8 @@ final class IpGeolocationService implements IpGeolocationServiceContract
                 ->acceptJson()
                 ->get($url, [
                     'apiKey' => $apiKey,
-                    'ip' => $ip,
+                    'ip' => $lookupIp,
                 ]);
-
             if ($response->status() === 402 || $response->status() === 429) {
                 throw new IpGeolocationQuotaExceededException('Quota exceeded.');
             }
@@ -57,13 +58,13 @@ final class IpGeolocationService implements IpGeolocationServiceContract
 
             return new IpGeolocationResult(
                 IpGeolocationResult::STATUS_OK,
-                $data['ip'] ?? $ip,
+                $data['ip'] ?? $lookupIp,
                 $this->mapPayload($data),
             );
         } catch (IpGeolocationQuotaExceededException $e) {
-            return new IpGeolocationResult(IpGeolocationResult::STATUS_LIMITED, $ip);
+            return new IpGeolocationResult(IpGeolocationResult::STATUS_LIMITED, $lookupIp);
         } catch (Throwable) {
-            return new IpGeolocationResult(IpGeolocationResult::STATUS_FAILED, $ip);
+            return new IpGeolocationResult(IpGeolocationResult::STATUS_FAILED, $lookupIp);
         }
     }
 
@@ -129,6 +130,44 @@ final class IpGeolocationService implements IpGeolocationServiceContract
         }
         $normalized = Str::replace(',', '.', (string) $value);
         return is_numeric($normalized) ? (float) $normalized : null;
+    }
+
+    private function prepareLookupIp(?string $ip): ?string
+    {
+        $trimmed = trim((string) $ip);
+
+        if ($trimmed === '' || filter_var($trimmed, FILTER_VALIDATE_IP) === false) {
+            return null;
+        }
+
+        if (function_exists('is_local') && is_local() && $this->isLoopbackOrPrivate($trimmed)) {
+            return $this->randomPublicIp();
+        }
+
+        return $trimmed;
+    }
+
+    private function isLoopbackOrPrivate(string $ip): bool
+    {
+        if ($ip === '::1' || str_starts_with($ip, '127.')) {
+            return true;
+        }
+
+        // private/reserved ranges
+        return filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE) === false;
+    }
+
+    private function randomPublicIp(): string
+    {
+        $pool = [
+            '1.1.1.1',
+            '8.8.8.8',
+            '9.9.9.9',
+            '208.67.222.222',
+            '4.2.2.1',
+        ];
+
+        return $pool[array_rand($pool)];
     }
 }
 
