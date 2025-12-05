@@ -22,6 +22,7 @@ class UserResource extends JsonResource
             'email_verified_at' => $this->email_verified_at?->toISOString(),
             'created_at' => $this->created_at?->toISOString(),
             'can_manage_role' => $this->id !== Auth::id(),
+            'can_be_impersonated' => Auth::user()?->canImpersonate() && $this->canBeImpersonated() && $this->id !== Auth::id(),
         ];
     }
 }

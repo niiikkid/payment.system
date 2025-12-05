@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { BreadcrumbItemType } from '@/types';
 import { computed } from 'vue';
-import { Link, usePage } from '@inertiajs/vue3';
+import { Link, useForm, usePage } from '@inertiajs/vue3';
 import Alert from '@/components/ui/Alert.vue';
 
 interface Props {
@@ -17,6 +17,7 @@ const props = withDefaults(defineProps<Props>(), {
 const appName = (import.meta.env.VITE_APP_NAME as string) || 'Laravel';
 
 const page = usePage();
+const impersonationForm = useForm({});
 
 const isDashboardActive = computed(() => page.url === '/dashboard');
 const isAddressesActive = computed(() => page.url.startsWith('/addresses'));
@@ -28,8 +29,13 @@ const isApiDocsActive = computed(() => page.url.startsWith('/api'));
 const isAdminUsersActive = computed(() => page.url.startsWith('/admin/users'));
 
 const userEmail = computed(() => (page.props as any)?.auth?.user?.email ?? '');
+const isImpersonated = computed(() => (page.props as any)?.auth?.is_impersonated === true);
 const flashSuccess = computed(() => (page.props as any)?.flash?.success ?? null);
 const flashError = computed(() => (page.props as any)?.flash?.error ?? null);
+
+function leaveImpersonation() {
+    impersonationForm.post('/impersonate/leave', { preserveScroll: true });
+}
 
 const pageTitle = computed(() => {
     if (props.title) return props.title;
@@ -209,6 +215,14 @@ const pageIconPath = computed(() => {
                                 </Link>
                             </li>
                         </ul>
+                    </div>
+                    <div v-if="isImpersonated" class="mt-4 rounded-xl border border-warning/50 bg-warning/10 p-3">
+                        <div class="text-sm font-semibold text-warning">Режим пользователя</div>
+                        <p class="text-xs opacity-80 mb-2">Вы просматриваете интерфейс как другой пользователь.</p>
+                        <button class="btn btn-warning btn-sm w-full" :disabled="impersonationForm.processing" @click="leaveImpersonation">
+                            <span v-if="impersonationForm.processing" class="loading loading-spinner loading-xs mr-2" />
+                            Вернуться в админку
+                        </button>
                     </div>
                 </div>
                 <div class="hidden lg:block mt-auto border-t border-base-200 p-2 mb-2">

@@ -67,4 +67,14 @@ class User extends Authenticatable implements LaratrustUser
     {
         return $this->hasMany(ApiToken::class);
     }
+
+    public function canImpersonate(): bool
+    {
+        return $this->hasRole('admin');
+    }
+
+    public function canBeImpersonated(): bool
+    {
+        return ! $this->hasRole('admin');
+    }
 }

@@ -51,6 +51,7 @@ class HandleInertiaRequests extends Middleware
                 'user' => $user,
                 'roles' => $user ? $user->roles->pluck('name') : [],
                 'is_admin' => $user ? $user->hasRole('admin') : false,
+                'is_impersonated' => $request->session()->get('impersonating', false),
             ],
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
             'flash' => [

@@ -9,6 +9,7 @@ use App\Http\Controllers\CallbackLogController;
 use App\Http\Controllers\ApiController;
 use App\Http\Controllers\Dev\CallbackSandboxController;
 use App\Http\Controllers\Admin\UsersController;
+use App\Http\Controllers\ImpersonationController;
 use Inertia\Inertia;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
@@ -54,7 +55,12 @@ Route::middleware(['auth', 'verified', 'role:admin'])
         Route::get('users', [UsersController::class, 'index'])->name('users.index');
         Route::post('users', [UsersController::class, 'store'])->name('users.store');
         Route::patch('users/{user}', [UsersController::class, 'update'])->name('users.update');
+        Route::post('impersonate/{user}', [ImpersonationController::class, 'start'])->name('impersonate.start');
     });
+
+Route::post('impersonate/leave', [ImpersonationController::class, 'leave'])
+    ->middleware('auth')
+    ->name('impersonate.leave');
 
 require __DIR__.'/settings.php';
 

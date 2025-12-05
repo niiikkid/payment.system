@@ -16,6 +16,7 @@ type UserItem = {
     email_verified_at?: string | null;
     created_at?: string | null;
     can_manage_role: boolean;
+    can_be_impersonated: boolean;
 };
 
 type PaginationLink = { url: string | null; label: string; active: boolean };
@@ -44,6 +45,8 @@ const editForm = useForm({
     password_confirmation: '',
     role: 'user',
 });
+
+const impersonateForm = useForm({});
 
 function openCreate() {
     createForm.reset();
@@ -110,6 +113,10 @@ function closeCreate() {
     showCreate.value = false;
     createForm.clearErrors();
 }
+
+function impersonate(user: UserItem) {
+    impersonateForm.post(`/admin/impersonate/${user.id}`, { preserveScroll: true });
+}
 </script>
 
 <template>
@@ -150,11 +157,23 @@ function closeCreate() {
                                         <DateTimeFormat :value="user.created_at || ''" />
                                     </td>
                                     <td>
-                                        <button class="btn btn-xs" @click="openEdit(user)">
-                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4">
-                                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25" />
-                                            </svg>
-                                        </button>
+                                        <div class="flex gap-2">
+                                            <button class="btn btn-xs" @click="openEdit(user)">
+                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25" />
+                                                </svg>
+                                            </button>
+                                            <button
+                                                v-if="user.can_be_impersonated"
+                                                class="btn btn-xs btn-warning"
+                                                :disabled="impersonateForm.processing"
+                                                @click="impersonate(user)"
+                                            >
+                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z" />
+                                                </svg>
+                                            </button>
+                                        </div>
                                     </td>
                                 </tr>
                                 <tr v-if="!users.data.length">
@@ -182,6 +201,14 @@ function closeCreate() {
                                 <div class="text-xs opacity-70">
                                     <DateTimeFormat :value="user.created_at || ''" />
                                 </div>
+                                <button
+                                    v-if="user.can_be_impersonated"
+                                    class="btn btn-warning btn-sm w-full"
+                                    :disabled="impersonateForm.processing"
+                                    @click="impersonate(user)"
+                                >
+                                    Войти как пользователь
+                                </button>
                             </div>
                         </div>
                         <div v-if="!users.data.length" class="text-center text-sm opacity-70 py-6">
