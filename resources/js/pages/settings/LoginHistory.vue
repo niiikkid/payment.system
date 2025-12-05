@@ -77,28 +77,20 @@ function statusBadge(login: LoginItem) {
                     </p>
                 </div>
 
-                <div class="lg:card lg:bg-base-100 lg:shadow">
-                    <div class="lg:card-body">
+                <div>
+                    <div>
                         <!-- Desktop table -->
                         <div class="hidden lg:block overflow-x-auto">
                             <table class="table table-sm w-full">
                                 <thead>
                                     <tr>
-                                        <th>Время</th>
-                                        <th>IP</th>
                                         <th>Локация</th>
                                         <th>Устройство</th>
+                                        <th>Время</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <tr v-for="login in props.logins.data" :key="login.id">
-                                        <td>
-                                            <DateTimeFormat v-if="login.created_at" :value="login.created_at" />
-                                            <span v-else class="opacity-60">—</span>
-                                        </td>
-                                        <td class="font-mono text-xs">
-                                            {{ login.ip_address || '—' }}
-                                        </td>
                                         <td class="space-y-1">
                                             <div class="flex items-center gap-2">
                                                 <img
@@ -114,8 +106,8 @@ function statusBadge(login: LoginItem) {
                                                     {{ locationLabel(login) }}
                                                 </span>
                                             </div>
-                                            <p v-if="login.geo?.location?.latitude && login.geo?.location?.longitude" class="text-xs opacity-70">
-                                                {{ login.geo.location.latitude }}, {{ login.geo.location.longitude }}
+                                            <p class="text-xs opacity-70">
+                                                {{ login.ip_address || '—' }}
                                             </p>
                                         </td>
                                         <td>
@@ -125,6 +117,10 @@ function statusBadge(login: LoginItem) {
                                                     {{ [login.browser, login.device_type].filter(Boolean).join(' · ') || '—' }}
                                                 </span>
                                             </div>
+                                        </td>
+                                        <td>
+                                            <DateTimeFormat v-if="login.created_at" :value="login.created_at" short-year hide-seconds />
+                                            <span v-else class="opacity-60">—</span>
                                         </td>
                                     </tr>
                                     <tr v-if="!props.logins.data.length">
