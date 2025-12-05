@@ -62,4 +62,9 @@ class User extends Authenticatable implements LaratrustUser
     {
         return $this->hasMany(Invoice::class);
     }
+
+    public function apiTokens(): HasMany
+    {
+        return $this->hasMany(ApiToken::class);
+    }
 }

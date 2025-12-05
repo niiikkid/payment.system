@@ -4,54 +4,43 @@ declare(strict_types=1);
 
 namespace App\Http\Middleware;
 
+use App\Models\ApiToken;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 
 class ApiKeyAuth
 {
     public function handle(Request $request, Closure $next)
     {
         $provided = (string) $request->header('X-Api-Key', '');
-        $expected = (string) config('services.public_api.key', '');
-
-        if ($expected === '' || !hash_equals($expected, $provided)) {
-            return response()->json([
-                'message' => 'Unauthorized',
-            ], 401);
+        if ($provided === '') {
+            return $this->unauthorized();
         }
 
-        $user = $this->resolveUser();
-        if ($user) {
-            Auth::setUser($user);
+        $token = ApiToken::query()
+            ->with('user')
+            ->where('token', $provided)
+            ->first();
+
+        if (!$token || !$token->user) {
+            return $this->unauthorized();
         }
+
+        $token->updateQuietly(['last_used_at' => Carbon::now()]);
+
+        Auth::setUser($token->user);
 
         return $next($request);
     }
 
-    private function resolveUser(): ?User
+    private function unauthorized()
     {
-        $configuredId = config('services.public_api.user_id');
-        if ($configuredId) {
-            $user = User::query()->find($configuredId);
-            if ($user) {
-                return $user;
-            }
-        }
-
-        $admin = User::query()
-            ->whereHas('roles', function ($query) {
-                $query->where('name', 'admin');
-            })
-            ->orderBy('id')
-            ->first();
-
-        if ($admin) {
-            return $admin;
-        }
-
-        return User::query()->orderBy('id')->first();
+        return response()->json([
+            'message' => 'Unauthorized',
+        ], 401);
     }
 }
 

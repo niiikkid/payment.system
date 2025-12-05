@@ -37,9 +37,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Callback Logs
     Route::get('callback-logs', [CallbackLogController::class, 'index'])->name('callback-logs.index');
 
-    // App Settings (глобальные настройки проекта)
-    Route::get('app-settings', [\App\Http\Controllers\AppSettingsController::class, 'index'])->name('app-settings.index');
-    Route::put('app-settings', [\App\Http\Controllers\AppSettingsController::class, 'update'])->name('app-settings.update');
+    // App Settings (глобальные настройки проекта) — только admin
+    Route::middleware('role:admin')->group(function () {
+        Route::get('app-settings', [\App\Http\Controllers\AppSettingsController::class, 'index'])->name('app-settings.index');
+        Route::put('app-settings', [\App\Http\Controllers\AppSettingsController::class, 'update'])->name('app-settings.update');
+    });
 
     // API Docs & Playground (не в настройках)
     Route::get('api', ApiController::class)->name('api.docs');

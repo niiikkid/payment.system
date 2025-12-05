@@ -14,6 +14,11 @@ use Inertia\Response;
 
 class AppSettingsController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('role:admin');
+    }
+
     public function index(AppSettingsServiceContract $service): Response
     {
         $settings = $service->all();
