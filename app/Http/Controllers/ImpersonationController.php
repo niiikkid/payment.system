@@ -20,15 +20,15 @@ class ImpersonationController extends Controller
         $currentUser = $request->user();
 
         if (! $currentUser || ! $currentUser->hasRole('admin')) {
-            abort(Response::HTTP_FORBIDDEN, 'Нет прав для входа под другим пользователем');
+            abort(Response::HTTP_FORBIDDEN, __('messages.impersonation.forbidden'));
         }
 
         if ($currentUser->id === $user->id) {
-            return back()->with('error', 'Нельзя войти под своей учетной записью');
+            return back()->with('error', __('messages.impersonation.self'));
         }
 
         if ($user->hasRole('admin')) {
-            return back()->with('error', 'Нельзя входить под администратором');
+            return back()->with('error', __('messages.impersonation.admin_forbidden'));
         }
 
         if (! $request->session()->has(self::SESSION_ORIGINAL_USER_ID)) {
@@ -39,7 +39,9 @@ class ImpersonationController extends Controller
         Auth::login($user);
         $request->session()->regenerate();
 
-        return redirect()->route('dashboard')->with('success', 'Вы вошли как '.$user->email);
+        return redirect()
+            ->route('dashboard')
+            ->with('success', __('messages.impersonation.logged_in_as', ['email' => $user->email]));
     }
 
     public function leave(Request $request): RedirectResponse
@@ -48,7 +50,7 @@ class ImpersonationController extends Controller
         $wasImpersonating = $request->session()->pull(self::SESSION_FLAG, false);
 
         if (! $wasImpersonating || ! $originalUserId) {
-            return redirect()->back()->with('error', 'Режим входа под пользователем не активен');
+            return redirect()->back()->with('error', __('messages.impersonation.session_inactive'));
         }
 
         $adminUser = User::query()->find($originalUserId);
@@ -58,13 +60,17 @@ class ImpersonationController extends Controller
             $request->session()->invalidate();
             $request->session()->regenerateToken();
 
-            return redirect()->route('login')->with('error', 'Исходная сессия не найдена, войдите снова');
+            return redirect()
+                ->route('login')
+                ->with('error', __('messages.impersonation.session_missing'));
         }
 
         Auth::login($adminUser);
         $request->session()->regenerate();
 
-        return redirect()->route('admin.users.index')->with('success', 'Вы вернулись в админскую учетную запись');
+        return redirect()
+            ->route('admin.users.index')
+            ->with('success', __('messages.impersonation.returned_to_admin'));
     }
 }
 

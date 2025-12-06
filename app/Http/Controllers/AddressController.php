@@ -84,7 +84,11 @@ class AddressController extends Controller
         } catch (Throwable $exception) {
             report($exception);
 
-            return $this->storeErrorResponse($request, 'Не удалось добавить адрес.', HttpResponse::HTTP_INTERNAL_SERVER_ERROR);
+            return $this->storeErrorResponse(
+                $request,
+                __('messages.addresses.add_failed'),
+                HttpResponse::HTTP_INTERNAL_SERVER_ERROR
+            );
         }
     }
 
@@ -92,12 +96,12 @@ class AddressController extends Controller
     {
         if ($request->expectsJson()) {
             return response()->json([
-                'message' => 'Address added',
+                'message' => __('messages.addresses.added'),
                 'address' => (new AddressResource($address))->resolve(),
             ], HttpResponse::HTTP_CREATED);
         }
 
-        return back()->with('success', 'Address added');
+        return back()->with('success', __('messages.addresses.added'));
     }
 
     private function storeErrorResponse(StoreAddressRequest $request, string $message, int $status): JsonResponse|RedirectResponse
@@ -116,12 +120,12 @@ class AddressController extends Controller
     private function mapServiceException(AddressServiceException $exception): string
     {
         return match (true) {
-            $exception instanceof AddressNotFoundOnBlockchainException => 'Указанный адрес не найден в блокчейне.',
-            $exception instanceof DuplicateAddressException => 'Адрес уже существует для выбранной сети и валюты.',
-            $exception instanceof UnsupportedCurrencyException => 'Неподдерживаемая валюта.',
-            $exception instanceof UnsupportedNetworkException => 'Неподдерживаемая сеть.',
-            $exception instanceof CurrencyNetworkMismatchException => 'Эта валюта недоступна в выбранной сети.',
-            default => $exception->getMessage() ?: 'Не удалось добавить адрес.',
+            $exception instanceof AddressNotFoundOnBlockchainException => __('messages.addresses.errors.not_found_blockchain'),
+            $exception instanceof DuplicateAddressException => __('messages.addresses.errors.duplicate'),
+            $exception instanceof UnsupportedCurrencyException => __('messages.addresses.errors.unsupported_currency'),
+            $exception instanceof UnsupportedNetworkException => __('messages.addresses.errors.unsupported_network'),
+            $exception instanceof CurrencyNetworkMismatchException => __('messages.addresses.errors.currency_mismatch'),
+            default => $exception->getMessage() ?: __('messages.addresses.add_failed'),
         };
     }
 
@@ -140,7 +144,7 @@ class AddressController extends Controller
             $addressService->disable($address);
         }
 
-        return back()->with('success', 'Address updated');
+        return back()->with('success', __('messages.addresses.updated'));
     }
 
     private function authorizeAddress(Address $address): void

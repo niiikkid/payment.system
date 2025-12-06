@@ -104,13 +104,13 @@ class InvoiceController extends Controller
 
         if ($invoice->status->isFinal()) {
             return response()->json([
-                'message' => 'Invoice already finalized',
+                'message' => __('messages.invoices.already_finalized'),
             ], 409);
         }
 
         if ($invoice->expires_at && now()->greaterThanOrEqualTo($invoice->expires_at)) {
             return response()->json([
-                'message' => 'Invoice already expired',
+                'message' => __('messages.invoices.already_expired'),
             ], 409);
         }
 

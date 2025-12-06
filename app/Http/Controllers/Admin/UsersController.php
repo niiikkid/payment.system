@@ -33,8 +33,8 @@ class UsersController extends Controller
         return Inertia::render('admin/users/Index', [
             'users' => $paginator,
             'roleOptions' => [
-                ['value' => 'admin', 'label' => 'Администратор'],
-                ['value' => 'user', 'label' => 'Пользователь'],
+                ['value' => 'admin', 'label' => __('messages.users.roles.admin')],
+                ['value' => 'user', 'label' => __('messages.users.roles.user')],
             ],
             'currentUserId' => Auth::id(),
         ]);
@@ -61,12 +61,12 @@ class UsersController extends Controller
 
         if ($request->expectsJson()) {
             return response()->json([
-                'message' => 'Пользователь создан',
+                'message' => __('messages.users.created'),
                 'user' => (new UserResource($user))->resolve(),
             ], HttpResponse::HTTP_CREATED);
         }
 
-        return back()->with('success', 'Пользователь создан');
+        return back()->with('success', __('messages.users.created'));
     }
 
     public function update(UpdateUserRequest $request, User $user): JsonResponse|RedirectResponse
@@ -83,7 +83,7 @@ class UsersController extends Controller
 
         if (isset($payload['role'])) {
             if ($user->id === $request->user()?->id) {
-                abort(HttpResponse::HTTP_FORBIDDEN, 'Нельзя менять собственную роль');
+                abort(HttpResponse::HTTP_FORBIDDEN, __('messages.users.cannot_change_own_role'));
             }
             $role = $this->resolveRole($payload['role']);
             if ($role) {
@@ -93,12 +93,12 @@ class UsersController extends Controller
 
         if ($request->expectsJson()) {
             return response()->json([
-                'message' => 'Пользователь обновлён',
+                'message' => __('messages.users.updated'),
                 'user' => (new UserResource($user->fresh('roles')))->resolve(),
             ]);
         }
 
-        return back()->with('success', 'Пользователь обновлён');
+        return back()->with('success', __('messages.users.updated'));
     }
 
     private function resolveRole(string $name): ?Role
@@ -110,8 +110,10 @@ class UsersController extends Controller
         return Role::query()->firstOrCreate(
             ['name' => $name],
             [
-                'display_name' => $name === 'admin' ? 'Администратор' : 'Пользователь',
-                'description' => $name === 'admin' ? 'Администратор' : 'Обычный пользователь',
+                'display_name' => $name === 'admin' ? __('messages.users.roles.admin') : __('messages.users.roles.user'),
+                'description' => $name === 'admin'
+                    ? __('messages.users.roles.admin_description')
+                    : __('messages.users.roles.user_description'),
             ]
         );
     }

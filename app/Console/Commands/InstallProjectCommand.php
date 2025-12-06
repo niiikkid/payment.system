@@ -42,11 +42,17 @@ class InstallProjectCommand extends Command
         $this->info('Создаю роли admin/user и назначаю админу...');
         $adminRole = Role::query()->firstOrCreate(
             ['name' => 'admin'],
-            ['display_name' => 'Администратор', 'description' => 'Администратор']
+            [
+                'display_name' => __('messages.users.roles.admin'),
+                'description' => __('messages.users.roles.admin_description'),
+            ]
         );
         Role::query()->firstOrCreate(
             ['name' => 'user'],
-            ['display_name' => 'Пользователь', 'description' => 'Обычный пользователь']
+            [
+                'display_name' => __('messages.users.roles.user'),
+                'description' => __('messages.users.roles.user_description'),
+            ]
         );
         $user->roles()->sync([$adminRole->id]);
 

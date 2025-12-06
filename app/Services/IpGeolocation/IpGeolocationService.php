@@ -46,11 +46,13 @@ final class IpGeolocationService implements IpGeolocationServiceContract
                     'ip' => $lookupIp,
                 ]);
             if ($response->status() === 402 || $response->status() === 429) {
-                throw new IpGeolocationQuotaExceededException('Quota exceeded.');
+                throw new IpGeolocationQuotaExceededException(__('messages.ip_geolocation.quota_exceeded'));
             }
 
             if ($response->failed()) {
-                throw new IpGeolocationException('Request failed with status ' . $response->status());
+                throw new IpGeolocationException(__('messages.ip_geolocation.request_failed', [
+                    'status' => $response->status(),
+                ]));
             }
 
             /** @var array<string,mixed> $data */

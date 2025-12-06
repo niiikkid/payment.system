@@ -49,12 +49,18 @@ class UpdateAppSettingsRequest extends FormRequest
                     $maxMinorStr = $money->toMinor($max);
                     
                     if (!preg_match('/^-?\d+$/', $minMinorStr)) {
-                        $validator->errors()->add("settings.{$index}.min_invoice_amount", 'Минимальная сумма должна быть целым числом.');
+                        $validator->errors()->add(
+                            "settings.{$index}.min_invoice_amount",
+                            __('validation.app.settings.min_integer')
+                        );
                         continue;
                     }
                     
                     if (!preg_match('/^-?\d+$/', $maxMinorStr)) {
-                        $validator->errors()->add("settings.{$index}.max_invoice_amount", 'Максимальная сумма должна быть целым числом.');
+                        $validator->errors()->add(
+                            "settings.{$index}.max_invoice_amount",
+                            __('validation.app.settings.max_integer')
+                        );
                         continue;
                     }
                     
@@ -62,16 +68,25 @@ class UpdateAppSettingsRequest extends FormRequest
                     $maxMinor = (int) $maxMinorStr;
                     
                     if ($minMinor < 0) {
-                        $validator->errors()->add("settings.{$index}.min_invoice_amount", 'Минимальная сумма не может быть меньше нуля.');
+                        $validator->errors()->add(
+                            "settings.{$index}.min_invoice_amount",
+                            __('validation.app.settings.min_non_negative')
+                        );
                     }
                     
                     if ($maxMinor < 0) {
-                        $validator->errors()->add("settings.{$index}.max_invoice_amount", 'Максимальная сумма не может быть меньше нуля.');
+                        $validator->errors()->add(
+                            "settings.{$index}.max_invoice_amount",
+                            __('validation.app.settings.max_non_negative')
+                        );
                     }
                     
                     if ($maxMinor > $maxUsdtValue) {
                         $maxUsdtFormatted = $money->format($money->fromMinor($maxUsdtValue, Currency::USDT));
-                        $validator->errors()->add("settings.{$index}.max_invoice_amount", "Максимальная сумма не может превышать {$maxUsdtFormatted} USDT.");
+                        $validator->errors()->add(
+                            "settings.{$index}.max_invoice_amount",
+                            __('validation.app.settings.max_limit_exceeded', ['amount' => $maxUsdtFormatted])
+                        );
                     }
                 } catch (\Exception $e) {
                     // Игнорируем ошибки конвертации, они будут обработаны другими правилами валидации

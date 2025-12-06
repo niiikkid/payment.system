@@ -39,7 +39,7 @@ class ApiKeyAuth
     private function unauthorized()
     {
         return response()->json([
-            'message' => 'Unauthorized',
+            'message' => __('messages.auth.unauthorized'),
         ], 401);
     }
 }

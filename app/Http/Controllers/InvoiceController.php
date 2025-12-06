@@ -69,10 +69,10 @@ class InvoiceController extends Controller
                 ]);
             }
 
-            return back()->with('success', 'Инвойс создан');
+            return back()->with('success', __('messages.invoices.created'));
         } catch (Throwable $e) {
             report($e);
-            $message = $e->getMessage() ?: 'Не удалось создать инвойс.';
+            $message = $e->getMessage() ?: __('messages.invoices.create_failed');
 
             if ($request->expectsJson()) {
                 return response()->json([
@@ -154,10 +154,10 @@ class InvoiceController extends Controller
                 ]);
             }
 
-            return back()->with('success', 'Инвойс обновлён');
+            return back()->with('success', __('messages.invoices.updated'));
         } catch (Throwable $e) {
             report($e);
-            $message = $e->getMessage() ?: 'Не удалось обновить инвойс.';
+            $message = $e->getMessage() ?: __('messages.invoices.update_failed');
 
             if ($request->expectsJson()) {
                 return response()->json([

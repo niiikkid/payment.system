@@ -23,7 +23,10 @@ class AssignDefaultUserRole
 
         $role = Role::query()->firstOrCreate(
             ['name' => 'user'],
-            ['display_name' => 'User', 'description' => 'Обычный пользователь']
+            [
+                'display_name' => __('messages.users.roles.user'),
+                'description' => __('messages.users.roles.user_description'),
+            ]
         );
 
         $user->roles()->attach($role->id);

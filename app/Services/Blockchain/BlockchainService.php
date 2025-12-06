@@ -23,14 +23,14 @@ class BlockchainService implements BlockchainServiceContract
     public function getTransactionInfoByHash(Network $network, Currency $currency, string $txid): array
     {
         if ($network !== Network::TRON) {
-            throw new UnsupportedNetworkException('Only TRON network is supported for this operation.');
+            throw new UnsupportedNetworkException(__('messages.blockchain.only_tron'));
         }
 
         if ($currency === Currency::USDT) {
             return $this->getTrc20TransactionByHash($txid);
         }
 
-        throw new UnsupportedCurrencyException('Only USDT (TRC20) is supported for this operation.');
+        throw new UnsupportedCurrencyException(__('messages.blockchain.only_usdt'));
     }
 
     public function getAddressBalance(Network $network, Currency $currency, string $address): MoneyAmount
@@ -38,23 +38,23 @@ class BlockchainService implements BlockchainServiceContract
         $money = app(MoneyServiceContract::class);
 
         if ($network !== Network::TRON) {
-            throw new UnsupportedNetworkException('Only TRON network is supported for this operation.');
+            throw new UnsupportedNetworkException(__('messages.blockchain.only_tron'));
         }
         if ($currency === Currency::USDT) {
             $minor = $this->getTrc20BalanceMinorByContract($address);
             return $money->fromMinor($minor, Currency::USDT);
         }
 
-        throw new UnsupportedCurrencyException('Only USDT (TRC20) is supported for this operation.');
+        throw new UnsupportedCurrencyException(__('messages.blockchain.only_usdt'));
     }
 
     public function getIncomingTransactions(Network $network, Currency $currency, string $address): array
     {
         if ($network !== Network::TRON) {
-            throw new UnsupportedNetworkException('Only TRON network is supported for this operation.');
+            throw new UnsupportedNetworkException(__('messages.blockchain.only_tron'));
         }
         if ($currency !== Currency::USDT) {
-            throw new UnsupportedCurrencyException('Only USDT (TRC20) is supported for this operation.');
+            throw new UnsupportedCurrencyException(__('messages.blockchain.only_usdt'));
         }
 
         $url = rtrim($this->getApiBaseUrl(), '/') . "/v1/accounts/{$address}/transactions/trc20";
@@ -74,7 +74,7 @@ class BlockchainService implements BlockchainServiceContract
         $payload = $response->json();
         $data = is_array($payload) ? ($payload['data'] ?? []) : [];
         if (!is_array($data)) {
-            throw new ApiRequestException('Malformed TronGrid response: data is not an array.');
+            throw new ApiRequestException(__('messages.blockchain.malformed_trongrid_data'));
         }
 
         $result = [];
@@ -125,7 +125,7 @@ class BlockchainService implements BlockchainServiceContract
         $eventsPayload = $eventsResponse->json();
         $events = is_array($eventsPayload) ? ($eventsPayload['data'] ?? []) : [];
         if (!is_array($events)) {
-            throw new ApiRequestException('Malformed TronGrid events response: data is not an array.');
+            throw new ApiRequestException(__('messages.blockchain.malformed_trongrid_events'));
         }
 
         $transferEvent = null;
@@ -142,7 +142,7 @@ class BlockchainService implements BlockchainServiceContract
         }
 
         if ($transferEvent === null) {
-            throw new ApiRequestException('TRC20 Transfer event not found for given txid.');
+            throw new ApiRequestException(__('messages.blockchain.trc20_transfer_missing'));
         }
 
         // Получаем номер блока и текущий блок (с fallback, без исключения на 404)
@@ -221,7 +221,7 @@ class BlockchainService implements BlockchainServiceContract
         }
         $nowPayload = $nowResponse->json();
         if (!is_array($nowPayload)) {
-            throw new ApiRequestException('Malformed Tron wallet nowblock response: not an object');
+            throw new ApiRequestException(__('messages.blockchain.malformed_wallet_nowblock'));
         }
         return (int) ($nowPayload['block_header']['raw_data']['number'] ?? 0);
     }
@@ -241,17 +241,17 @@ class BlockchainService implements BlockchainServiceContract
 
         $payload = $response->json();
         if (!is_array($payload)) {
-            throw new ApiRequestException('Malformed TronGrid account response: not an object');
+            throw new ApiRequestException(__('messages.blockchain.malformed_trongrid_account'));
         }
 
         $data = $payload['data'][0] ?? null;
         if (!is_array($data)) {
-            throw new TokenContractNotFoundException('Account data not found.');
+            throw new TokenContractNotFoundException(__('messages.blockchain.account_not_found'));
         }
 
         $trc20 = $data['trc20'] ?? [];
         if (!is_array($trc20)) {
-            throw new ApiRequestException('Malformed TronGrid account response: trc20 is not an array');
+            throw new ApiRequestException(__('messages.blockchain.malformed_trongrid_trc20'));
         }
 
         $configuredContract = strtolower(trim($this->getUsdtContractAddress()));

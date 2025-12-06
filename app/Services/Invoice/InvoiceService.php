@@ -40,17 +40,17 @@ class InvoiceService implements InvoiceServiceContract
             $max = $this->money->fromMinor($settings->max_invoice_amount_minor, $currency);
 
             if ($this->money->compare($amount, $min) < 0) {
-                throw new InvoiceAmountOutOfRangeException('Сумма ниже минимально допустимой.');
+                throw new InvoiceAmountOutOfRangeException(__('messages.invoices.amount_below_min'));
             }
             if ($this->money->compare($amount, $max) > 0) {
-                throw new InvoiceAmountOutOfRangeException('Сумма выше максимально допустимой.');
+                throw new InvoiceAmountOutOfRangeException(__('messages.invoices.amount_above_max'));
             }
         }
 
         $address = $this->addresses->pickForPayment($user, $currency, $network, $amount);
 
         if ($address->user_id !== $user->id) {
-            throw new \RuntimeException('Address does not belong to the current user.');
+            throw new \RuntimeException(__('messages.addresses.errors.not_owner'));
         }
         $amountMinor = $this->money->toMinor($amount);
 

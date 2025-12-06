@@ -58,7 +58,9 @@ class SendInvoiceCallbackJob implements ShouldQueue
                 ->post($callbackUrl, $payload);
 
             if (!$response->successful()) {
-                throw new InvoiceCallbackException('Callback request failed with status ' . $response->status());
+                throw new InvoiceCallbackException(__('messages.api.callback_failed', [
+                    'status' => $response->status(),
+                ]));
             }
             $log->response_status = $response->status();
             $log->response_body = $response->body();

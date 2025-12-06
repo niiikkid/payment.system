@@ -38,7 +38,7 @@ final class MoneyService implements MoneyServiceContract
     {
         $normalized = str_replace([' ', '_', ','], ['', '', '.'], trim($value));
         if ($normalized === '') {
-            throw new InvalidArgumentException('Empty money string.');
+            throw new InvalidArgumentException(__('messages.money.empty_string'));
         }
         $scale = $this->scaleFor($currency);
         $decimal = BigDecimal::of($normalized)->toScale($scale, RoundingMode::DOWN);
@@ -101,7 +101,7 @@ final class MoneyService implements MoneyServiceContract
     private function assertSameCurrency(MoneyAmount $a, MoneyAmount $b): void
     {
         if ($a->currency !== $b->currency) {
-            throw new InvalidArgumentException('Currencies must match.');
+            throw new InvalidArgumentException(__('messages.money.currency_mismatch'));
         }
     }
 

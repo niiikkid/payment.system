@@ -51,7 +51,7 @@ class UpdateInvoiceRequest extends FormRequest
             // Если ставим paid — txid обязателен
             if ($status === InvoiceStatus::PAID->value) {
                 if (!is_string($this->input('txid')) || trim((string) $this->input('txid')) === '') {
-                    $v->errors()->add('txid', 'TXID обязателен для статуса paid.');
+                    $v->errors()->add('txid', __('validation.app.invoice.txid_required_for_paid'));
                 }
             }
 

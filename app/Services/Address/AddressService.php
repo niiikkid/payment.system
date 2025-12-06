@@ -39,16 +39,23 @@ class AddressService implements AddressServiceContract
         $networkEnum = Network::tryFrom(strtolower(trim($network)));
 
         if (!$currencyEnum) {
-            throw new UnsupportedCurrencyException('Unsupported currency: ' . $currency);
+            throw new UnsupportedCurrencyException(__('messages.addresses.errors.unsupported_currency_value', [
+                'currency' => $currency,
+            ]));
         }
         if (!$networkEnum) {
-            throw new UnsupportedNetworkException('Unsupported network: ' . $network);
+            throw new UnsupportedNetworkException(__('messages.addresses.errors.unsupported_network_value', [
+                'network' => $network,
+            ]));
         }
 
         // Проверка совместимости валюты и сети
         $allowedNetworks = NetworkCurrency::networksByCurrency($currencyEnum);
         if (!in_array($networkEnum, $allowedNetworks, true)) {
-            throw new CurrencyNetworkMismatchException('Currency ' . $currencyEnum->value . ' is not available on network ' . $networkEnum->value);
+            throw new CurrencyNetworkMismatchException(__('messages.addresses.errors.currency_mismatch_value', [
+                'currency' => $currencyEnum->value,
+                'network' => $networkEnum->value,
+            ]));
         }
 
         $exists = Address::query()
@@ -58,7 +65,7 @@ class AddressService implements AddressServiceContract
             ->where('address', $address)
             ->exists();
         if ($exists) {
-            throw new DuplicateAddressException('Address already exists for the network & currency');
+            throw new DuplicateAddressException(__('messages.addresses.errors.duplicate'));
         }
 
         // Получаем баланс адреса из блокчейн-сервиса
@@ -66,7 +73,7 @@ class AddressService implements AddressServiceContract
             $balance = $this->blockchain->getAddressBalance($networkEnum, $currencyEnum, $address);
         } catch (TokenContractNotFoundException $e) {
             // Отсутствие токена/баланса трактуем как несуществующий адрес для нужной валюты
-            throw new AddressNotFoundOnBlockchainException('Address does not exist on blockchain for specified currency/network.');
+            throw new AddressNotFoundOnBlockchainException(__('messages.addresses.errors.not_exist_blockchain'));
         }
 
         $balanceMinor = $this->money->toMinor($balance);
@@ -97,7 +104,10 @@ class AddressService implements AddressServiceContract
     public function pickForPayment(User $user, Currency $currency, Network $network, MoneyAmount $amount): Address
     {
         if (!NetworkCurrency::isSupported($currency, $network)) {
-            throw new CurrencyNetworkMismatchException('Currency ' . $currency->value . ' is not available on network ' . $network->value);
+            throw new CurrencyNetworkMismatchException(__('messages.addresses.errors.currency_mismatch_value', [
+                'currency' => $currency->value,
+                'network' => $network->value,
+            ]));
         }
 
         // Сумма уже MoneyAmount: приводим к минорным единицам для сравнения с БД
@@ -132,7 +142,7 @@ class AddressService implements AddressServiceContract
             ->first();
 
         if (!$candidate) {
-            throw new NoAvailableAddressException('No available address for the given amount right now');
+            throw new NoAvailableAddressException(__('messages.addresses.errors.no_available'));
         }
 
         return $candidate;
@@ -141,7 +151,7 @@ class AddressService implements AddressServiceContract
     public function updateChecked(Address $address, string $balance): Address
     {
         if (!$this->isValidDecimalString($balance)) {
-            throw new InvalidBalanceFormatException('Balance must be a non-negative decimal string');
+            throw new InvalidBalanceFormatException(__('messages.addresses.errors.invalid_balance'));
         }
         $address->update([
             'balance' => ltrim($balance, '+'),
