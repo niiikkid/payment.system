@@ -4,6 +4,7 @@ import { computed } from 'vue';
 import { Link, useForm, usePage } from '@inertiajs/vue3';
 import Alert from '@/components/ui/Alert.vue';
 import { vueLang } from '@erag/lang-sync-inertia';
+import LanguageSwitcher from '@/components/ui/LanguageSwitcher.vue';
 
 interface Props {
     breadcrumbs?: BreadcrumbItemType[];
@@ -143,6 +144,9 @@ const pageIconPath = computed(() => {
                     <a href="/dashboard" class="block px-2 py-3 text-xl font-semibold tracking-wide text-center">
                         {{ appName }}
                     </a>
+                    <div class="px-2 pb-2">
+                        <LanguageSwitcher />
+                    </div>
                     <div>
                         <ul class="menu w-full font-semibold space-y-1">
                             <li>

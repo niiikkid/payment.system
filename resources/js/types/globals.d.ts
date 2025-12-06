@@ -31,3 +31,10 @@ declare module '@erag/lang-sync-inertia' {
         trans: (key: string, replacements?: Record<string, string | number>) => string;
     };
 }
+
+declare module 'vue-flagpack' {
+    import type { Plugin } from 'vue';
+    const Flagpack: Plugin;
+    export default Flagpack;
+}
+

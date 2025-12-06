@@ -14,6 +14,19 @@ use Inertia\Inertia;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
+Route::get('lang/{locale}', function (string $locale) {
+    $available = ['en', 'ru'];
+
+    if (! in_array($locale, $available, true)) {
+        abort(404);
+    }
+
+    session(['locale' => $locale]);
+    app()->setLocale($locale);
+
+    return back();
+})->name('locale.switch');
+
 // Public payment page
 Route::get('pay/{invoice}', [InvoiceController::class, 'public'])->name('invoices.public');
 Route::get('pay/{invoice}/data', [InvoiceController::class, 'publicData'])->name('invoices.public.data');
