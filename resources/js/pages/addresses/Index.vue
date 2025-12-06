@@ -7,6 +7,7 @@ import AddressCopy from '@/components/ui/AddressCopy.vue';
 import DateTimeFormat from '@/components/ui/DateTimeFormat.vue';
 import Pagination from '@/components/ui/Pagination.vue';
 import AddressCreateModal, { type AddressCreateForm } from '@/components/modals/addresses/AddressCreateModal.vue';
+import { vueLang } from '@erag/lang-sync-inertia';
 
 interface AddressItem {
     id: number;
@@ -39,6 +40,7 @@ interface Props {
 }
 
 const props = defineProps<Props>();
+const { __ } = vueLang();
 const showCreate = ref(false);
 const createForm = useForm<AddressCreateForm>({
     currency: '',
@@ -90,29 +92,29 @@ function toIso(input: string | null | undefined): string {
 </script>
 
 <template>
-    <AppLayout :breadcrumbs="[{ title: 'Главная', href: '/' }, { title: 'Адреса', href: '/addresses' }]">
+    <AppLayout :breadcrumbs="[{ title: __('frontend.nav.dashboard'), href: '/' }, { title: __('frontend.nav.addresses'), href: '/addresses' }]">
         <template #header-actions>
             <div class="flex items-center gap-2">
-                <button class="btn btn-primary btn-sm" @click="showCreate = true">Создать адрес</button>
+                <button class="btn btn-primary btn-sm" @click="showCreate = true">{{ __('frontend.addresses.actions.create') }}</button>
             </div>
         </template>
 
         <div class="grid gap-6">
             <div class="lg:card lg:bg-base-100 lg:shadow">
                 <div class="lg:card-body">
-                    <h2 class="hidden lg:block card-title">Список адресов</h2>
-                    <h2 class="lg:hidden card-title mb-3">Список адресов</h2>
+                    <h2 class="hidden lg:block card-title">{{ __('frontend.addresses.list.title') }}</h2>
+                    <h2 class="lg:hidden card-title mb-3">{{ __('frontend.addresses.list.title') }}</h2>
 
                     <!-- Desktop Table View (lg and above) -->
                     <div class="hidden lg:block overflow-x-auto">
                         <table class="table table-sm w-full">
                             <thead>
                                 <tr>
-                                    <th>ID</th>
-                                    <th>Адрес</th>
-                                    <th>Баланс</th>
-                                    <th>Валюта</th>
-                                    <th>Активен</th>
+                                    <th>{{ __('frontend.common.id') }}</th>
+                                    <th>{{ __('frontend.common.address') }}</th>
+                                    <th>{{ __('frontend.common.balance') }}</th>
+                                    <th>{{ __('frontend.common.currency') }}</th>
+                                    <th>{{ __('frontend.common.active') }}</th>
                                     <th></th>
                                 </tr>
                             </thead>
@@ -133,7 +135,7 @@ function toIso(input: string | null | undefined): string {
                                     </td>
                                 </tr>
                                 <tr v-if="props.addresses.data.length === 0">
-                                    <td colspan="6" class="text-center text-sm opacity-70 py-6">Пока нет адресов</td>
+                                    <td colspan="6" class="text-center text-sm opacity-70 py-6">{{ __('frontend.addresses.empty') }}</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -146,7 +148,7 @@ function toIso(input: string | null | undefined): string {
                                 <!-- Header: ID and Date -->
                                 <div class="flex items-center justify-between mb-3">
                                     <div class="flex items-center gap-2">
-                                        <span class="text-xs opacity-70">ID:</span>
+                                        <span class="text-xs opacity-70">{{ __('frontend.common.id') }}:</span>
                                         <span class="text-sm font-semibold">{{ addr.id }}</span>
                                     </div>
                                     <div class="flex items-center gap-1.5 text-xs opacity-70" v-if="addr.created_at">
@@ -170,7 +172,7 @@ function toIso(input: string | null | undefined): string {
                                     </div>
 
                                     <div class="flex items-center gap-2 whitespace-nowrap">
-                                        <span class="text-xs opacity-70">Баланс:</span>
+                                        <span class="text-xs opacity-70">{{ __('frontend.common.balance') }}:</span>
                                         <span class="text-sm font-semibold">{{ addr.balance }}</span>
                                     </div>
 
@@ -181,7 +183,7 @@ function toIso(input: string | null | undefined): string {
                             </div>
                         </div>
                         <div v-if="!props.addresses.data.length" class="text-center text-sm opacity-70 py-6">
-                            Пока нет адресов
+                            {{ __('frontend.addresses.empty') }}
                         </div>
                     </div>
 
@@ -192,7 +194,7 @@ function toIso(input: string | null | undefined): string {
                                 <!-- Header: ID and Date -->
                                 <div class="flex items-center justify-between mb-3">
                                     <div class="flex items-center gap-2">
-                                        <span class="text-xs opacity-70">ID:</span>
+                                        <span class="text-xs opacity-70">{{ __('frontend.common.id') }}:</span>
                                         <span class="text-sm font-semibold">{{ addr.id }}</span>
                                     </div>
                                     <div class="flex items-center gap-1.5 text-xs opacity-70" v-if="addr.created_at">
@@ -224,14 +226,14 @@ function toIso(input: string | null | undefined): string {
                                         <CurrencyNetworkBadge :currency-label="addr.currency_label" :network-label="addr.network_label" />
                                     </div>
                                     <div class="inline-flex items-center gap-2">
-                                        <span class="text-xs opacity-70">Баланс:</span>
+                                        <span class="text-xs opacity-70">{{ __('frontend.common.balance') }}:</span>
                                         <div class="text-sm font-semibold">{{ addr.balance }}</div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                         <div v-if="!props.addresses.data.length" class="text-center text-sm opacity-70 py-6">
-                            Пока нет адресов
+                            {{ __('frontend.addresses.empty') }}
                         </div>
                     </div>
 

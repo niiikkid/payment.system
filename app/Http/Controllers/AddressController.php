@@ -56,7 +56,7 @@ class AddressController extends Controller
             ];
         }, Network::cases());
 
-        return Inertia::render('addresses/Index', [
+        return $this->inertia('addresses/Index', [
             'addresses' => $paginator,
             'currencyOptions' => $currencyOptions,
             'networkOptions' => $networkOptions,

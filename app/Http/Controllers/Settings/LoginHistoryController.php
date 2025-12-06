@@ -22,7 +22,7 @@ class LoginHistoryController extends Controller
             ->paginate(20)
             ->through(fn ($login) => (new UserLoginHistoryResource($login))->resolve());
 
-        return Inertia::render('settings/LoginHistory', [
+        return $this->inertia('settings/LoginHistory', [
             'logins' => $logins,
         ]);
     }

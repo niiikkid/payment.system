@@ -2,6 +2,7 @@
 import { dashboard } from '@/routes';
 import { type BreadcrumbItem } from '@/types';
 import AppLayout from '@/layouts/AppLayout.vue';
+import { vueLang } from '@erag/lang-sync-inertia';
 
 const props = defineProps<{
     stats: {
@@ -14,9 +15,11 @@ const props = defineProps<{
     }
 }>();
 
+const { __ } = vueLang();
+
 const breadcrumbs: BreadcrumbItem[] = [
     {
-        title: 'Главная',
+        title: __('frontend.nav.dashboard'),
         href: dashboard().url,
     },
 ];
@@ -29,21 +32,21 @@ const breadcrumbs: BreadcrumbItem[] = [
         >
             <div class="stats stats-vertical md:stats-horizontal shadow bg-base-100">
                 <div class="stat">
-                    <div class="stat-title">Всего инвойсов</div>
+                    <div class="stat-title">{{ __('frontend.dashboard.stats.total') }}</div>
                     <div class="stat-value">{{ props.stats.totalInvoices }}</div>
-                    <div class="stat-desc">Активных: {{ props.stats.activeInvoices }}</div>
+                    <div class="stat-desc">{{ __('frontend.dashboard.stats.active', { count: props.stats.activeInvoices }) }}</div>
                 </div>
 
                 <div class="stat">
-                    <div class="stat-title">Оплачено</div>
+                    <div class="stat-title">{{ __('frontend.dashboard.stats.paid') }}</div>
                     <div class="stat-value text-success">{{ props.stats.paidInvoices }}</div>
-                    <div class="stat-desc">Успех: {{ props.stats.successRate }}%</div>
+                    <div class="stat-desc">{{ __('frontend.dashboard.stats.success', { rate: props.stats.successRate }) }}</div>
                 </div>
 
                 <div class="stat">
-                    <div class="stat-title">Истёкших</div>
+                    <div class="stat-title">{{ __('frontend.dashboard.stats.expired') }}</div>
                     <div class="stat-value text-warning">{{ props.stats.expiredInvoices }}</div>
-                    <div class="stat-desc">Адресов: {{ props.stats.addressesTotal }}</div>
+                    <div class="stat-desc">{{ __('frontend.dashboard.stats.addresses', { count: props.stats.addressesTotal }) }}</div>
                 </div>
             </div>
         </div>

@@ -15,7 +15,7 @@ class HomeController extends Controller
      */
     public function index(): Response
     {
-        return Inertia::render('Welcome', [
+        return $this->inertia('Welcome', [
             'canRegister' => Features::enabled(Features::registration()),
         ]);
     }

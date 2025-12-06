@@ -30,7 +30,7 @@ class UsersController extends Controller
             ->paginate(20)
             ->through(fn (User $user) => (new UserResource($user))->resolve());
 
-        return Inertia::render('admin/users/Index', [
+        return $this->inertia('admin/users/Index', [
             'users' => $paginator,
             'roleOptions' => [
                 ['value' => 'admin', 'label' => __('messages.users.roles.admin')],

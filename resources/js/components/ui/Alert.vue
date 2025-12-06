@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue';
+import { vueLang } from '@erag/lang-sync-inertia';
 
 interface Props {
     type?: 'error' | 'success' | 'info' | 'warning';
@@ -11,6 +12,8 @@ const props = withDefaults(defineProps<Props>(), {
     type: 'info',
     closable: true,
 });
+
+const { __ } = vueLang();
 
 const alertClass = {
     error: 'alert-error',
@@ -45,7 +48,7 @@ function closeAlert() {
             v-if="props.closable"
             type="button"
             class="btn btn-ghost btn-xs btn-circle"
-            aria-label="Закрыть"
+            :aria-label="__('frontend.common.close')"
             @click="closeAlert"
         >
             ✕

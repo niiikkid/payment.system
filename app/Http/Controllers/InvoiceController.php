@@ -37,7 +37,7 @@ class InvoiceController extends Controller
         $currencyOptions = array_map(fn (Currency $c) => ['value' => $c->value, 'label' => $c->value], Currency::cases());
         $networkOptions = array_map(fn (Network $n) => ['value' => $n->value, 'label' => strtoupper($n->value)], Network::cases());
 
-        return Inertia::render('invoices/Index', [
+        return $this->inertia('invoices/Index', [
             'invoices' => $paginator,
             'currencyOptions' => $currencyOptions,
             'networkOptions' => $networkOptions,
@@ -96,7 +96,7 @@ class InvoiceController extends Controller
     {
         $invoice->load('address');
 
-        return Inertia::render('PaymentForm/Index', [
+        return $this->inertia('PaymentForm/Index', [
             'invoice' => (new InvoiceResource($invoice))->resolve(),
             'appName' => config('app.name'),
             'statuses' => [

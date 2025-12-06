@@ -24,3 +24,10 @@ declare module 'vue' {
         $headManager: ReturnType<typeof createHeadManager>;
     }
 }
+
+declare module '@erag/lang-sync-inertia' {
+    export function vueLang(): {
+        __: (key: string, replacements?: Record<string, string | number>) => string;
+        trans: (key: string, replacements?: Record<string, string | number>) => string;
+    };
+}

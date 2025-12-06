@@ -21,6 +21,21 @@ Route::middleware('auth')->group(function () {
         ->name('user-password.update');
 
     Route::get('settings/appearance', function () {
+        $locale = app()->getLocale();
+        $basePath = rtrim(config('inertia-lang.lang_path', resource_path('lang')), '/');
+        $path = "{$basePath}/{$locale}";
+
+        $files = [];
+        if (is_dir($path)) {
+            $files = array_values(array_filter(array_map(function ($file) {
+                return str_ends_with($file, '.php')
+                    ? pathinfo($file, PATHINFO_FILENAME)
+                    : null;
+            }, scandir($path) ?: [])));
+        }
+
+        \syncLangFiles($files);
+
         return Inertia::render('settings/Appearance');
     })->name('appearance.edit');
 

@@ -30,11 +30,12 @@
         "vue-tsc": "^2.2.4"
     },
     "dependencies": {
+        "@erag/lang-sync-inertia": "^1.4.10",
         "@inertiajs/vue3": "^2.1.0",
         "@vueuse/core": "^12.8.2",
+        "axios": "^1.7.7",
         "class-variance-authority": "^0.7.1",
         "clsx": "^2.1.1",
-        "axios": "^1.7.7",
         "laravel-vite-plugin": "^2.0.0",
         "lucide-vue-next": "^0.468.0",
         "reka-ui": "^2.4.1",

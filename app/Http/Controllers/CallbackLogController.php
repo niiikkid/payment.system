@@ -22,7 +22,7 @@ class CallbackLogController extends Controller
             ->paginate(20)
             ->through(fn ($log) => (new InvoiceCallbackLogResource($log))->resolve());
 
-        return Inertia::render('callbacks/Index', [
+        return $this->inertia('callbacks/Index', [
             'logs' => $paginator,
         ]);
     }

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import ModalDialog from '@/components/ui/modal/ModalDialog.vue'
+import { vueLang } from '@erag/lang-sync-inertia'
 
 interface Props {
     modelValue: boolean
@@ -12,15 +13,18 @@ interface Props {
     loading?: boolean
 }
 
+const { __ } = vueLang()
+
 const props = withDefaults(defineProps<Props>(), {
     modelValue: false,
-    title: 'Подтверждение',
-    message: 'Вы уверены, что хотите выполнить это действие?',
-    confirmText: 'Подтвердить',
-    cancelText: 'Отмена',
     danger: false,
     loading: false,
 })
+
+const title = computed(() => props.title ?? __('frontend.common.confirmation'))
+const message = computed(() => props.message ?? __('frontend.common.confirm_message'))
+const confirmText = computed(() => props.confirmText ?? __('frontend.common.confirm'))
+const cancelText = computed(() => props.cancelText ?? __('frontend.common.cancel'))
 
 const emit = defineEmits<{
     (e: 'update:modelValue', value: boolean): void

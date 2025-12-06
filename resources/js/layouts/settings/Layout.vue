@@ -10,14 +10,17 @@ import { Link, router, usePage } from '@inertiajs/vue3';
 import { computed, ref } from 'vue';
 import ConfirmDialog from '@/components/ui/modal/ConfirmDialog.vue';
 import { logout as logoutRoute } from '@/routes';
+import { vueLang } from '@erag/lang-sync-inertia';
 
-const sidebarNavItems: NavItem[] = [
-    { title: 'Профиль', href: editProfile() },
-    { title: 'Пароль', href: editPassword() },
-    { title: '2FA авторизация', href: show() },
-    { title: 'История входов', href: loginHistory() },
-    { title: 'Внешний вид', href: editAppearance() },
-];
+const { __ } = vueLang();
+
+const sidebarNavItems = computed<NavItem[]>(() => [
+    { title: __('frontend.settings.nav.profile'), href: editProfile() },
+    { title: __('frontend.settings.nav.password'), href: editPassword() },
+    { title: __('frontend.settings.nav.two_factor'), href: show() },
+    { title: __('frontend.settings.nav.login_history'), href: loginHistory() },
+    { title: __('frontend.settings.nav.appearance'), href: editAppearance() },
+]);
 
 const page = usePage();
 const currentPath = computed(() => page.url);
@@ -48,7 +51,7 @@ function confirmLogout() {
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5 opacity-60">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
                 </svg>
-                Настройки аккаунта
+                {{ __('frontend.settings.title') }}
             </h1>
         </div>
 
@@ -67,15 +70,15 @@ function confirmLogout() {
                 </nav>
                 <div class="divider my-4"></div>
                 <button type="button" class="btn btn-error w-full" @click="requestLogout">
-                    Выйти
+                    {{ __('frontend.common.logout') }}
                 </button>
                 <ConfirmDialog
                     v-model="isLogoutDialogOpen"
                     :loading="isLogoutProcessing"
-                    title="Выйти из аккаунта"
-                    message="Вы действительно хотите выйти?"
-                    confirm-text="Выйти"
-                    cancel-text="Отмена"
+                    :title="__('frontend.settings.logout.title')"
+                    :message="__('frontend.settings.logout.message')"
+                    :confirm-text="__('frontend.settings.logout.confirm')"
+                    :cancel-text="__('frontend.common.cancel')"
                     :danger="true"
                     @confirm="confirmLogout"
                 />

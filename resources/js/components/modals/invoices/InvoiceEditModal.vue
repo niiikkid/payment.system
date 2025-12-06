@@ -5,6 +5,7 @@ import FormControl from '@/components/form/FormControl.vue'
 import Label from '@/components/form/Label.vue'
 import Input from '@/components/form/Input.vue'
 import Select from '@/components/form/Select.vue'
+import { vueLang } from '@erag/lang-sync-inertia'
 
 interface Option { value: string; label: string }
 
@@ -45,6 +46,8 @@ const form = computed({
 
 const fieldErrors = computed<InvoiceEditErrors>(() => props.errors ?? {})
 
+const { __ } = vueLang()
+
 const txidInput = computed({
     get: () => form.value.txid || '',
     set: (value: string) => {
@@ -73,8 +76,8 @@ function submit() {
 <template>
     <ModalDialog
         :model-value="modelValue"
-        title="Редактировать инвойс"
-        description="Сменить статус и при необходимости указать TXID"
+        :title="__('frontend.invoices.modals.edit.title')"
+        :description="__('frontend.invoices.modals.edit.description')"
         size="xl"
         placement="bottom"
         @update:modelValue="emit('update:modelValue', $event)"
@@ -82,7 +85,7 @@ function submit() {
     >
         <form class="mt-4 grid gap-4" @submit.prevent="submit">
             <FormControl :error="fieldErrors.status">
-                <Label for="status" required>Статус</Label>
+                <Label for="status" required>{{ __('frontend.invoices.fields.status') }}</Label>
                 <Select
                     id="status"
                     v-model="form.status"
@@ -90,21 +93,23 @@ function submit() {
                     required
                 />
             </FormControl>
-            <FormControl v-if="form.status === 'paid'" hint="Обязателен для статуса paid" :error="fieldErrors.txid">
-                <Label for="txid" required>TXID</Label>
+            <FormControl v-if="form.status === 'paid'" :hint="__('frontend.invoices.fields.txid_hint')" :error="fieldErrors.txid">
+                <Label for="txid" required>{{ __('frontend.invoices.fields.txid') }}</Label>
                 <Input
                     id="txid"
                     v-model="txidInput"
                     type="text"
-                    placeholder="Введите хэш транзакции"
+                    :placeholder="__('frontend.invoices.fields.txid_placeholder')"
                     required
                 />
             </FormControl>
         </form>
 
         <template #actions>
-            <button type="button" class="btn" @click="close" :disabled="loading">Отмена</button>
-            <button type="button" class="btn btn-primary" :class="{ loading }" :disabled="loading" @click="submit">Сохранить</button>
+            <button type="button" class="btn" @click="close" :disabled="loading">{{ __('frontend.common.cancel') }}</button>
+            <button type="button" class="btn btn-primary" :class="{ loading }" :disabled="loading" @click="submit">
+                {{ __('frontend.invoices.actions.save') }}
+            </button>
         </template>
     </ModalDialog>
 </template>

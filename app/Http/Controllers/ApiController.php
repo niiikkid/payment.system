@@ -26,7 +26,7 @@ class ApiController extends Controller
             }
         }
 
-        return Inertia::render('api/Index', [
+        return $this->inertia('api/Index', [
             'publicApiKey' => $token?->token ?? '',
             'apiBaseUrl' => url('/api/v1'),
         ]);

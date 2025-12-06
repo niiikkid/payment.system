@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, ref, onUnmounted, watch } from 'vue'
+import { vueLang } from '@erag/lang-sync-inertia'
 
 interface Props {
   /**
@@ -25,7 +26,9 @@ interface Props {
 
 const props = defineProps<Props>()
 
-const tooltipText = ref('Скопировать')
+const { __ } = vueLang()
+
+const tooltipText = ref(__('frontend.common.copy'))
 const showTooltip = ref(false)
 let resetTimer: number | undefined
 let tooltipElement = ref<HTMLElement | null>(null)
@@ -151,13 +154,13 @@ async function copyToClipboard() {
   if (!fullFormatted.value) return
   try {
     await navigator.clipboard.writeText(fullFormatted.value)
-    tooltipText.value = 'Скопировано'
+    tooltipText.value = __('frontend.common.copied')
   } catch (_) {
-    tooltipText.value = 'Не удалось скопировать'
+    tooltipText.value = __('frontend.common.copy_failed')
   } finally {
     if (resetTimer) clearTimeout(resetTimer)
     resetTimer = window.setTimeout(() => {
-      tooltipText.value = 'Скопировать'
+      tooltipText.value = __('frontend.common.copy')
     }, 1500)
   }
 }

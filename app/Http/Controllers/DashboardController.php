@@ -30,7 +30,7 @@ class DashboardController extends Controller
             ? round(($paidInvoices / $totalInvoices) * 100, 2)
             : 0.0;
 
-        return Inertia::render('Dashboard', [
+        return $this->inertia('Dashboard', [
             'stats' => [
                 'totalInvoices' => $totalInvoices,
                 'paidInvoices' => $paidInvoices,

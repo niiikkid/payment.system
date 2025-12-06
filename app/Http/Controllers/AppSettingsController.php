@@ -22,7 +22,7 @@ class AppSettingsController extends Controller
     public function index(AppSettingsServiceContract $service): Response
     {
         $settings = $service->all();
-        return Inertia::render('app-settings/Index', [
+        return $this->inertia('app-settings/Index', [
             'settings' => AppSettingResource::collection($settings)->resolve(),
             'currencies' => array_map(fn (Currency $c) => $c->value, Currency::cases()),
         ]);

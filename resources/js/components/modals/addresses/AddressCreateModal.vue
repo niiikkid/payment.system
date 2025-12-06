@@ -5,6 +5,7 @@ import FormControl from '@/components/form/FormControl.vue'
 import Label from '@/components/form/Label.vue'
 import Input from '@/components/form/Input.vue'
 import Select from '@/components/form/Select.vue'
+import { vueLang } from '@erag/lang-sync-inertia'
 
 interface Option { value: string; label: string }
 
@@ -52,6 +53,8 @@ const form = computed({
 
 const fieldErrors = computed<AddressCreateErrors>(() => props.errors ?? {})
 
+const { __ } = vueLang()
+
 function close() {
     emit('update:modelValue', false)
     emit('close')
@@ -70,8 +73,8 @@ function submit() {
 <template>
     <ModalDialog
         :model-value="modelValue"
-        title="Добавить новый адрес"
-        description="Заполните данные для добавления нового адреса"
+        :title="__('frontend.addresses.modals.create.title')"
+        :description="__('frontend.addresses.modals.create.description')"
         size="xl"
         placement="bottom"
         @update:modelValue="emit('update:modelValue', $event)"
@@ -79,41 +82,41 @@ function submit() {
     >
         <form class="mt-4 grid gap-4" @submit.prevent="submit">
             <FormControl :error="fieldErrors.currency">
-                <Label for="currency" required>Валюта</Label>
+                <Label for="currency" required>{{ __('frontend.addresses.fields.currency') }}</Label>
                 <Select
                     id="currency"
                     v-model="form.currency"
                     :options="currencyOptions"
-                    placeholder="Выберите валюту"
+                    :placeholder="__('frontend.addresses.fields.currency_placeholder')"
                     required
                 />
             </FormControl>
             <FormControl :error="fieldErrors.network">
-                <Label for="network" required>Сеть</Label>
+                <Label for="network" required>{{ __('frontend.addresses.fields.network') }}</Label>
                 <Select
                     id="network"
                     v-model="form.network"
                     :options="networkOptions"
-                    placeholder="Выберите сеть"
+                    :placeholder="__('frontend.addresses.fields.network_placeholder')"
                     required
                 />
             </FormControl>
             <FormControl :error="fieldErrors.address">
-                <Label for="address" required>Адрес</Label>
+                <Label for="address" required>{{ __('frontend.addresses.fields.address') }}</Label>
                 <Input
                     id="address"
                     v-model="form.address"
                     type="text"
-                    placeholder="Например: T..."
+                    :placeholder="__('frontend.addresses.fields.address_placeholder')"
                     required
                 />
             </FormControl>
 
             <div class="modal-action">
-                <button type="button" class="btn" @click="close" :disabled="loading">Отмена</button>
+                <button type="button" class="btn" @click="close" :disabled="loading">{{ __('frontend.common.cancel') }}</button>
                 <button type="submit" class="btn btn-primary" :disabled="loading">
                     <span v-if="loading" class="loading loading-spinner loading-sm mr-2" />
-                    Добавить
+                    {{ __('frontend.addresses.actions.add') }}
                 </button>
             </div>
         </form>

@@ -26,7 +26,7 @@ class TwoFactorAuthenticationController extends Controller
 
         $user = $request->user();
 
-        return Inertia::render('settings/TwoFactor', [
+        return $this->inertia('settings/TwoFactor', [
             'twoFactorEnabled' => $user->hasEnabledTwoFactorAuthentication(),
             'requiresConfirmation' => Features::optionEnabled(Features::twoFactorAuthentication(), 'confirm'),
             'hasUnconfirmedTwoFactor' => ! $user->hasEnabledTwoFactorAuthentication()
