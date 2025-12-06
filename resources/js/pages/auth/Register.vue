@@ -3,6 +3,7 @@ import AuthBase from '@/layouts/AuthLayout.vue';
 import { login } from '@/routes';
 import { store as registerStore } from '@/routes/register';
 import { Head, Link, useForm } from '@inertiajs/vue3';
+import { vueLang } from '@erag/lang-sync-inertia';
 
 const form = useForm({
     name: '',
@@ -10,6 +11,7 @@ const form = useForm({
     password: '',
     password_confirmation: '',
 });
+const { __ } = vueLang();
 
 function submit() {
     form.post(registerStore.url(), {
@@ -20,16 +22,16 @@ function submit() {
 
 <template>
     <AuthBase
-        title="Создать аккаунт"
-        description="Заполните данные, чтобы создать аккаунт"
+        :title="__('frontend.auth.register.title')"
+        :description="__('frontend.auth.register.description')"
     >
-        <Head title="Регистрация" />
+        <Head :title="__('frontend.auth.register.page_title')" />
 
         <form @submit.prevent="submit" class="flex flex-col gap-6">
             <div class="grid gap-6">
                 <div class="grid gap-2">
                     <label for="name" class="label">
-                        <span class="label-text">Имя</span>
+                        <span class="label-text">{{ __('frontend.auth.register.name') }}</span>
                     </label>
                     <input
                         id="name"
@@ -39,7 +41,7 @@ function submit() {
                         tabindex="1"
                         autocomplete="name"
                         name="name"
-                        placeholder="Полное имя"
+                        :placeholder="__('frontend.auth.register.name_placeholder')"
                         v-model="form.name"
                         class="input input-bordered w-full"
                     />
@@ -48,7 +50,7 @@ function submit() {
 
                 <div class="grid gap-2">
                     <label for="email" class="label">
-                        <span class="label-text">E‑mail</span>
+                        <span class="label-text">{{ __('frontend.auth.register.email') }}</span>
                     </label>
                     <input
                         id="email"
@@ -66,7 +68,7 @@ function submit() {
 
                 <div class="grid gap-2">
                     <label for="password" class="label">
-                        <span class="label-text">Пароль</span>
+                        <span class="label-text">{{ __('frontend.auth.register.password') }}</span>
                     </label>
                     <input
                         id="password"
@@ -75,7 +77,7 @@ function submit() {
                         tabindex="3"
                         autocomplete="new-password"
                         name="password"
-                        placeholder="Пароль"
+                        :placeholder="__('frontend.auth.register.password_placeholder')"
                         v-model="form.password"
                         class="input input-bordered w-full"
                     />
@@ -84,7 +86,7 @@ function submit() {
 
                 <div class="grid gap-2">
                     <label for="password_confirmation" class="label">
-                        <span class="label-text">Подтвердите пароль</span>
+                        <span class="label-text">{{ __('frontend.auth.register.password_confirmation') }}</span>
                     </label>
                     <input
                         id="password_confirmation"
@@ -93,7 +95,7 @@ function submit() {
                         tabindex="4"
                         autocomplete="new-password"
                         name="password_confirmation"
-                        placeholder="Подтвердите пароль"
+                        :placeholder="__('frontend.auth.register.password_confirm_placeholder')"
                         v-model="form.password_confirmation"
                         class="input input-bordered w-full"
                     />
@@ -108,13 +110,13 @@ function submit() {
                     data-test="register-user-button"
                 >
                     <span v-if="form.processing" class="loading loading-spinner loading-sm mr-2" />
-                    Создать аккаунт
+                    {{ __('frontend.auth.register.submit') }}
                 </button>
             </div>
 
             <div class="text-center text-sm text-base-content/60">
-                Уже есть аккаунт?
-                <Link :href="login().url" class="link link-hover" tabindex="6">Войти</Link>
+                {{ __('frontend.auth.register.have_account') }}
+                <Link :href="login().url" class="link link-hover" tabindex="6">{{ __('frontend.auth.register.login') }}</Link>
             </div>
         </form>
     </AuthBase>

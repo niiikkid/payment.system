@@ -11,6 +11,7 @@ import Pagination from '@/components/ui/Pagination.vue';
 import InvoiceDetailsModal from '@/components/modals/invoices/InvoiceDetailsModal.vue';
 import InvoiceEditModal, { type InvoiceEditForm } from '@/components/modals/invoices/InvoiceEditModal.vue';
 import InvoiceCreateModal, { type InvoiceCreateForm } from '@/components/modals/invoices/InvoiceCreateModal.vue';
+import { vueLang } from '@erag/lang-sync-inertia';
 
 type Invoice = {
   id: string
@@ -39,6 +40,7 @@ const invoices = computed(() => page.props.invoices as any);
 const statuses = computed(() => page.props.statuses as { active: string[]; final: string[] });
 const currencyOptions = computed(() => page.props.currencyOptions as Option[]);
 const networkOptions = computed(() => page.props.networkOptions as Option[]);
+const { __ } = vueLang();
 
 const selected: any = ref<Invoice | null>(null);
 const showModal = ref(false);
@@ -107,7 +109,7 @@ async function sendCallback() {
     await axios.post(`/invoices/${selected.value.id}/send-callback`);
     sendSuccess.value = true;
   } catch (e: any) {
-    sendError.value = e?.response?.data?.message || e?.message || 'Ошибка при отправке колбэка';
+    sendError.value = e?.response?.data?.message || e?.message || __('frontend.invoices_page.errors.callback_send');
   } finally {
     sendLoading.value = false;
   }
@@ -149,7 +151,7 @@ function submitCreate() {
     try {
       metadataParsed = JSON.parse(createForm.metadata as string);
     } catch (e) {
-      createForm.setError('metadata', 'Некорректный JSON в metadata');
+      createForm.setError('metadata', __('frontend.invoices_page.errors.metadata_invalid'));
       return;
     }
   }
@@ -196,10 +198,10 @@ watch(invoices, (collection: any) => {
 </script>
 
 <template>
-  <AppLayout :breadcrumbs="[{ title: 'Главная', href: '/' }, { title: 'Invoices', href: '/invoices' }]">
+  <AppLayout :breadcrumbs="[{ title: __('frontend.invoices_page.breadcrumb.home'), href: '/' }, { title: __('frontend.invoices_page.breadcrumb.title'), href: '/invoices' }]">
     <template #header-actions>
       <div class="flex items-center gap-2">
-        <button class="btn btn-primary btn-sm" @click="showCreate = true">Создать инвойс</button>
+        <button class="btn btn-primary btn-sm" @click="showCreate = true">{{ __('frontend.invoices_page.actions.create') }}</button>
       </div>
     </template>
 
@@ -207,20 +209,20 @@ watch(invoices, (collection: any) => {
       <!-- List -->
       <div class="lg:card lg:bg-base-100 lg:shadow">
         <div class="lg:card-body">
-          <h2 class="hidden lg:block card-title">Список инвойсов</h2>
-          <h2 class="lg:hidden card-title mb-3">Список инвойсов</h2>
+          <h2 class="hidden lg:block card-title">{{ __('frontend.invoices_page.list_title') }}</h2>
+          <h2 class="lg:hidden card-title mb-3">{{ __('frontend.invoices_page.list_title') }}</h2>
 
           <!-- Desktop Table View (lg and above) -->
           <div class="hidden lg:block overflow-x-auto">
             <table class="table table-sm w-full">
               <thead>
                 <tr>
-                  <th>ID</th>
-                  <th>Адрес</th>
-                  <th>Сумма</th>
-                  <th>Валюта</th>
-                  <th>Статус</th>
-                  <th>Создан</th>
+                  <th>{{ __('frontend.invoices_page.table.id') }}</th>
+                  <th>{{ __('frontend.invoices_page.table.address') }}</th>
+                  <th>{{ __('frontend.invoices_page.table.amount') }}</th>
+                  <th>{{ __('frontend.invoices_page.table.currency') }}</th>
+                  <th>{{ __('frontend.invoices_page.table.status') }}</th>
+                  <th>{{ __('frontend.invoices_page.table.created') }}</th>
                   <th></th>
                 </tr>
               </thead>
@@ -253,7 +255,7 @@ watch(invoices, (collection: any) => {
                             <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25" />
                         </svg>
                     </button>
-                    <Link :href="`/pay/${inv.id}`" target="_blank" rel="noopener" class="btn btn-ghost btn-xs" title="Открыть платёжную страницу">
+                    <Link :href="`/pay/${inv.id}`" target="_blank" rel="noopener" class="btn btn-ghost btn-xs" :title="__('frontend.invoices_page.table.open_payment_page')">
                       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 0 0 3 8.25v10.5A2.25 2.25 0 0 0 5.25 21h10.5A2.25 2.25 0 0 0 18 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
                       </svg>
@@ -261,7 +263,7 @@ watch(invoices, (collection: any) => {
                   </td>
                 </tr>
                 <tr v-if="!invoices.data.length">
-                  <td colspan="8" class="text-center text-sm opacity-70 py-6">Пока нет инвойсов</td>
+                  <td colspan="8" class="text-center text-sm opacity-70 py-6">{{ __('frontend.invoices_page.table.empty') }}</td>
                 </tr>
               </tbody>
             </table>
@@ -319,7 +321,7 @@ watch(invoices, (collection: any) => {
                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25" />
                       </svg>
                     </button>
-                    <Link :href="`/pay/${inv.id}`" target="_blank" rel="noopener" class="btn btn-ghost btn-xs" title="Открыть платёжную страницу">
+                    <Link :href="`/pay/${inv.id}`" target="_blank" rel="noopener" class="btn btn-ghost btn-xs" :title="__('frontend.invoices_page.table.open_payment_page')">
                       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 0 0 3 8.25v10.5A2.25 2.25 0 0 0 5.25 21h10.5A2.25 2.25 0 0 0 18 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
                       </svg>
@@ -329,7 +331,7 @@ watch(invoices, (collection: any) => {
               </div>
             </div>
             <div v-if="!invoices.data.length" class="text-center text-sm opacity-70 py-6">
-              Пока нет инвойсов
+              {{ __('frontend.invoices_page.table.empty') }}
             </div>
           </div>
 
@@ -387,7 +389,7 @@ watch(invoices, (collection: any) => {
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25" />
                                     </svg>
                                 </button>
-                                <Link :href="`/pay/${inv.id}`" target="_blank" rel="noopener" class="btn btn-ghost btn-xs" title="Открыть платёжную страницу">
+                                <Link :href="`/pay/${inv.id}`" target="_blank" rel="noopener" class="btn btn-ghost btn-xs" :title="__('frontend.invoices_page.table.open_payment_page')">
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 0 0 3 8.25v10.5A2.25 2.25 0 0 0 5.25 21h10.5A2.25 2.25 0 0 0 18 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
                                     </svg>
@@ -397,7 +399,7 @@ watch(invoices, (collection: any) => {
                     </div>
                 </div>
                 <div v-if="!invoices.data.length" class="text-center text-sm opacity-70 py-6">
-                    Пока нет инвойсов
+                    {{ __('frontend.invoices_page.table.empty') }}
                 </div>
             </div>
 

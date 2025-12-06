@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import CurrencyNetworkBadge from '@/components/ui/CurrencyNetworkBadge.vue';
 import { ref } from 'vue';
+import { vueLang } from '@erag/lang-sync-inertia';
 
 interface Props {
   amount: number
@@ -11,20 +12,21 @@ interface Props {
 }
 
 const props = defineProps<Props>()
+const { __ } = vueLang()
 
-const tooltipText = ref('Скопировать сумму')
+const tooltipText = ref(__('frontend.payment_form.amount.copy'))
 let resetTimer: number | undefined
 
 async function copyAmount() {
   try {
     await navigator.clipboard.writeText(String(props.amount ?? ''))
-    tooltipText.value = 'Скопировано'
+    tooltipText.value = __('frontend.payment_form.amount.copied')
   } catch (_) {
-    tooltipText.value = 'Не удалось скопировать'
+    tooltipText.value = __('frontend.payment_form.amount.copy_failed')
   } finally {
     if (resetTimer) clearTimeout(resetTimer)
     resetTimer = window.setTimeout(() => {
-      tooltipText.value = 'Скопировать сумму'
+      tooltipText.value = __('frontend.payment_form.amount.copy')
     }, 1500)
   }
 }
@@ -39,7 +41,7 @@ function onKeydown(e: KeyboardEvent) {
 
 <template>
   <div class="grid gap-1">
-    <div class="text-md opacity-60">К оплате</div>
+    <div class="text-md opacity-60">{{ __('frontend.payment_form.amount.title') }}</div>
     <div class="flex items-center gap-3">
       <div>
         <div class="tooltip" :data-tip="tooltipText">

@@ -4,6 +4,7 @@ import { register } from '@/routes';
 import { store as loginStore } from '@/routes/login';
 import { request as forgotRequest } from '@/routes/password';
 import { Head, Link, useForm } from '@inertiajs/vue3';
+import { vueLang } from '@erag/lang-sync-inertia';
 
 const props = defineProps<{
     status?: string;
@@ -16,6 +17,7 @@ const form = useForm({
     password: '',
     remember: false,
 });
+const { __ } = vueLang();
 
 function submit() {
     form.post(loginStore.url(), {
@@ -26,10 +28,10 @@ function submit() {
 
 <template>
     <AuthBase
-        title="Вход в аккаунт"
-        description="Введите e‑mail и пароль, чтобы войти"
+        :title="__('frontend.auth.login.title')"
+        :description="__('frontend.auth.login.description')"
     >
-        <Head title="Вход" />
+        <Head :title="__('frontend.auth.login.page_title')" />
 
         <div v-if="props.status" class="mb-4 text-center text-sm font-medium text-success">
             {{ props.status }}
@@ -39,7 +41,7 @@ function submit() {
             <div class="grid gap-6">
                 <div class="grid gap-2">
                     <label for="email" class="label">
-                        <span class="label-text">E‑mail</span>
+                        <span class="label-text">{{ __('frontend.auth.login.email') }}</span>
                     </label>
                     <input
                         id="email"
@@ -59,7 +61,7 @@ function submit() {
                 <div class="grid gap-2">
                     <div class="flex items-center justify-between">
                         <label for="password" class="label">
-                            <span class="label-text">Пароль</span>
+                            <span class="label-text">{{ __('frontend.auth.login.password') }}</span>
                         </label>
                         <Link
                             v-if="props.canResetPassword"
@@ -67,7 +69,7 @@ function submit() {
                             class="text-sm link link-hover"
                             tabindex="5"
                         >
-                            Забыли пароль?
+                            {{ __('frontend.auth.login.forgot') }}
                         </Link>
                     </div>
                     <input
@@ -77,7 +79,7 @@ function submit() {
                         required
                         tabindex="2"
                         autocomplete="current-password"
-                        placeholder="Пароль"
+                        :placeholder="__('frontend.auth.login.password')"
                         v-model="form.password"
                         class="input input-bordered w-full"
                     />
@@ -87,7 +89,7 @@ function submit() {
                 <div class="flex items-center justify-between">
                     <label for="remember" class="label cursor-pointer gap-3">
                         <input id="remember" name="remember" type="checkbox" tabindex="3" class="checkbox" v-model="form.remember" />
-                        <span class="label-text">Запомнить меня</span>
+                        <span class="label-text">{{ __('frontend.auth.login.remember') }}</span>
                     </label>
                 </div>
 
@@ -99,13 +101,13 @@ function submit() {
                     data-test="login-button"
                 >
                     <span v-if="form.processing" class="loading loading-spinner loading-sm mr-2" />
-                    Войти
+                    {{ __('frontend.auth.login.submit') }}
                 </button>
             </div>
 
             <div class="text-center text-sm text-base-content/60" v-if="props.canRegister">
-                Нет аккаунта?
-                <Link :href="register().url" tabindex="5" class="link link-hover">Зарегистрироваться</Link>
+                {{ __('frontend.auth.login.no_account') }}
+                <Link :href="register().url" tabindex="5" class="link link-hover">{{ __('frontend.auth.login.register') }}</Link>
             </div>
         </form>
     </AuthBase>

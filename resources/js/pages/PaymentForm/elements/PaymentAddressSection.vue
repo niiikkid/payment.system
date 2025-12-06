@@ -1,25 +1,27 @@
 <script setup lang="ts">
 import { ref } from 'vue';
+import { vueLang } from '@erag/lang-sync-inertia';
 
 interface Props {
   address: string
 }
 
 const props = defineProps<Props>()
+const { __ } = vueLang()
 
-const tooltipText = ref('Скопировать')
+const tooltipText = ref(__('frontend.payment_form.address.copy'))
 let resetTimer: number | undefined
 
 async function copyAddress() {
   try {
     await navigator.clipboard.writeText(props.address)
-    tooltipText.value = 'Скопировано'
+    tooltipText.value = __('frontend.payment_form.address.copied')
   } catch (_) {
-    tooltipText.value = 'Не удалось скопировать'
+    tooltipText.value = __('frontend.payment_form.address.copy_failed')
   } finally {
     if (resetTimer) clearTimeout(resetTimer)
     resetTimer = window.setTimeout(() => {
-      tooltipText.value = 'Скопировать'
+      tooltipText.value = __('frontend.payment_form.address.copy')
     }, 1500)
   }
 }
@@ -34,7 +36,7 @@ function onKeydown(e: KeyboardEvent) {
 
 <template>
   <div class="grid gap-1">
-    <div class="text-md opacity-60">Адрес для оплаты</div>
+    <div class="text-md opacity-60">{{ __('frontend.payment_form.address.title') }}</div>
     <div class="font-mono">
       <div class="tooltip" :data-tip="tooltipText">
         <div

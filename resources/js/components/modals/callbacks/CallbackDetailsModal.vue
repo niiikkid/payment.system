@@ -4,6 +4,7 @@ import DateTimeFormat from '@/components/ui/DateTimeFormat.vue'
 import Alert from '@/components/ui/Alert.vue'
 import UidCopy from '@/components/ui/UidCopy.vue';
 import LinkCopy from '@/components/ui/LinkCopy.vue';
+import { vueLang } from '@erag/lang-sync-inertia';
 
 type CallbackLog = {
     id: string
@@ -32,6 +33,8 @@ const emit = defineEmits<{
     (e: 'close'): void
 }>()
 
+const { __ } = vueLang();
+
 function close() {
     emit('update:modelValue', false)
     emit('close')
@@ -48,8 +51,8 @@ function toIso(input: string | null | undefined): string {
 <template>
     <ModalDialog
         :model-value="modelValue"
-        title="Детали коллбэка"
-        description="Полная информация по выбранной записи"
+        :title="__('frontend.callbacks.details.title')"
+        :description="__('frontend.callbacks.details.description')"
         size="2xl"
         placement="bottom"
         @update:modelValue="emit('update:modelValue', $event)"
@@ -66,17 +69,17 @@ function toIso(input: string | null | undefined): string {
 
                 <div class="grid gap-2 md:grid-cols-2">
                     <div class="grid gap-1">
-                        <div class="text-xs opacity-60">Invoice</div>
+                        <div class="text-xs opacity-60">{{ __('frontend.callbacks.details.invoice') }}</div>
                         <div class="font-mono break-all">
                             <UidCopy :uid="log.invoice_id"/>
                         </div>
                     </div>
                     <div class="grid gap-1">
-                        <div class="text-xs opacity-60">Событие</div>
+                        <div class="text-xs opacity-60">{{ __('frontend.callbacks.details.event') }}</div>
                         <div><span class="badge badge-outline">{{ log.event }}</span></div>
                     </div>
                     <div class="grid gap-1 md:col-span-2">
-                        <div class="text-xs opacity-60">URL</div>
+                        <div class="text-xs opacity-60">{{ __('frontend.callbacks.details.url') }}</div>
                         <div class="flex items-center gap-2">
                             <span class="badge badge-outline">POST</span>
                             <span class="break-all font-mono">
@@ -85,7 +88,7 @@ function toIso(input: string | null | undefined): string {
                         </div>
                     </div>
                     <div class="grid gap-1">
-                        <div class="text-xs opacity-60">HTTP статус</div>
+                        <div class="text-xs opacity-60">{{ __('frontend.callbacks.details.http_status') }}</div>
                         <div>
                             <span
                                 class="badge"
@@ -99,11 +102,11 @@ function toIso(input: string | null | undefined): string {
                         </div>
                     </div>
                     <div class="grid gap-1">
-                        <div class="text-xs opacity-60">Длительность, мс</div>
+                        <div class="text-xs opacity-60">{{ __('frontend.callbacks.details.duration') }}</div>
                         <div>{{ log.duration_ms ?? '—' }}</div>
                     </div>
                     <div class="grid gap-1">
-                        <div class="text-xs opacity-60">Создан</div>
+                        <div class="text-xs opacity-60">{{ __('frontend.callbacks.details.created_at') }}</div>
                         <div>
                             <DateTimeFormat :value="toIso(log.created_at)" />
                         </div>
@@ -113,21 +116,21 @@ function toIso(input: string | null | undefined): string {
                 <div class="divider my-0"></div>
 
                 <div class="grid gap-3">
-                    <div class="text-xs opacity-60">Запрос (payload)</div>
+                    <div class="text-xs opacity-60">{{ __('frontend.callbacks.details.request') }}</div>
                     <div class="mockup-code">
                         <pre><code>{{ JSON.stringify(log.request_payload || {}, null, 2) }}</code></pre>
                     </div>
                 </div>
 
                 <div class="grid gap-3">
-                    <div class="text-xs opacity-60">Ответ (body)</div>
+                    <div class="text-xs opacity-60">{{ __('frontend.callbacks.details.response') }}</div>
                     <div class="mockup-code">
                         <pre><code>{{ log.response_body || '' }}</code></pre>
                     </div>
                 </div>
 
                 <div class="grid gap-3" v-if="log.error_message">
-                    <div class="text-xs opacity-60">Ошибка</div>
+                    <div class="text-xs opacity-60">{{ __('frontend.callbacks.details.error') }}</div>
                     <Alert type="warning" :message="log.error_message" />
                 </div>
             </div>
@@ -135,7 +138,7 @@ function toIso(input: string | null | undefined): string {
 
         <template #actions>
             <button class="btn btn-ghost" @click="close">
-                Закрыть
+                {{ __('frontend.callbacks.details.close') }}
             </button>
         </template>
     </ModalDialog>

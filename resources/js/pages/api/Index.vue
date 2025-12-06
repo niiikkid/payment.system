@@ -6,14 +6,17 @@ import { computed } from 'vue';
 import ApiTokens from './elements/ApiTokens.vue';
 import ApiRequests from './elements/ApiRequests.vue';
 import ApiDocumentation from './elements/ApiDocumentation.vue';
+import { vueLang } from '@erag/lang-sync-inertia';
 
 type PageProps = {
     publicApiKey: string;
     apiBaseUrl: string;
 }
 
+const { __ } = vueLang();
+
 const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'API и документация', href: '/api' },
+    { title: __('frontend.api.breadcrumb'), href: '/api' },
 ];
 
 const page = usePage();

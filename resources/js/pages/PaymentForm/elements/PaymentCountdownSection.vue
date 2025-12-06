@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import { computed, ref, onMounted, onBeforeUnmount } from 'vue';
+import { vueLang } from '@erag/lang-sync-inertia';
 
 interface Props {
   expiresAt: string | null
 }
 
 const props = defineProps<Props>()
+const { __ } = vueLang();
 
 function parseIsoToMs(s: string | null): number | null {
   if (!s) return null
@@ -51,7 +53,7 @@ onBeforeUnmount(() => {
 
 <template>
   <div class="grid gap-1" v-if="props.expiresAt">
-    <div class="text-md opacity-60">Осталось времени</div>
+    <div class="text-md opacity-60">{{ __('frontend.payment_form.countdown.title') }}</div>
     <span class="countdown font-mono text-md">
       <span :style="`--value:${hh};`" :aria-label="String(hh)" aria-live="polite">{{ hh }}</span>
       :

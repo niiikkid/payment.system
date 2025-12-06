@@ -5,6 +5,7 @@ import AppLayout from '@/layouts/AppLayout.vue';
 import Pagination from '@/components/ui/Pagination.vue';
 import ModalDialog from '@/components/ui/modal/ModalDialog.vue';
 import DateTimeFormat from '@/components/ui/DateTimeFormat.vue';
+import { vueLang } from '@erag/lang-sync-inertia';
 
 type RoleOption = { value: string; label: string };
 
@@ -25,6 +26,7 @@ type PaginatedUsers = { data: UserItem[]; links: PaginationLink[] };
 const page = usePage();
 const users = computed(() => page.props.users as PaginatedUsers);
 const roleOptions = computed(() => page.props.roleOptions as RoleOption[]);
+const { __ } = vueLang();
 
 const showCreate = ref(false);
 const showEdit = ref(false);
@@ -120,26 +122,29 @@ function impersonate(user: UserItem) {
 </script>
 
 <template>
-    <AppLayout :breadcrumbs="[{ title: 'Главная', href: '/' }, { title: 'Пользователи', href: '/admin/users' }]" :title="'Пользователи'">
+    <AppLayout
+        :breadcrumbs="[{ title: __('frontend.admin_users.breadcrumb.home'), href: '/' }, { title: __('frontend.admin_users.breadcrumb.users'), href: '/admin/users' }]"
+        :title="__('frontend.admin_users.title')"
+    >
         <template #header-actions>
-            <button class="btn btn-primary btn-sm" @click="openCreate">Создать пользователя</button>
+            <button class="btn btn-primary btn-sm" @click="openCreate">{{ __('frontend.admin_users.actions.create_user') }}</button>
         </template>
 
         <div class="grid gap-6">
             <div class="lg:card lg:bg-base-100 lg:shadow">
                 <div class="lg:card-body">
-                    <h2 class="hidden lg:block card-title">Список пользователей</h2>
-                    <h2 class="lg:hidden card-title mb-3">Список пользователей</h2>
+                    <h2 class="hidden lg:block card-title">{{ __('frontend.admin_users.list_title') }}</h2>
+                    <h2 class="lg:hidden card-title mb-3">{{ __('frontend.admin_users.list_title') }}</h2>
 
                     <div class="hidden lg:block overflow-x-auto">
                         <table class="table table-sm w-full">
                             <thead>
                                 <tr>
-                                    <th>ID</th>
-                                    <th>Имя</th>
-                                    <th>Email</th>
-                                    <th>Роли</th>
-                                    <th>Создан</th>
+                                    <th>{{ __('frontend.admin_users.table.id') }}</th>
+                                    <th>{{ __('frontend.admin_users.table.name') }}</th>
+                                    <th>{{ __('frontend.admin_users.table.email') }}</th>
+                                    <th>{{ __('frontend.admin_users.table.roles') }}</th>
+                                    <th>{{ __('frontend.admin_users.table.created') }}</th>
                                     <th></th>
                                 </tr>
                             </thead>
@@ -177,7 +182,7 @@ function impersonate(user: UserItem) {
                                     </td>
                                 </tr>
                                 <tr v-if="!users.data.length">
-                                    <td colspan="6" class="text-center text-sm opacity-70 py-6">Пользователи не найдены</td>
+                                    <td colspan="6" class="text-center text-sm opacity-70 py-6">{{ __('frontend.admin_users.table.empty') }}</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -194,7 +199,7 @@ function impersonate(user: UserItem) {
                                         </svg>
                                     </button>
                                 </div>
-                                <div class="text-sm opacity-80">{{ user.email }}</div>
+                                    <div class="text-sm opacity-80">{{ user.email }}</div>
                                 <div class="flex flex-wrap gap-1">
                                     <span v-for="role in user.roles" :key="role" class="badge badge-ghost badge-sm uppercase">{{ role }}</span>
                                 </div>
@@ -207,12 +212,12 @@ function impersonate(user: UserItem) {
                                     :disabled="impersonateForm.processing"
                                     @click="impersonate(user)"
                                 >
-                                    Войти как пользователь
+                                    {{ __('frontend.admin_users.actions.impersonate') }}
                                 </button>
                             </div>
                         </div>
                         <div v-if="!users.data.length" class="text-center text-sm opacity-70 py-6">
-                            Пользователи не найдены
+                            {{ __('frontend.admin_users.table.empty') }}
                         </div>
                     </div>
 
@@ -221,33 +226,33 @@ function impersonate(user: UserItem) {
             </div>
         </div>
 
-        <ModalDialog v-model="showCreate" title="Создать пользователя">
+        <ModalDialog v-model="showCreate" :title="__('frontend.admin_users.forms.create_title')">
             <form class="grid gap-4" @submit.prevent="submitCreate">
                 <div class="grid gap-2">
-                    <label class="label text-sm" for="create-name">Имя</label>
-                    <input id="create-name" v-model="createForm.name" type="text" class="input input-bordered w-full" placeholder="Имя" />
+                    <label class="label text-sm" for="create-name">{{ __('frontend.admin_users.forms.name') }}</label>
+                    <input id="create-name" v-model="createForm.name" type="text" class="input input-bordered w-full" :placeholder="__('frontend.admin_users.forms.name')" />
                     <p v-if="createForm.errors.name" class="text-error text-sm">{{ createForm.errors.name }}</p>
                 </div>
 
                 <div class="grid gap-2">
-                    <label class="label text-sm" for="create-email">Email</label>
+                    <label class="label text-sm" for="create-email">{{ __('frontend.admin_users.table.email') }}</label>
                     <input id="create-email" v-model="createForm.email" type="email" class="input input-bordered w-full" placeholder="email@example.com" />
                     <p v-if="createForm.errors.email" class="text-error text-sm">{{ createForm.errors.email }}</p>
                 </div>
 
                 <div class="grid gap-2">
-                    <label class="label text-sm" for="create-password">Пароль</label>
-                    <input id="create-password" v-model="createForm.password" type="password" class="input input-bordered w-full" placeholder="Пароль" />
+                    <label class="label text-sm" for="create-password">{{ __('frontend.admin_users.forms.password') }}</label>
+                    <input id="create-password" v-model="createForm.password" type="password" class="input input-bordered w-full" :placeholder="__('frontend.admin_users.forms.password')" />
                     <p v-if="createForm.errors.password" class="text-error text-sm">{{ createForm.errors.password }}</p>
                 </div>
 
                 <div class="grid gap-2">
-                    <label class="label text-sm" for="create-password-confirmation">Подтверждение пароля</label>
-                    <input id="create-password-confirmation" v-model="createForm.password_confirmation" type="password" class="input input-bordered w-full" placeholder="Подтверждение пароля" />
+                    <label class="label text-sm" for="create-password-confirmation">{{ __('frontend.admin_users.forms.password_confirmation') }}</label>
+                    <input id="create-password-confirmation" v-model="createForm.password_confirmation" type="password" class="input input-bordered w-full" :placeholder="__('frontend.admin_users.forms.password_confirmation')" />
                 </div>
 
                 <div class="grid gap-2">
-                    <label class="label text-sm" for="create-role">Роль</label>
+                    <label class="label text-sm" for="create-role">{{ __('frontend.admin_users.forms.role') }}</label>
                     <select id="create-role" v-model="createForm.role" class="select select-bordered w-full">
                         <option v-for="role in roleOptions" :key="role.value" :value="role.value">{{ role.label }}</option>
                     </select>
@@ -255,42 +260,42 @@ function impersonate(user: UserItem) {
                 </div>
 
                 <div class="modal-action">
-                    <button type="button" class="btn btn-ghost" @click="closeCreate">Отмена</button>
+                    <button type="button" class="btn btn-ghost" @click="closeCreate">{{ __('frontend.admin_users.actions.cancel') }}</button>
                     <button type="submit" class="btn btn-primary" :disabled="createForm.processing">
                         <span v-if="createForm.processing" class="loading loading-spinner loading-sm mr-2" />
-                        Создать
+                        {{ __('frontend.admin_users.actions.create') }}
                     </button>
                 </div>
             </form>
         </ModalDialog>
 
-        <ModalDialog v-model="showEdit" title="Редактировать пользователя" @close="closeEdit">
+        <ModalDialog v-model="showEdit" :title="__('frontend.admin_users.forms.edit_title')" @close="closeEdit">
             <form v-if="selectedUser" class="grid gap-4" @submit.prevent="submitEdit">
                 <div class="grid gap-2">
-                    <label class="label text-sm" for="edit-name">Имя</label>
+                    <label class="label text-sm" for="edit-name">{{ __('frontend.admin_users.forms.name') }}</label>
                     <input id="edit-name" v-model="editForm.name" type="text" class="input input-bordered w-full" />
                     <p v-if="editForm.errors.name" class="text-error text-sm">{{ editForm.errors.name }}</p>
                 </div>
 
                 <div class="grid gap-2">
-                    <label class="label text-sm" for="edit-email">Email</label>
+                    <label class="label text-sm" for="edit-email">{{ __('frontend.admin_users.table.email') }}</label>
                     <input id="edit-email" v-model="editForm.email" type="email" class="input input-bordered w-full" />
                     <p v-if="editForm.errors.email" class="text-error text-sm">{{ editForm.errors.email }}</p>
                 </div>
 
                 <div class="grid gap-2">
-                    <label class="label text-sm" for="edit-password">Новый пароль</label>
-                    <input id="edit-password" v-model="editForm.password" type="password" class="input input-bordered w-full" placeholder="Оставьте пустым, чтобы не менять" />
+                    <label class="label text-sm" for="edit-password">{{ __('frontend.admin_users.forms.new_password') }}</label>
+                    <input id="edit-password" v-model="editForm.password" type="password" class="input input-bordered w-full" :placeholder="__('frontend.admin_users.forms.new_password_placeholder')" />
                     <p v-if="editForm.errors.password" class="text-error text-sm">{{ editForm.errors.password }}</p>
                 </div>
 
                 <div class="grid gap-2">
-                    <label class="label text-sm" for="edit-password-confirmation">Подтверждение</label>
-                    <input id="edit-password-confirmation" v-model="editForm.password_confirmation" type="password" class="input input-bordered w-full" placeholder="Оставьте пустым, чтобы не менять" />
+                    <label class="label text-sm" for="edit-password-confirmation">{{ __('frontend.admin_users.forms.password_confirmation') }}</label>
+                    <input id="edit-password-confirmation" v-model="editForm.password_confirmation" type="password" class="input input-bordered w-full" :placeholder="__('frontend.admin_users.forms.confirm_placeholder')" />
                 </div>
 
                 <div class="grid gap-2">
-                    <label class="label text-sm" for="edit-role">Роль</label>
+                    <label class="label text-sm" for="edit-role">{{ __('frontend.admin_users.forms.role') }}</label>
                     <select
                         id="edit-role"
                         v-model="editForm.role"
@@ -300,14 +305,16 @@ function impersonate(user: UserItem) {
                         <option v-for="role in roleOptions" :key="role.value" :value="role.value">{{ role.label }}</option>
                     </select>
                     <p v-if="editForm.errors.role" class="text-error text-sm">{{ editForm.errors.role }}</p>
-                    <p v-if="!selectedUser.can_manage_role" class="text-xs opacity-70">Нельзя менять роль своей учетной записи</p>
+                    <p v-if="!selectedUser.can_manage_role" class="text-xs opacity-70">
+                        {{ __('frontend.admin_users.forms.cannot_change_own_role') }}
+                    </p>
                 </div>
 
                 <div class="modal-action">
-                    <button type="button" class="btn btn-ghost" @click="closeEdit">Отмена</button>
+                    <button type="button" class="btn btn-ghost" @click="closeEdit">{{ __('frontend.admin_users.actions.cancel') }}</button>
                     <button type="submit" class="btn btn-primary" :disabled="editForm.processing">
                         <span v-if="editForm.processing" class="loading loading-spinner loading-sm mr-2" />
-                        Сохранить
+                        {{ __('frontend.admin_users.actions.save') }}
                     </button>
                 </div>
             </form>

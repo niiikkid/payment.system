@@ -5,6 +5,7 @@ import { Head } from '@inertiajs/vue3';
 import Pagination from '@/components/ui/Pagination.vue';
 import DateTimeFormat from '@/components/ui/DateTimeFormat.vue';
 import type { BreadcrumbItem } from '@/types';
+import { vueLang } from '@erag/lang-sync-inertia';
 
 type PaginationLink = { url: string | null; label: string; active: boolean };
 
@@ -35,9 +36,10 @@ interface Props {
 }
 
 const props = defineProps<Props>();
+const { __ } = vueLang();
 
 const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'История входов', href: '/settings/login-history' },
+    { title: __('frontend.login_history.breadcrumb'), href: '/settings/login-history' },
 ];
 
 function locationLabel(login: LoginItem): string {
@@ -47,33 +49,33 @@ function locationLabel(login: LoginItem): string {
     if (city && country) return `${city}, ${country}`;
     if (state && country) return `${state}, ${country}`;
     if (country) return country;
-    return '—';
+    return __('frontend.login_history.table.ip');
 }
 
 function statusBadge(login: LoginItem) {
     switch (login.geo_status) {
     case 'ok':
-        return { text: 'Обогащено', class: 'badge-success' };
+        return { text: __('frontend.login_history.status.ok'), class: 'badge-success' };
     case 'limited':
-        return { text: 'Без доп. данных', class: 'badge-warning' };
+        return { text: __('frontend.login_history.status.limited'), class: 'badge-warning' };
     case 'failed':
-        return { text: 'Ошибка гео', class: 'badge-error' };
+        return { text: __('frontend.login_history.status.failed'), class: 'badge-error' };
     case 'skipped':
     default:
-        return { text: 'Без гео', class: 'badge-ghost' };
+        return { text: __('frontend.login_history.status.skipped'), class: 'badge-ghost' };
     }
 }
 </script>
 
 <template>
     <AppLayout :breadcrumbs="breadcrumbs">
-        <Head title="История входов" />
+        <Head :title="__('frontend.login_history.breadcrumb')" />
         <SettingsLayout>
             <div class="space-y-6">
                 <div class="space-y-1">
-                    <h2 class="text-lg font-medium">История авторизации</h2>
+                    <h2 class="text-lg font-medium">{{ __('frontend.login_history.title') }}</h2>
                     <p class="text-sm text-base-content/70">
-                        Последние 20 входов в аккаунт с данными об устройстве и гео.
+                        {{ __('frontend.login_history.description') }}
                     </p>
                 </div>
 
@@ -84,9 +86,9 @@ function statusBadge(login: LoginItem) {
                             <table class="table table-sm w-full">
                                 <thead>
                                     <tr>
-                                        <th>Локация</th>
-                                        <th>Устройство</th>
-                                        <th>Время</th>
+                                        <th>{{ __('frontend.login_history.table.location') }}</th>
+                                        <th>{{ __('frontend.login_history.table.device') }}</th>
+                                        <th>{{ __('frontend.login_history.table.time') }}</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -107,24 +109,26 @@ function statusBadge(login: LoginItem) {
                                                 </span>
                                             </div>
                                             <p class="text-xs opacity-70">
-                                                {{ login.ip_address || '—' }}
+                                                {{ login.ip_address || __('frontend.login_history.table.ip') }}
                                             </p>
                                         </td>
                                         <td>
                                             <div class="flex flex-col text-sm">
-                                                <span>{{ login.platform || 'Неизвестно' }}</span>
+                                                <span>{{ login.platform || __('frontend.login_history.table.unknown_platform') }}</span>
                                                 <span class="opacity-70 text-xs">
-                                                    {{ [login.browser, login.device_type].filter(Boolean).join(' · ') || '—' }}
+                                                    {{ [login.browser, login.device_type].filter(Boolean).join(' · ') || __('frontend.login_history.table.ip') }}
                                                 </span>
                                             </div>
                                         </td>
                                         <td>
                                             <DateTimeFormat v-if="login.created_at" :value="login.created_at" short-year hide-seconds />
-                                            <span v-else class="opacity-60">—</span>
+                                            <span v-else class="opacity-60">{{ __('frontend.login_history.table.ip') }}</span>
                                         </td>
                                     </tr>
                                     <tr v-if="!props.logins.data.length">
-                                        <td colspan="5" class="text-center text-sm opacity-70 py-6">Пока нет событий</td>
+                                        <td colspan="5" class="text-center text-sm opacity-70 py-6">
+                                            {{ __('frontend.login_history.table.empty') }}
+                                        </td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -139,8 +143,8 @@ function statusBadge(login: LoginItem) {
                             >
                                 <div class="card-body p-4 space-y-3">
                                     <div class="flex items-center justify-between">
-                                        <div class="flex items-center gap-2 text-sm">
-                                            <span class="font-mono text-xs">{{ login.ip_address || '—' }}</span>
+                                    <div class="flex items-center gap-2 text-sm">
+                                        <span class="font-mono text-xs">{{ login.ip_address || __('frontend.login_history.table.ip') }}</span>
                                         </div>
                                     </div>
 
@@ -160,19 +164,19 @@ function statusBadge(login: LoginItem) {
                                             </span>
                                         </div>
                                         <p class="text-xs opacity-70">
-                                            {{ [login.platform, login.browser, login.device_type].filter(Boolean).join(' · ') || 'Устройство неизвестно' }}
+                                            {{ [login.platform, login.browser, login.device_type].filter(Boolean).join(' · ') || __('frontend.login_history.table.unknown_device') }}
                                         </p>
                                     </div>
 
                                     <div class="text-xs opacity-70">
                                         <DateTimeFormat v-if="login.created_at" :value="login.created_at" hide-seconds />
-                                        <span v-else>—</span>
+                                        <span v-else>{{ __('frontend.login_history.table.ip') }}</span>
                                     </div>
                                 </div>
                             </div>
 
                             <div v-if="!props.logins.data.length" class="text-center text-sm opacity-70 py-6">
-                                Пока нет событий
+                                {{ __('frontend.login_history.table.empty') }}
                             </div>
                         </div>
 

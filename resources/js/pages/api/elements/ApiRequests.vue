@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { reactive, ref } from 'vue';
+import { vueLang } from '@erag/lang-sync-inertia';
 
 interface Props {
     apiKey: string;
@@ -7,6 +8,7 @@ interface Props {
 }
 
 const props = defineProps<Props>();
+const { __ } = vueLang();
 
 function pretty(obj: unknown) {
     try {
@@ -127,45 +129,45 @@ async function cancelInvoice() {
     <div class="space-y-4">
         <div class="collapse collapse-arrow bg-base-100 border">
             <input type="checkbox" />
-            <div class="collapse-title text-md font-medium">POST /invoices — Создать инвойс</div>
+            <div class="collapse-title text-md font-medium">{{ __('frontend.api.requests.create_title') }}</div>
             <div class="collapse-content space-y-4">
-                <p class="text-sm text-base-content/70">Создаёт инвойс и возвращает объект. Требует: currency, network, amount. Опционально: external_invoice_id, callback_url, tag, metadata.</p>
+                <p class="text-sm text-base-content/70">{{ __('frontend.api.requests.create_description') }}</p>
                 <div class="grid md:grid-cols-3 gap-4">
                     <div class="card-body gap-4 p-0 pt-3 w-full">
                         <label class="floating-label">
-                            <span>Валюта</span>
+                            <span>{{ __('frontend.api.requests.fields.currency') }}</span>
                             <input class="input input-md w-full" v-model="createForm.currency" placeholder="USDT" />
                         </label>
                         <label class="floating-label">
-                            <span>Сеть</span>
+                            <span>{{ __('frontend.api.requests.fields.network') }}</span>
                             <input class="input input-md w-full" v-model="createForm.network" placeholder="tron" />
                         </label>
                         <label class="floating-label">
-                            <span>Сумма</span>
+                            <span>{{ __('frontend.api.requests.fields.amount') }}</span>
                             <input class="input input-md w-full" v-model="createForm.amount" placeholder="12.50" />
                         </label>
                         <label class="floating-label">
-                            <span>Внешний ID</span>
+                            <span>{{ __('frontend.api.requests.fields.external_id') }}</span>
                             <input class="input input-md w-full" v-model="createForm.external_invoice_id" placeholder="ORDER-123" />
                         </label>
                         <label class="floating-label">
-                            <span>Callback URL</span>
+                            <span>{{ __('frontend.api.requests.fields.callback_url') }}</span>
                             <input class="input input-md w-full" v-model="createForm.callback_url" placeholder="https://example.com/callback" />
                         </label>
                         <label class="floating-label">
-                            <span>Тег</span>
+                            <span>{{ __('frontend.api.requests.fields.tag') }}</span>
                             <input class="input input-md w-full" v-model="createForm.tag" placeholder="vip" />
                         </label>
                         <label class="floating-label">
-                            <span>Metadata (JSON)</span>
+                            <span>{{ __('frontend.api.requests.fields.metadata') }}</span>
                             <textarea class="textarea textarea-md textarea-bordered w-full" v-model="createForm.metadata" rows="4" placeholder='{"note":"vip"}'></textarea>
                         </label>
                         <div class="card-actions items-center gap-6">
-                            <button class="btn btn-primary" @click="createInvoice">Отправить</button>
+                            <button class="btn btn-primary" @click="createInvoice">{{ __('frontend.api.requests.send') }}</button>
                         </div>
                     </div>
                     <div class="min-w-0 w-full sm:col-span-1 md:col-span-2">
-                        <label class="label"><span class="label-text">Ответ</span></label>
+                        <label class="label"><span class="label-text">{{ __('frontend.api.requests.response') }}</span></label>
                         <pre class="mockup-code whitespace-pre overflow-x-auto max-w-full w-full"><code class="block">{{ createResult }}</code></pre>
                     </div>
                 </div>
@@ -174,20 +176,20 @@ async function cancelInvoice() {
 
         <div class="collapse collapse-arrow bg-base-100 border">
             <input type="checkbox" />
-            <div class="collapse-title text-md font-medium">GET /invoices/{id} — Получить инвойс</div>
+            <div class="collapse-title text-md font-medium">{{ __('frontend.api.requests.get_title') }}</div>
             <div class="collapse-content space-y-4">
                 <div class="grid md:grid-cols-3 gap-4">
                     <div class="card-body gap-4 p-0 pt-3 w-full">
                         <label class="floating-label">
-                            <span>ID инвойса</span>
+                            <span>{{ __('frontend.api.requests.invoice_id') }}</span>
                             <input class="input input-md w-full" v-model="getByIdForm.id" placeholder="e.g. inv_123" />
                         </label>
                         <div class="card-actions items-center gap-6">
-                            <button class="btn btn-primary" @click="getInvoice">Запросить</button>
+                            <button class="btn btn-primary" @click="getInvoice">{{ __('frontend.api.requests.request') }}</button>
                         </div>
                     </div>
                     <div class="min-w-0 w-full sm:col-span-1 md:col-span-2">
-                        <label class="label"><span class="label-text">Ответ</span></label>
+                        <label class="label"><span class="label-text">{{ __('frontend.api.requests.response') }}</span></label>
                         <pre class="mockup-code whitespace-pre overflow-x-auto max-w-full w-full"><code class="block">{{ getByIdResult }}</code></pre>
                     </div>
                 </div>
@@ -196,20 +198,20 @@ async function cancelInvoice() {
 
         <div class="collapse collapse-arrow bg-base-100 border">
             <input type="checkbox" />
-            <div class="collapse-title text-md font-medium">GET /invoices/{id}/status — Статус инвойса</div>
+            <div class="collapse-title text-md font-medium">{{ __('frontend.api.requests.status_title') }}</div>
             <div class="collapse-content space-y-4">
                 <div class="grid md:grid-cols-3 gap-4">
                     <div class="card-body gap-4 p-0 pt-3 w-full">
                         <label class="floating-label">
-                            <span>ID инвойса</span>
+                            <span>{{ __('frontend.api.requests.invoice_id') }}</span>
                             <input class="input input-md w-full" v-model="getStatusForm.id" placeholder="e.g. inv_123" />
                         </label>
                         <div class="card-actions items-center gap-6">
-                            <button class="btn btn-primary" @click="getStatus">Запросить</button>
+                            <button class="btn btn-primary" @click="getStatus">{{ __('frontend.api.requests.request') }}</button>
                         </div>
                     </div>
                     <div class="min-w-0 w-full sm:col-span-1 md:col-span-2">
-                        <label class="label"><span class="label-text">Ответ</span></label>
+                        <label class="label"><span class="label-text">{{ __('frontend.api.requests.response') }}</span></label>
                         <pre class="mockup-code whitespace-pre overflow-x-auto max-w-full w-full"><code class="block">{{ getStatusResult }}</code></pre>
                     </div>
                 </div>
@@ -218,20 +220,20 @@ async function cancelInvoice() {
 
         <div class="collapse collapse-arrow bg-base-100 border">
             <input type="checkbox" />
-            <div class="collapse-title text-md font-medium">GET /invoices/{id}/public — Публичные данные</div>
+            <div class="collapse-title text-md font-medium">{{ __('frontend.api.requests.public_title') }}</div>
             <div class="collapse-content space-y-4">
                 <div class="grid md:grid-cols-3 gap-4">
                     <div class="card-body gap-4 p-0 pt-3 w-full">
                         <label class="floating-label">
-                            <span>ID инвойса</span>
+                            <span>{{ __('frontend.api.requests.invoice_id') }}</span>
                             <input class="input input-md w-full" v-model="publicForm.id" placeholder="e.g. inv_123" />
                         </label>
                         <div class="card-actions items-center gap-6">
-                            <button class="btn btn-primary" @click="getPublic">Запросить</button>
+                            <button class="btn btn-primary" @click="getPublic">{{ __('frontend.api.requests.request') }}</button>
                         </div>
                     </div>
                     <div class="min-w-0 w-full sm:col-span-1 md:col-span-2">
-                        <label class="label"><span class="label-text">Ответ</span></label>
+                        <label class="label"><span class="label-text">{{ __('frontend.api.requests.response') }}</span></label>
                         <pre class="mockup-code whitespace-pre overflow-x-auto max-w-full w-full"><code class="block">{{ publicResult }}</code></pre>
                     </div>
                 </div>
@@ -240,23 +242,23 @@ async function cancelInvoice() {
 
         <div class="collapse collapse-arrow bg-base-100 border">
             <input type="checkbox" />
-            <div class="collapse-title text-md font-medium">GET /invoices/{id}/qr — QR адреса</div>
+            <div class="collapse-title text-md font-medium">{{ __('frontend.api.requests.qr_title') }}</div>
             <div class="collapse-content space-y-4">
                 <div class="grid md:grid-cols-3 gap-4">
                     <div class="card-body gap-4 p-0 pt-3 w-full">
                         <label class="floating-label">
-                            <span>ID инвойса</span>
+                            <span>{{ __('frontend.api.requests.invoice_id') }}</span>
                             <input class="input input-md w-full" v-model="qrForm.id" placeholder="e.g. inv_123" />
                         </label>
                         <div class="card-actions items-center gap-6">
-                            <button class="btn btn-primary" @click="getQr">Получить QR</button>
+                            <button class="btn btn-primary" @click="getQr">{{ __('frontend.api.requests.request') }}</button>
                         </div>
                     </div>
                     <div class="min-w-0 w-full sm:col-span-1 md:col-span-2">
-                        <label class="label"><span class="label-text">Превью</span></label>
+                        <label class="label"><span class="label-text">{{ __('frontend.api.requests.qr_preview') }}</span></label>
                         <div class="border rounded-box p-3 min-h-32 flex items-center justify-center bg-base-200">
                             <img v-if="qrUrl" :src="qrUrl" alt="QR" class="max-h-64" />
-                            <span v-else class="text-base-content/60">Нет данных</span>
+                            <span v-else class="text-base-content/60">{{ __('frontend.api.requests.qr_no_data') }}</span>
                         </div>
                     </div>
                 </div>
@@ -265,20 +267,20 @@ async function cancelInvoice() {
 
         <div class="collapse collapse-arrow bg-base-100 border">
             <input type="checkbox" />
-            <div class="collapse-title text-md font-medium">POST /invoices/{id}/cancel — Отменить (expire)</div>
+            <div class="collapse-title text-md font-medium">{{ __('frontend.api.requests.cancel_title') }}</div>
             <div class="collapse-content space-y-4">
                 <div class="grid md:grid-cols-3 gap-4">
                     <div class="card-body gap-4 p-0 pt-3 w-full">
                         <label class="floating-label">
-                            <span>ID инвойса</span>
+                            <span>{{ __('frontend.api.requests.invoice_id') }}</span>
                             <input class="input input-md w-full" v-model="cancelForm.id" placeholder="e.g. inv_123" />
                         </label>
                         <div class="card-actions items-center gap-6">
-                            <button class="btn btn-warning" @click="cancelInvoice">Отменить</button>
+                            <button class="btn btn-warning" @click="cancelInvoice">{{ __('frontend.api.requests.cancel') }}</button>
                         </div>
                     </div>
                     <div class="min-w-0 w-full sm:col-span-1 md:col-span-2">
-                        <label class="label"><span class="label-text">Ответ</span></label>
+                        <label class="label"><span class="label-text">{{ __('frontend.api.requests.response') }}</span></label>
                         <pre class="mockup-code whitespace-pre overflow-x-auto max-w-full w-full"><code class="block">{{ cancelResult }}</code></pre>
                     </div>
                 </div>

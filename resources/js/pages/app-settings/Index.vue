@@ -6,6 +6,7 @@ import type { BreadcrumbItem } from '@/types';
 import FormControl from '@/components/form/FormControl.vue';
 import Label from '@/components/form/Label.vue';
 import Input from '@/components/form/Input.vue';
+import { vueLang } from '@erag/lang-sync-inertia';
 
 interface SettingItem {
     id?: number;
@@ -20,6 +21,7 @@ interface PageProps {
 }
 
 const props = defineProps<PageProps>();
+const { __ } = vueLang();
 
 const form = useForm({
     settings: props.currencies.map((c) => {
@@ -37,8 +39,8 @@ const submit = () => {
 };
 
 const breadcrumbs = computed<BreadcrumbItem[]>(() => [
-    { title: 'Главная', href: '/dashboard' },
-    { title: 'App Settings' },
+    { title: __('frontend.app_settings_page.breadcrumb.home'), href: '/dashboard' },
+    { title: __('frontend.app_settings_page.breadcrumb.title') },
 ]);
 </script>
 
@@ -53,7 +55,7 @@ const breadcrumbs = computed<BreadcrumbItem[]>(() => [
                         </div>
 
                         <FormControl>
-                            <Label :for="`min-${item.currency}`">Минимальная сумма ({{ item.currency }})</Label>
+                            <Label :for="`min-${item.currency}`">{{ __('frontend.app_settings_page.min_amount', { currency: item.currency }) }}</Label>
                             <Input
                                 :id="`min-${item.currency}`"
                                 v-model="form.settings[idx].min_invoice_amount"
@@ -64,7 +66,7 @@ const breadcrumbs = computed<BreadcrumbItem[]>(() => [
                         </FormControl>
 
                         <FormControl class="mt-4">
-                            <Label :for="`max-${item.currency}`">Максимальная сумма ({{ item.currency }})</Label>
+                            <Label :for="`max-${item.currency}`">{{ __('frontend.app_settings_page.max_amount', { currency: item.currency }) }}</Label>
                             <Input
                                 :id="`max-${item.currency}`"
                                 v-model="form.settings[idx].max_invoice_amount"
@@ -79,7 +81,7 @@ const breadcrumbs = computed<BreadcrumbItem[]>(() => [
 
             <div class="flex justify-start">
                 <button type="submit" class="btn btn-primary" :disabled="form.processing">
-                    Сохранить
+                    {{ __('frontend.app_settings_page.save') }}
                 </button>
             </div>
         </form>

@@ -11,6 +11,7 @@ import PaymentAmountSection from './elements/PaymentAmountSection.vue';
 import PaymentAddressSection from './elements/PaymentAddressSection.vue';
 import PaymentCountdownSection from './elements/PaymentCountdownSection.vue';
 import PaymentTransactionSection from './elements/PaymentTransactionSection.vue';
+import { vueLang } from '@erag/lang-sync-inertia';
 
 type Invoice = {
   id: string
@@ -39,6 +40,7 @@ const page = usePage();
 const appName = computed(() => (page.props.appName as string) || (import.meta.env.VITE_APP_NAME as string) || 'App');
 const initial = page.props.invoice as Invoice;
 const statuses = computed(() => page.props.statuses as { active: string[]; final: string[] });
+const { __ } = vueLang();
 
 const invoice = ref<Invoice>(initial);
 
@@ -79,11 +81,11 @@ const statusBadgeClass = computed(() => {
 
 const statusText = computed(() => {
   const s = invoice.value.status;
-  if (s === 'paid') return 'Оплачено';
-  if (s === 'processing') return 'Транзакция найдена, ждём подтверждения';
-  if (s === 'expired') return 'Срок оплаты истёк';
-  if (s === 'cancelled') return 'Отменено';
-  return 'Ожидаем оплату';
+  if (s === 'paid') return __('frontend.payment_form.status.paid');
+  if (s === 'processing') return __('frontend.payment_form.status.processing');
+  if (s === 'expired') return __('frontend.payment_form.status.expired');
+  if (s === 'cancelled') return __('frontend.payment_form.status.cancelled');
+  return __('frontend.payment_form.status.pending');
 });
 
 </script>
@@ -93,7 +95,10 @@ const statusText = computed(() => {
     <div class="min-h-screen flex items-center mx-4">
         <div class="mx-auto max-w-7xl py-6 grid gap-4">
             <div class="sm:flex items-center justify-between gap-4">
-                <h1 class="text-xl font-semibold flex items-center gap-2">Платёж ID: <UidCopy v-if="invoice?.id" :uid="invoice.id" size="xl" class="text-primary" /></h1>
+                <h1 class="text-xl font-semibold flex items-center gap-2">
+                    {{ __('frontend.payment_form.page_title', { id: '' }) }}
+                    <UidCopy v-if="invoice?.id" :uid="invoice.id" size="xl" class="text-primary" />
+                </h1>
                 <div class="badge" :class="statusBadgeClass">{{ statusText }}</div>
             </div>
 
@@ -112,7 +117,7 @@ const statusText = computed(() => {
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" />
                                   </svg>
                                 </span>
-                                <span class="text-base-content text-xs sm:text-sm lg:text-base">Важно: переведите сумму точно до копейки, чтобы мы автоматически зачли ваш платёж.</span>
+                                <span class="text-base-content text-xs sm:text-sm lg:text-base">{{ __('frontend.payment_form.important') }}</span>
                             </div>
                             <PaymentQrSection
                                 :qr-url="qrUrl"
@@ -147,9 +152,9 @@ const statusText = computed(() => {
 
                             <div class="divider my-0"></div>
                             <div class="text-sm opacity-70">
-                                - Переведите точную сумму на указанный адрес.<br />
-                                - Сеть должна соответствовать указанной сетке.<br />
-                                - После отправки страница обновится автоматически.
+                                {{ __('frontend.payment_form.rules.exact_amount') }}<br />
+                                {{ __('frontend.payment_form.rules.network_match') }}<br />
+                                {{ __('frontend.payment_form.rules.auto_refresh') }}
                             </div>
                         </div>
                     </div>

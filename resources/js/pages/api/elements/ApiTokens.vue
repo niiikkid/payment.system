@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, ref, onUnmounted, watch } from 'vue';
+import { vueLang } from '@erag/lang-sync-inertia';
 
 interface Props {
     apiKey: string;
@@ -7,6 +8,7 @@ interface Props {
 }
 
 const props = defineProps<Props>();
+const { __ } = vueLang();
 
 const truncatedKey = computed(() => {
     const src = (props.apiKey ?? '').trim();
@@ -25,14 +27,14 @@ const truncatedBase = computed(() => {
 });
 
 // Tooltip state for API Key
-const tooltipTextKey = ref('Скопировать');
+const tooltipTextKey = ref(__('frontend.api.token.copy'));
 const showTooltipKey = ref(false);
 let resetTimerKey: number | undefined;
 let tooltipElementKey = ref<HTMLElement | null>(null);
 let triggerElementKey = ref<HTMLElement | null>(null);
 
 // Tooltip state for API Base
-const tooltipTextBase = ref('Скопировать');
+const tooltipTextBase = ref(__('frontend.api.token.copy'));
 const showTooltipBase = ref(false);
 let resetTimerBase: number | undefined;
 let tooltipElementBase = ref<HTMLElement | null>(null);
@@ -141,24 +143,24 @@ async function copyToClipboard(text: string, type: 'key' | 'base') {
     try {
         await navigator.clipboard.writeText(text);
         if (type === 'key') {
-            tooltipTextKey.value = 'Скопировано';
+            tooltipTextKey.value = __('frontend.api.token.copied');
         } else {
-            tooltipTextBase.value = 'Скопировано';
+            tooltipTextBase.value = __('frontend.api.token.copied');
         }
     } catch (_) {
         if (type === 'key') {
-            tooltipTextKey.value = 'Не удалось скопировать';
+            tooltipTextKey.value = __('frontend.api.token.copy_failed');
         } else {
-            tooltipTextBase.value = 'Не удалось скопировать';
+            tooltipTextBase.value = __('frontend.api.token.copy_failed');
         }
     } finally {
         const timer = type === 'key' ? resetTimerKey : resetTimerBase;
         if (timer) clearTimeout(timer);
         const newTimer = window.setTimeout(() => {
             if (type === 'key') {
-                tooltipTextKey.value = 'Скопировать';
+                tooltipTextKey.value = __('frontend.api.token.copy');
             } else {
-                tooltipTextBase.value = 'Скопировать';
+                tooltipTextBase.value = __('frontend.api.token.copy');
             }
         }, 1500);
         if (type === 'key') {
@@ -181,10 +183,10 @@ function onKeydown(e: KeyboardEvent, type: 'key' | 'base') {
 <template>
     <div class="card bg-base-100 shadow">
         <div class="card-body">
-            <h3 class="card-title">API Token</h3>
+            <h3 class="card-title">{{ __('frontend.api.token.title') }}</h3>
             <div class="form-control">
                 <label class="label">
-                    <span class="label-text">X-Api-Key</span>
+                    <span class="label-text">{{ __('frontend.api.token.x_api_key') }}</span>
                 </label>
                 <div class="relative inline-block w-full">
                     <span
@@ -217,7 +219,7 @@ function onKeydown(e: KeyboardEvent, type: 'key' | 'base') {
             </div>
             <div class="form-control mt-4">
                 <label class="label">
-                    <span class="label-text">Базовый URL API</span>
+                    <span class="label-text">{{ __('frontend.api.token.api_base') }}</span>
                 </label>
                 <div class="relative inline-block w-full">
                     <span

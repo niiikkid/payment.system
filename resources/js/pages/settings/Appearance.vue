@@ -5,9 +5,12 @@ import { edit } from '@/routes/appearance';
 import { Head } from '@inertiajs/vue3';
 import type { BreadcrumbItem } from '@/types';
 import { ref, onMounted } from 'vue';
+import { vueLang } from '@erag/lang-sync-inertia';
+
+const { __ } = vueLang();
 
 const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'Внешний вид', href: edit().url },
+    { title: __('frontend.appearance.breadcrumb'), href: edit().url },
 ];
 
 // Полный список тем DaisyUI + дополнительные
@@ -53,13 +56,13 @@ onMounted(() => {
 
 <template>
     <AppLayout :breadcrumbs="breadcrumbs">
-        <Head title="Настройки внешнего вида" />
+        <Head :title="__('frontend.appearance.title')" />
 
         <SettingsLayout>
             <div class="space-y-6">
                 <div class="space-y-1">
-                    <h2 class="text-lg font-medium">Внешний вид</h2>
-                    <p class="text-sm text-base-content/70">Выберите тему интерфейса</p>
+                    <h2 class="text-lg font-medium">{{ __('frontend.appearance.title') }}</h2>
+                    <p class="text-sm text-base-content/70">{{ __('frontend.appearance.subtitle') }}</p>
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
@@ -74,7 +77,7 @@ onMounted(() => {
                             class="w-full p-3 rounded-lg border bg-base-200 hover:border-primary transition"
                             :class="currentTheme === t ? 'border-primary ring-2 ring-primary' : 'border-base-300'"
                             :title="t"
-                            :aria-label="'Тема ' + t"
+                            :aria-label="__('frontend.appearance.theme_label', { theme: t })"
                             :aria-pressed="currentTheme === t"
                             :data-theme="t"
                         >

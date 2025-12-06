@@ -6,6 +6,7 @@ import DateTimeFormat from '@/components/ui/DateTimeFormat.vue';
 import CallbackDetailsModal from '@/components/modals/callbacks/CallbackDetailsModal.vue';
 import UidCopy from '@/components/ui/UidCopy.vue';
 import Pagination from '@/components/ui/Pagination.vue';
+import { vueLang } from '@erag/lang-sync-inertia';
 
 type CallbackLog = {
   id: string
@@ -22,6 +23,7 @@ type CallbackLog = {
 
 const page = usePage();
 const logs = computed(() => page.props.logs as any);
+const { __ } = vueLang();
 
 const selected = ref<CallbackLog | null>(null);
 const showModal = ref(false);
@@ -50,25 +52,25 @@ function formatDuration(ms: number | null | undefined): string {
 </script>
 
 <template>
-  <AppLayout :breadcrumbs="[{ title: 'Главная', href: '/' }, { title: 'Callback логи', href: '/callback-logs' }]">
+  <AppLayout :breadcrumbs="[{ title: __('frontend.callbacks.breadcrumb.home'), href: '/' }, { title: __('frontend.callbacks.breadcrumb.title'), href: '/callback-logs' }]">
     <div class="grid gap-6">
       <!-- List -->
       <div class="lg:card lg:bg-base-100 lg:shadow">
         <div class="lg:card-body">
-          <h2 class="hidden lg:block card-title">Список логов</h2>
-          <h2 class="lg:hidden card-title mb-3">Список логов</h2>
+          <h2 class="hidden lg:block card-title">{{ __('frontend.callbacks.list_title') }}</h2>
+          <h2 class="lg:hidden card-title mb-3">{{ __('frontend.callbacks.list_title') }}</h2>
 
           <!-- Desktop Table View (lg and above) -->
           <div class="hidden lg:block overflow-x-auto">
             <table class="table table-sm w-full">
               <thead>
                 <tr>
-                  <th>ID</th>
-                  <th>Invoice</th>
-                  <th>Событие</th>
-                  <th>HTTP</th>
-                  <th>Время</th>
-                  <th>Длит., сек</th>
+                  <th>{{ __('frontend.callbacks.table.id') }}</th>
+                  <th>{{ __('frontend.callbacks.table.invoice') }}</th>
+                  <th>{{ __('frontend.callbacks.table.event') }}</th>
+                  <th>{{ __('frontend.callbacks.table.http') }}</th>
+                  <th>{{ __('frontend.callbacks.table.time') }}</th>
+                  <th>{{ __('frontend.callbacks.table.duration') }}</th>
                   <th></th>
                 </tr>
               </thead>
@@ -101,7 +103,7 @@ function formatDuration(ms: number | null | undefined): string {
                   </td>
                 </tr>
                 <tr v-if="!logs.data.length">
-                  <td colspan="7" class="text-center text-sm opacity-70 py-6">Пока нет логов</td>
+                  <td colspan="7" class="text-center text-sm opacity-70 py-6">{{ __('frontend.callbacks.table.empty') }}</td>
                 </tr>
               </tbody>
             </table>
@@ -114,7 +116,7 @@ function formatDuration(ms: number | null | undefined): string {
                 <!-- Header: UUID and Date -->
                 <div class="flex items-center justify-between mb-3">
                   <div class="flex items-center gap-2">
-                    <span class="text-xs opacity-70">UUID:</span>
+                        <span class="text-xs opacity-70">UUID:</span>
                     <UidCopy :uid="log.id" />
                   </div>
                   <div class="flex items-center gap-1.5 text-xs opacity-70">
@@ -129,7 +131,7 @@ function formatDuration(ms: number | null | undefined): string {
                 <div class="grid grid-cols-[auto_1fr_auto] items-center gap-3">
                   <!-- Event and Status -->
                     <div class="flex  items-center gap-2">
-                        <span class="text-xs opacity-70">Инвойс:</span>
+                        <span class="text-xs opacity-70">{{ __('frontend.callbacks.table.invoice') }}:</span>
                         <div class="text-center">
                             <UidCopy :uid="log.invoice_id" />
                         </div>
@@ -139,7 +141,7 @@ function formatDuration(ms: number | null | undefined): string {
                   <div class="flex items-center justify-center min-w-0 gap-2">
                     <span class="badge badge-sm badge-outline">{{ log.event }}</span>
                     <span class="badge badge-sm" :class="{ 'badge-success': (log.response_status||0) >= 200 && (log.response_status||0) < 300, 'badge-error': (log.response_status||0) >= 400 }">
-                      {{ log.response_status ?? '—' }}
+                      {{ log.response_status ?? __('frontend.login_history.table.ip') }}
                     </span>
                   </div>
 
@@ -147,7 +149,7 @@ function formatDuration(ms: number | null | undefined): string {
                   <!-- Right Side: Duration and Actions -->
                   <div class="flex items-center gap-3">
                     <div class="text-xs opacity-70">
-                      {{ formatDuration(log.duration_ms) }} сек
+                      {{ formatDuration(log.duration_ms) }} {{ __('frontend.callbacks.table.duration_suffix') }}
                     </div>
                     <button class="btn btn-xs" @click="openDetails(log)">
                       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4">
@@ -159,7 +161,7 @@ function formatDuration(ms: number | null | undefined): string {
               </div>
             </div>
             <div v-if="!logs.data.length" class="text-center text-sm opacity-70 py-6">
-              Пока нет логов
+              {{ __('frontend.callbacks.table.empty') }}
             </div>
           </div>
 
@@ -184,7 +186,7 @@ function formatDuration(ms: number | null | undefined): string {
                 <!-- Main Content Row -->
                 <div class="flex justify-between items-center gap-3">
                     <div class="flex items-center gap-2">
-                        <span class="text-xs opacity-70">Инвойс:</span>
+                        <span class="text-xs opacity-70">{{ __('frontend.callbacks.table.invoice') }}:</span>
                         <div class="text-center">
                             <UidCopy :uid="log.invoice_id" />
                         </div>
@@ -192,7 +194,7 @@ function formatDuration(ms: number | null | undefined): string {
 
                   <!-- Right Side: Duration -->
                   <div class="text-xs opacity-70">
-                    {{ formatDuration(log.duration_ms) }} cек
+                    {{ formatDuration(log.duration_ms) }} {{ __('frontend.callbacks.table.duration_suffix') }}
                   </div>
                 </div>
 
@@ -215,7 +217,7 @@ function formatDuration(ms: number | null | undefined): string {
               </div>
             </div>
             <div v-if="!logs.data.length" class="text-center text-sm opacity-70 py-6">
-              Пока нет логов
+              {{ __('frontend.callbacks.table.empty') }}
             </div>
           </div>
 

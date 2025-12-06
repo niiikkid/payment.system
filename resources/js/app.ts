@@ -8,9 +8,6 @@ import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import type { DefineComponent } from 'vue';
 import { createApp, h } from 'vue';
 import axios from 'axios';
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-expect-error vue-flagpack lacks types
-
 // Для корректной работы CSRF в axios
 axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 

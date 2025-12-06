@@ -2,6 +2,7 @@
 import AuthLayout from '@/layouts/AuthLayout.vue';
 import { update } from '@/routes/password';
 import { Head, useForm } from '@inertiajs/vue3';
+import { vueLang } from '@erag/lang-sync-inertia';
 
 const props = defineProps<{
     token: string;
@@ -14,6 +15,7 @@ const form = useForm({
     password: '',
     password_confirmation: '',
 });
+const { __ } = vueLang();
 
 function submit() {
     form.post(update.url(), {
@@ -24,16 +26,16 @@ function submit() {
 
 <template>
     <AuthLayout
-        title="Сброс пароля"
-        description="Введите новый пароль ниже"
+        :title="__('frontend.auth.reset.title')"
+        :description="__('frontend.auth.reset.description')"
     >
-        <Head title="Сброс пароля" />
+        <Head :title="__('frontend.auth.reset.page_title')" />
 
         <form @submit.prevent="submit">
             <div class="grid gap-6">
                 <div class="grid gap-2">
                     <label for="email" class="label">
-                        <span class="label-text">E‑mail</span>
+                        <span class="label-text">{{ __('frontend.auth.reset.email') }}</span>
                     </label>
                     <input
                         id="email"
@@ -49,7 +51,7 @@ function submit() {
 
                 <div class="grid gap-2">
                     <label for="password" class="label">
-                        <span class="label-text">Пароль</span>
+                        <span class="label-text">{{ __('frontend.auth.reset.password') }}</span>
                     </label>
                     <input
                         id="password"
@@ -58,7 +60,7 @@ function submit() {
                         autocomplete="new-password"
                         class="input input-bordered w-full"
                         autofocus
-                        placeholder="Пароль"
+                        :placeholder="__('frontend.auth.reset.password')"
                         v-model="form.password"
                     />
                     <p v-if="form.errors.password" class="text-error text-sm">{{ form.errors.password }}</p>
@@ -66,7 +68,7 @@ function submit() {
 
                 <div class="grid gap-2">
                     <label for="password_confirmation" class="label">
-                        <span class="label-text">Подтвердите пароль</span>
+                        <span class="label-text">{{ __('frontend.auth.reset.password_confirmation') }}</span>
                     </label>
                     <input
                         id="password_confirmation"
@@ -74,7 +76,7 @@ function submit() {
                         name="password_confirmation"
                         autocomplete="new-password"
                         class="input input-bordered w-full"
-                        placeholder="Подтвердите пароль"
+                        :placeholder="__('frontend.auth.reset.password_confirmation')"
                         v-model="form.password_confirmation"
                     />
                     <p v-if="form.errors.password_confirmation" class="text-error text-sm">{{ form.errors.password_confirmation }}</p>
@@ -87,7 +89,7 @@ function submit() {
                     data-test="reset-password-button"
                 >
                     <span v-if="form.processing" class="loading loading-spinner loading-sm mr-2" />
-                    Сбросить пароль
+                    {{ __('frontend.auth.reset.submit') }}
                 </button>
             </div>
         </form>

@@ -3,6 +3,7 @@ import AuthLayout from '@/layouts/AuthLayout.vue';
 import { store } from '@/routes/two-factor/login';
 import { Head, useForm } from '@inertiajs/vue3';
 import { computed, ref } from 'vue';
+import { vueLang } from '@erag/lang-sync-inertia';
 
 interface AuthConfigContent {
     title: string;
@@ -11,22 +12,21 @@ interface AuthConfigContent {
 }
 
 const showRecoveryInput = ref(false);
+const { __ } = vueLang();
 
 const authConfigContent = computed<AuthConfigContent>(() => {
     if (showRecoveryInput.value) {
         return {
-            title: 'Резервный код',
-            description:
-                'Подтвердите доступ, введя один из аварийных кодов.',
-            toggleText: 'войти по коду аутентификации',
+            title: __('frontend.auth.two_factor_challenge.recovery_title'),
+            description: __('frontend.auth.two_factor_challenge.recovery_description'),
+            toggleText: __('frontend.auth.two_factor_challenge.toggle_to_code'),
         };
     }
 
     return {
-        title: 'Код аутентификации',
-        description:
-            'Введите код из приложения-аутентификатора.',
-        toggleText: 'войти по резервному коду',
+        title: __('frontend.auth.two_factor_challenge.auth_code_title'),
+        description: __('frontend.auth.two_factor_challenge.auth_code_description'),
+        toggleText: __('frontend.auth.two_factor_challenge.toggle_to_recovery'),
     };
 });
 
@@ -59,7 +59,7 @@ function toggleRecoveryMode() {
 
 <template>
     <AuthLayout :title="authConfigContent.title" :description="authConfigContent.description">
-        <Head title="Two-Factor Authentication" />
+        <Head :title="__('frontend.auth.two_factor_challenge.auth_code_title')" />
 
         <div class="space-y-6">
             <template v-if="!showRecoveryInput">
@@ -67,25 +67,25 @@ function toggleRecoveryMode() {
                     <div class="flex flex-col items-center justify-center space-y-3 text-center">
                         <div class="w-full">
                             <input
-                                id="otp"
-                                inputmode="numeric"
-                                pattern="[0-9]*"
-                                maxlength="6"
-                                name="code"
-                                placeholder="Введите 6-значный код"
-                                class="input input-bordered w-full tracking-widest text-center"
-                                v-model="form.code"
-                                autofocus
+                            id="otp"
+                            inputmode="numeric"
+                            pattern="[0-9]*"
+                            maxlength="6"
+                            name="code"
+                            :placeholder="__('frontend.auth.two_factor_challenge.code_placeholder')"
+                            class="input input-bordered w-full tracking-widest text-center"
+                            v-model="form.code"
+                            autofocus
                             />
                         </div>
                         <p v-if="form.errors.code" class="text-error text-sm">{{ form.errors.code }}</p>
                     </div>
                     <button type="submit" class="btn btn-primary w-full" :disabled="form.processing">
                         <span v-if="form.processing" class="loading loading-spinner loading-sm mr-2" />
-                        Продолжить
+                        {{ __('frontend.auth.two_factor_challenge.submit') }}
                     </button>
                     <div class="text-center text-sm text-base-content/60">
-                        <span>или вы можете </span>
+                        <span>{{ __('frontend.auth.two_factor_challenge.or') }} </span>
                         <button type="button" class="link link-hover" @click="toggleRecoveryMode">
                             {{ authConfigContent.toggleText }}
                         </button>
@@ -98,7 +98,7 @@ function toggleRecoveryMode() {
                     <input
                         name="recovery_code"
                         type="text"
-                        placeholder="Введите резервный код"
+                        :placeholder="__('frontend.auth.two_factor_challenge.recovery_placeholder')"
                         :autofocus="showRecoveryInput"
                         required
                         v-model="form.recovery_code"
@@ -107,11 +107,11 @@ function toggleRecoveryMode() {
                     <p v-if="form.errors.recovery_code" class="text-error text-sm">{{ form.errors.recovery_code }}</p>
                     <button type="submit" class="btn btn-primary w-full" :disabled="form.processing">
                         <span v-if="form.processing" class="loading loading-spinner loading-sm mr-2" />
-                        Продолжить
+                        {{ __('frontend.auth.two_factor_challenge.submit') }}
                     </button>
 
                     <div class="text-center text-sm text-base-content/60">
-                        <span>или вы можете </span>
+                        <span>{{ __('frontend.auth.two_factor_challenge.or') }} </span>
                         <button type="button" class="link link-hover" @click="toggleRecoveryMode">
                             {{ authConfigContent.toggleText }}
                         </button>

@@ -1,7 +1,11 @@
 <script setup lang="ts">
+import { vueLang } from '@erag/lang-sync-inertia';
+
 interface Props {
     apiBase: string;
 }
+
+const { __ } = vueLang();
 
 defineProps<Props>();
 </script>
@@ -9,15 +13,17 @@ defineProps<Props>();
 <template>
     <div class="card bg-base-100 shadow">
         <div class="card-body space-y-2">
-            <h3 class="card-title">Документация</h3>
-            <p class="text-sm">Все запросы должны содержать заголовок <code>X-Api-Key</code> со значением вашего токена. Базовый URL: <code>{{ apiBase }}</code>.</p>
+            <h3 class="card-title">{{ __('frontend.api.documentation.title') }}</h3>
+            <p class="text-sm">
+                {{ __('frontend.api.documentation.subtitle', { base: apiBase }) }}
+            </p>
             <ul class="list-disc list-inside text-sm space-y-1">
-                <li><b>POST /invoices</b>: создать инвойс.</li>
-                <li><b>GET /invoices/{id}</b>: получить инвойс.</li>
-                <li><b>GET /invoices/{id}/status</b>: получить краткий статус.</li>
-                <li><b>GET /invoices/{id}/public</b>: публичные данные (адрес и т.п.).</li>
-                <li><b>GET /invoices/{id}/qr</b>: PNG‑QR адреса.</li>
-                <li><b>POST /invoices/{id}/cancel</b>: отменить активный инвойс.</li>
+                <li>{{ __('frontend.api.documentation.endpoints.create') }}</li>
+                <li>{{ __('frontend.api.documentation.endpoints.get') }}</li>
+                <li>{{ __('frontend.api.documentation.endpoints.status') }}</li>
+                <li>{{ __('frontend.api.documentation.endpoints.public') }}</li>
+                <li>{{ __('frontend.api.documentation.endpoints.qr') }}</li>
+                <li>{{ __('frontend.api.documentation.endpoints.cancel') }}</li>
             </ul>
         </div>
     </div>

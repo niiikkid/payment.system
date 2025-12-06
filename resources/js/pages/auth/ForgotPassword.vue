@@ -3,12 +3,14 @@ import AuthLayout from '@/layouts/AuthLayout.vue';
 import { login } from '@/routes';
 import { email as sendEmail } from '@/routes/password';
 import { Head, Link, useForm } from '@inertiajs/vue3';
+import { vueLang } from '@erag/lang-sync-inertia';
 
 const props = defineProps<{ status?: string }>();
 
 const form = useForm({
     email: '',
 });
+const { __ } = vueLang();
 
 function submit() {
     form.post(sendEmail.url());
@@ -17,10 +19,10 @@ function submit() {
 
 <template>
     <AuthLayout
-        title="Забыли пароль"
-        description="Укажите e‑mail для получения ссылки на сброс"
+        :title="__('frontend.auth.forgot.title')"
+        :description="__('frontend.auth.forgot.description')"
     >
-        <Head title="Забыли пароль" />
+        <Head :title="__('frontend.auth.forgot.page_title')" />
 
         <div v-if="props.status" class="mb-4 text-center text-sm font-medium text-success">
             {{ props.status }}
@@ -30,7 +32,7 @@ function submit() {
             <form @submit.prevent="submit" class="space-y-4">
                 <div class="grid gap-2">
                     <label for="email" class="label">
-                        <span class="label-text">E‑mail</span>
+                        <span class="label-text">{{ __('frontend.auth.forgot.email') }}</span>
                     </label>
                     <input
                         id="email"
@@ -48,14 +50,14 @@ function submit() {
                 <div class="my-2">
                     <button class="btn btn-primary w-full" :disabled="form.processing" data-test="email-password-reset-link-button">
                         <span v-if="form.processing" class="loading loading-spinner loading-sm mr-2" />
-                        Отправить ссылку для сброса
+                        {{ __('frontend.auth.forgot.submit') }}
                     </button>
                 </div>
             </form>
 
             <div class="space-x-1 text-center text-sm text-base-content/60">
-                <span>Или вернуться ко</span>
-                <Link :href="login().url" class="link link-hover">входу</Link>
+                <span>{{ __('frontend.auth.forgot.back_to_login') }}</span>
+                <Link :href="login().url" class="link link-hover">{{ __('frontend.auth.forgot.login') }}</Link>
             </div>
         </div>
     </AuthLayout>
