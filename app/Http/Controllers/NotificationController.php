@@ -32,7 +32,7 @@ class NotificationController extends Controller
             ->when($filters['delivery_status'], fn ($query, string $status) => $query->where('status', $status))
             ->when($filters['only_unread'], fn ($query) => $query->whereNull('read_at'))
             ->latest('id')
-            ->paginate(20)
+            ->paginate(10)
             ->withQueryString()
             ->through(fn ($notification) => (new NotificationResource($notification))->resolve());
 
