@@ -21,12 +21,14 @@ class InstallMarketFiatsCommand extends Command
     private array $defaults = [
         MarketEnum::BINANCE->value => ['KZT', 'BYN', 'EUR', 'TJS', 'KGS', 'UAH', 'USD', 'AZN', 'TRY', 'IDR'],
         MarketEnum::RAPIRA->value => ['RUB'],
+        MarketEnum::BYBIT->value => ['KZT', 'BYN', 'EUR', 'TJS', 'KGS', 'UAH', 'USD', 'AZN', 'TRY', 'IDR', 'RUB'],
     ];
 
     public function handle(MarketServiceContract $service): int
     {
         $created = 0;
         foreach ($this->defaults as $market => $codes) {
+            $defaultRows = $market === MarketEnum::BYBIT->value ? 3 : 5;
             foreach ($codes as $code) {
                 $exists = MarketFiat::query()
                     ->where('market', $market)
@@ -36,7 +38,7 @@ class InstallMarketFiatsCommand extends Command
                     continue;
                 }
 
-                $service->createFiat(MarketEnum::from($market), $code, 5, [], 30, true);
+                $service->createFiat(MarketEnum::from($market), $code, $defaultRows, [], 30, true);
                 $created++;
             }
         }

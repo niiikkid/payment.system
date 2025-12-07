@@ -10,6 +10,7 @@ use App\Models\MarketFiat;
 use App\Models\MarketPrice;
 use App\Contracts\Market\MarketParserContract;
 use App\Services\Market\Parsers\BinanceParser;
+use App\Services\Market\Parsers\BybitParser;
 use App\Services\Market\Parsers\RapiraParser;
 use Brick\Math\BigDecimal;
 use Brick\Math\RoundingMode;
@@ -21,6 +22,7 @@ final class MarketService implements MarketServiceContract
     public function __construct(
         private readonly BinanceParser $binanceParser,
         private readonly RapiraParser $rapiraParser,
+        private readonly BybitParser $bybitParser,
     ) {
     }
 
@@ -33,7 +35,16 @@ final class MarketService implements MarketServiceContract
             ->get();
     }
 
-    public function createFiat(MarketEnum $market, string $code, int $rows, array $payTypes, int $pollingInterval, bool $isEnabled): MarketFiat
+    public function createFiat(
+        MarketEnum $market,
+        string $code,
+        int $rows,
+        array $payTypes,
+        int $pollingInterval,
+        bool $isEnabled,
+        ?string $bybitPaymentMethod = null,
+        ?float $bybitAmount = null
+    ): MarketFiat
     {
         return MarketFiat::query()->create([
             'market' => $market->value,
@@ -42,16 +53,28 @@ final class MarketService implements MarketServiceContract
             'pay_types' => array_values($payTypes),
             'polling_interval_seconds' => $pollingInterval,
             'is_enabled' => $isEnabled,
+            'bybit_payment_method' => $bybitPaymentMethod,
+            'bybit_amount' => $bybitAmount,
         ]);
     }
 
-    public function updateFiat(MarketFiat $fiat, int $rows, array $payTypes, int $pollingInterval, bool $isEnabled): MarketFiat
+    public function updateFiat(
+        MarketFiat $fiat,
+        int $rows,
+        array $payTypes,
+        int $pollingInterval,
+        bool $isEnabled,
+        ?string $bybitPaymentMethod = null,
+        ?float $bybitAmount = null
+    ): MarketFiat
     {
         $fiat->fill([
             'rows' => $rows,
             'pay_types' => array_values($payTypes),
             'polling_interval_seconds' => $pollingInterval,
             'is_enabled' => $isEnabled,
+            'bybit_payment_method' => $bybitPaymentMethod,
+            'bybit_amount' => $bybitAmount,
         ]);
 
         $fiat->save();
@@ -122,6 +145,7 @@ final class MarketService implements MarketServiceContract
         return match ($market) {
             MarketEnum::BINANCE => $this->binanceParser,
             MarketEnum::RAPIRA => $this->rapiraParser,
+            MarketEnum::BYBIT => $this->bybitParser,
         };
     }
 

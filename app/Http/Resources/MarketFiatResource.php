@@ -20,6 +20,8 @@ class MarketFiatResource extends JsonResource
             'code' => $this->code,
             'rows' => (int) $this->rows,
             'pay_types' => $this->pay_types ?? [],
+            'bybit_payment_method' => $this->bybit_payment_method,
+            'bybit_amount' => $this->bybit_amount !== null ? (float) $this->bybit_amount : null,
             'polling_interval_seconds' => (int) $this->polling_interval_seconds,
             'is_enabled' => (bool) $this->is_enabled,
             'last_polled_at' => optional($this->last_polled_at)?->toISOString(),

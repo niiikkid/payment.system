@@ -49,6 +49,8 @@ class MarketController extends Controller
             $payload['pay_types'],
             $payload['polling_interval_seconds'],
             $payload['is_enabled'],
+            $payload['bybit_payment_method'],
+            $payload['bybit_amount'],
         );
 
         return back()->with('success', __('messages.markets.created'));
@@ -63,6 +65,8 @@ class MarketController extends Controller
             $payload['pay_types'],
             $payload['polling_interval_seconds'],
             $payload['is_enabled'],
+            $payload['bybit_payment_method'],
+            $payload['bybit_amount'],
         );
 
         return back()->with('success', __('messages.markets.updated'));

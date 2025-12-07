@@ -12,4 +12,5 @@ Artisan::command('inspire', function () {
 Schedule::command('addresses:sync-balances --only-active=1')->everyMinute();
 // Планировщик: диспетчер задач парсинга курсов маркетов
 Schedule::command('markets:dispatch BINANCE')->everySecond();
-Schedule::command('markets:dispatch RAPIRAНет, давай без настроек будем отображать.')->everySecond();
+Schedule::command('markets:dispatch RAPIRA')->everySecond();
+Schedule::command('markets:dispatch BYBIT')->everySecond();

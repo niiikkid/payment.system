@@ -10,6 +10,8 @@ import { vueLang } from '@erag/lang-sync-inertia';
 export interface MarketFiatForm {
     rows: number;
     pay_types: string;
+    bybit_payment_method?: string | null;
+    bybit_amount?: number | string | null;
     polling_interval_seconds: number;
     is_enabled: boolean;
 }
@@ -19,6 +21,8 @@ type MarketFiatFormErrors = Partial<Record<keyof MarketFiatForm, string>>;
 interface VisibleFields {
     rows?: boolean;
     pay_types?: boolean;
+    bybit_payment_method?: boolean;
+    bybit_amount?: boolean;
     polling_interval_seconds?: boolean;
     is_enabled?: boolean;
 }
@@ -45,6 +49,8 @@ const props = withDefaults(defineProps<Props>(), {
     form: () => ({
         rows: 5,
         pay_types: '',
+        bybit_payment_method: '',
+        bybit_amount: '',
         polling_interval_seconds: 30,
         is_enabled: true,
     }),
@@ -52,6 +58,8 @@ const props = withDefaults(defineProps<Props>(), {
     visibleFields: () => ({
         rows: true,
         pay_types: true,
+        bybit_payment_method: false,
+        bybit_amount: false,
         polling_interval_seconds: true,
         is_enabled: true,
     }),
@@ -76,6 +84,8 @@ const fieldErrors = computed<MarketFiatFormErrors>(() => props.errors ?? {});
 const fieldsVisibility = computed<Required<VisibleFields>>(() => ({
     rows: Boolean(props.visibleFields?.rows),
     pay_types: Boolean(props.visibleFields?.pay_types),
+    bybit_payment_method: Boolean(props.visibleFields?.bybit_payment_method),
+    bybit_amount: Boolean(props.visibleFields?.bybit_amount),
     polling_interval_seconds: Boolean(props.visibleFields?.polling_interval_seconds),
     is_enabled: Boolean(props.visibleFields?.is_enabled),
 }));
@@ -150,6 +160,29 @@ function toIso(input: string | null | undefined): string {
                         placeholder="BANK, CARD"
                     />
                     <p class="text-xs opacity-70 mt-1">{{ __('frontend.markets.hints.pay_types') }}</p>
+                </FormControl>
+
+                <FormControl v-if="fieldsVisibility.bybit_payment_method" :error="fieldErrors.bybit_payment_method">
+                    <Label for="fiat-bybit-payment">{{ __('frontend.markets.fields.bybit_payment_method') }}</Label>
+                    <Input
+                        id="fiat-bybit-payment"
+                        v-model="form.bybit_payment_method"
+                        type="text"
+                        placeholder="0009"
+                    />
+                    <p class="text-xs opacity-70 mt-1">{{ __('frontend.markets.hints.bybit_payment_method') }}</p>
+                </FormControl>
+
+                <FormControl v-if="fieldsVisibility.bybit_amount" :error="fieldErrors.bybit_amount">
+                    <Label for="fiat-bybit-amount">{{ __('frontend.markets.fields.bybit_amount') }}</Label>
+                    <Input
+                        id="fiat-bybit-amount"
+                        v-model="form.bybit_amount"
+                        type="number"
+                        min="0"
+                        step="0.01"
+                    />
+                    <p class="text-xs opacity-70 mt-1">{{ __('frontend.markets.hints.bybit_amount') }}</p>
                 </FormControl>
 
                 <div v-if="fieldsVisibility.is_enabled" class="form-control">

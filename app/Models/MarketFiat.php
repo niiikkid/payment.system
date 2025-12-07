@@ -17,6 +17,8 @@ class MarketFiat extends Model
         'market',
         'code',
         'pay_types',
+        'bybit_payment_method',
+        'bybit_amount',
         'rows',
         'is_enabled',
         'polling_interval_seconds',
@@ -26,6 +28,8 @@ class MarketFiat extends Model
     protected $casts = [
         'market' => 'string',
         'pay_types' => 'array',
+        'bybit_payment_method' => 'string',
+        'bybit_amount' => 'decimal:8',
         'is_enabled' => 'boolean',
         'rows' => 'integer',
         'polling_interval_seconds' => 'integer',

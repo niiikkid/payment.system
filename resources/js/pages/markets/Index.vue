@@ -20,6 +20,8 @@ interface MarketFiat {
     code: string;
     rows: number;
     pay_types: string[];
+    bybit_payment_method?: string | null;
+    bybit_amount?: number | null;
     polling_interval_seconds: number;
     is_enabled: boolean;
     last_polled_at?: string | null;
@@ -41,6 +43,8 @@ interface MarketConfig {
     visibleFields: {
         rows: boolean;
         pay_types: boolean;
+        bybit_payment_method: boolean;
+        bybit_amount: boolean;
         polling_interval_seconds: boolean;
         is_enabled: boolean;
     };
@@ -52,6 +56,8 @@ const defaultConfig: MarketConfig = {
     visibleFields: {
         rows: true,
         pay_types: true,
+        bybit_payment_method: false,
+        bybit_amount: false,
         polling_interval_seconds: true,
         is_enabled: true,
     },
@@ -64,6 +70,8 @@ const marketConfigs: Record<string, MarketConfig> = {
         visibleFields: {
             rows: true,
             pay_types: true,
+            bybit_payment_method: false,
+            bybit_amount: false,
             polling_interval_seconds: true,
             is_enabled: true,
         },
@@ -74,6 +82,20 @@ const marketConfigs: Record<string, MarketConfig> = {
         visibleFields: {
             rows: false,
             pay_types: false,
+            bybit_payment_method: false,
+            bybit_amount: false,
+            polling_interval_seconds: true,
+            is_enabled: true,
+        },
+    },
+    BYBIT: {
+        code: 'BYBIT',
+        note: __('frontend.markets.notes.bybit'),
+        visibleFields: {
+            rows: true,
+            pay_types: false,
+            bybit_payment_method: true,
+            bybit_amount: true,
             polling_interval_seconds: true,
             is_enabled: true,
         },
@@ -99,6 +121,8 @@ const buildForms = (fiats: MarketFiat[]) => {
         editForms[fiat.id] = useForm({
             rows: fiat.rows,
             pay_types: fiat.pay_types.join(', '),
+            bybit_payment_method: fiat.bybit_payment_method ?? '',
+            bybit_amount: fiat.bybit_amount ?? '',
             polling_interval_seconds: fiat.polling_interval_seconds,
             is_enabled: fiat.is_enabled,
         });
@@ -138,6 +162,10 @@ const submitUpdate = (fiatId: number) => {
         .transform((data: any) => ({
             ...data,
             pay_types: normalizePayTypes(data.pay_types),
+            bybit_payment_method: data.bybit_payment_method ? String(data.bybit_payment_method).trim() : null,
+            bybit_amount: data.bybit_amount === '' || data.bybit_amount === null || Number.isNaN(Number(data.bybit_amount))
+                ? null
+                : Number(data.bybit_amount),
         }))
         .patch(`/markets/${fiatId}`, {
             preserveScroll: true,

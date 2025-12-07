@@ -21,11 +21,21 @@ interface MarketServiceContract
         int $rows,
         array $payTypes,
         int $pollingInterval,
-        bool $isEnabled
+        bool $isEnabled,
+        ?string $bybitPaymentMethod = null,
+        ?float $bybitAmount = null
     ): MarketFiat;
 
     /** Обновить настройки фиатной валюты */
-    public function updateFiat(MarketFiat $fiat, int $rows, array $payTypes, int $pollingInterval, bool $isEnabled): MarketFiat;
+    public function updateFiat(
+        MarketFiat $fiat,
+        int $rows,
+        array $payTypes,
+        int $pollingInterval,
+        bool $isEnabled,
+        ?string $bybitPaymentMethod = null,
+        ?float $bybitAmount = null
+    ): MarketFiat;
 
     /** Запустить парсинг по всем доступным валютам для рынка */
     public function loadDuePrices(MarketEnum $market): int;
