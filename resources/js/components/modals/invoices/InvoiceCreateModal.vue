@@ -25,6 +25,8 @@ export interface InvoiceCreateForm {
     network: string
     amount: string
     merchant_id: string | number | null
+    product_name: string
+    product_description: string
     external_invoice_id: string
     callback_url: string
     tag: string
@@ -51,6 +53,8 @@ const props = withDefaults(defineProps<Props>(), {
         network: '',
         amount: '',
         merchant_id: null,
+        product_name: '',
+        product_description: '',
         external_invoice_id: '',
         callback_url: '',
         tag: '',
@@ -169,6 +173,24 @@ function submit() {
                     id="tag"
                     v-model="form.tag"
                     type="text"
+                />
+            </FormControl>
+            <FormControl :error="fieldErrors.product_name">
+                <Label for="product_name">{{ __('frontend.invoices.fields.product_name') }}</Label>
+                <Input
+                    id="product_name"
+                    v-model="form.product_name"
+                    type="text"
+                    :placeholder="__('frontend.invoices.fields.product_name_placeholder')"
+                />
+            </FormControl>
+            <FormControl :error="fieldErrors.product_description">
+                <Label for="product_description">{{ __('frontend.invoices.fields.product_description') }}</Label>
+                <Textarea
+                    id="product_description"
+                    v-model="form.product_description"
+                    :placeholder="__('frontend.invoices.fields.product_description_placeholder')"
+                    :rows="3"
                 />
             </FormControl>
             <FormControl :error="fieldErrors.metadata">

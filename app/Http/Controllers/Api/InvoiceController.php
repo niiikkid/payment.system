@@ -29,7 +29,9 @@ class InvoiceController extends Controller
                 $request->input('callback_url'),
                 $request->input('tag'),
                 (array) $request->input('metadata', []),
-                $request->merchant()
+                $request->merchant(),
+                $request->productName(),
+                $request->productDescription()
             );
 
             return response()->json((new InvoiceResource($invoice->load(['address', 'merchant'])))->resolve());

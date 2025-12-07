@@ -18,6 +18,8 @@ use Illuminate\Validation\Rule;
  * @property-read string|int|float $amount Сумма в десятичном виде
  * @property-read string|null $external_invoice_id Внешний ID
  * @property-read int|null $merchant_id Идентификатор мерчанта
+ * @property-read string|null $product_name Название товара
+ * @property-read string|null $product_description Описание товара
  * @property-read string|null $callback_url URL для callback
  * @property-read string|null $tag Произвольная метка
  * @property-read array|null $metadata Доп. данные
@@ -41,6 +43,8 @@ class StoreInvoiceRequest extends FormRequest
                 'integer',
                 Rule::exists('merchants', 'id')->where(fn ($query) => $query->where('user_id', $this->user()?->id)),
             ],
+            'product_name' => ['nullable', 'string', 'max:255'],
+            'product_description' => ['nullable', 'string', 'max:2000'],
             'callback_url' => ['nullable', 'url', 'max:255'],
             'tag' => ['nullable', 'string', 'max:255'],
             'metadata' => ['nullable', 'array'],
@@ -73,6 +77,28 @@ class StoreInvoiceRequest extends FormRequest
             ->where('id', (int) $merchantId)
             ->where('user_id', $this->user()?->id)
             ->first();
+    }
+
+    public function productName(): ?string
+    {
+        $value = $this->input('product_name');
+        if ($value === null) {
+            return null;
+        }
+
+        $trimmed = trim((string) $value);
+        return $trimmed !== '' ? $trimmed : null;
+    }
+
+    public function productDescription(): ?string
+    {
+        $value = $this->input('product_description');
+        if ($value === null) {
+            return null;
+        }
+
+        $trimmed = trim((string) $value);
+        return $trimmed !== '' ? $trimmed : null;
     }
 }
 

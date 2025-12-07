@@ -39,6 +39,8 @@ class Invoice extends Model
         'callback_url',
         'tag',
         'metadata',
+        'product_name',
+        'product_description',
     ];
 
     protected $casts = [

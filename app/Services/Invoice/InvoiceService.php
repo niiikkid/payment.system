@@ -32,7 +32,7 @@ class InvoiceService implements InvoiceServiceContract
     ) {
     }
 
-    public function create(User $user, Currency $currency, Network $network, MoneyAmount $amount, ?string $externalInvoiceId = null, ?string $callbackUrl = null, ?string $tag = null, array $metadata = [], ?Merchant $merchant = null): Invoice
+    public function create(User $user, Currency $currency, Network $network, MoneyAmount $amount, ?string $externalInvoiceId = null, ?string $callbackUrl = null, ?string $tag = null, array $metadata = [], ?Merchant $merchant = null, ?string $productName = null, ?string $productDescription = null): Invoice
     {
         // Проверка суммы по глобальным App Settings
         $settings = $this->appSettings->get($currency);
@@ -74,6 +74,8 @@ class InvoiceService implements InvoiceServiceContract
             'callback_url' => $callbackUrl,
             'tag' => $tag,
             'metadata' => $metadata,
+            'product_name' => $productName,
+            'product_description' => $productDescription,
         ]);
 
         // Планируем асинхронную экспирацию ровно через 30 минут

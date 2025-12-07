@@ -43,6 +43,8 @@ type Invoice = {
   callback_url: string | null
   tag: string | null
   metadata: Record<string, any> | null
+  product_name?: string | null
+  product_description?: string | null
   created_at: string | null
   updated_at: string | null
 }
@@ -123,11 +125,14 @@ const whiteLabelInfo = computed<WhiteLabelInfo | null>(() => {
     return null;
   }
 
+  const productName = invoice.value.product_name || null;
+  const productDescription = invoice.value.product_description || null;
+
   return {
     storeName: merchant.name,
     storeDescription: merchant.description ?? '',
-    productName: __('frontend.payment_form.white_label.product_name'),
-    productDescription: __('frontend.payment_form.white_label.product_description'),
+    productName: productName ?? '',
+    productDescription: productDescription ?? '',
     initials: merchant.initials,
     logoUrl: merchant.logo_url,
     backUrl: '/',
@@ -180,11 +185,11 @@ const whiteLabelInfo = computed<WhiteLabelInfo | null>(() => {
                   </div>
                 </div>
 
-                <div class="space-y-1.5">
+                <div v-if="whiteLabelInfo.productName" class="space-y-1.5">
                   <p class="text-xs text-base-content/70">{{ __('frontend.payment_form.white_label.product_title') }}</p>
                   <p class="text-sm lg:text-base font-semibold text-base-content">
                     {{ whiteLabelInfo.productName }}
-                    <span class="text-sm lg:text-base font-normal text-base-content/70">
+                    <span v-if="whiteLabelInfo.productDescription" class="text-sm lg:text-base font-normal text-base-content/70">
                       — {{ whiteLabelInfo.productDescription }}
                     </span>
                   </p>

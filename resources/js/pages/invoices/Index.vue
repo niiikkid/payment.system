@@ -128,6 +128,8 @@ const createForm = useForm<InvoiceCreateForm>({
   network: '',
   amount: '',
   merchant_id: '',
+  product_name: '',
+  product_description: '',
   external_invoice_id: '',
   callback_url: '',
   tag: '',
@@ -144,6 +146,8 @@ function updateCreatePayload(payload: InvoiceCreateForm) {
   createForm.network = payload.network;
   createForm.amount = payload.amount;
   createForm.merchant_id = payload.merchant_id;
+  createForm.product_name = payload.product_name;
+  createForm.product_description = payload.product_description;
   createForm.external_invoice_id = payload.external_invoice_id;
   createForm.callback_url = payload.callback_url;
   createForm.tag = payload.tag;
@@ -170,6 +174,8 @@ function submitCreate() {
     .transform((data) => ({
       ...data,
       merchant_id: data.merchant_id || null,
+      product_name: data.product_name || null,
+      product_description: data.product_description || null,
       external_invoice_id: data.external_invoice_id || null,
       callback_url: data.callback_url || null,
       tag: data.tag || null,

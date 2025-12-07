@@ -40,6 +40,8 @@ class InvoiceResource extends JsonResource
             'metadata' => $this->metadata,
             'merchant_id' => $this->merchant_id,
             'merchant' => $this->whenLoaded('merchant', fn () => (new MerchantResource($this->merchant))->resolve()),
+            'product_name' => $this->product_name,
+            'product_description' => $this->product_description,
             'created_at' => $this->created_at?->toISOString(),
             'updated_at' => $this->updated_at?->toISOString(),
         ];
