@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Address\AddressFilterRequest;
 use App\Http\Requests\Address\StoreAddressRequest;
 use App\Http\Requests\Address\UpdateAddressStatusRequest;
 use App\Http\Resources\AddressResource;
@@ -19,6 +20,7 @@ use App\Exceptions\Address\UnsupportedCurrencyException;
 use App\Exceptions\Address\UnsupportedNetworkException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -30,14 +32,28 @@ class AddressController extends Controller
     /**
      * Display a listing of addresses.
      */
-    public function index(): Response
+    public function index(AddressFilterRequest $request): Response
     {
         $userId = Auth::id();
+        $filters = $request->filters();
 
         $paginator = Address::query()
             ->where('user_id', $userId)
+            ->when($filters['currency'], fn (Builder $query, string $currency) => $query->where('currency', Currency::from($currency)))
+            ->when($filters['network'], fn (Builder $query, string $network) => $query->where('network', Network::from($network)))
+            ->when($filters['is_active'], fn (Builder $query) => $query->where('is_active', true))
+            ->when($filters['search'], function (Builder $query, string $search) {
+                $term = '%' . $search . '%';
+
+                $query->where(function (Builder $nested) use ($term) {
+                    $nested
+                        ->where('id', 'like', $term)
+                        ->orWhere('address', 'like', $term);
+                });
+            })
             ->latest('id')
             ->paginate(20)
+            ->withQueryString()
             ->through(fn ($address) => (new AddressResource($address))->resolve());
 
         $currencyOptions = array_map(static function (Currency $c) {
@@ -60,6 +76,7 @@ class AddressController extends Controller
             'addresses' => $paginator,
             'currencyOptions' => $currencyOptions,
             'networkOptions' => $networkOptions,
+            'filters' => $filters,
         ]);
     }
 

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import AppLayout from '@/layouts/AppLayout.vue';
 import { useForm } from '@inertiajs/vue3';
 import CurrencyNetworkBadge from '@/components/ui/CurrencyNetworkBadge.vue';
@@ -7,6 +7,7 @@ import AddressCopy from '@/components/ui/AddressCopy.vue';
 import DateTimeFormat from '@/components/ui/DateTimeFormat.vue';
 import Pagination from '@/components/ui/Pagination.vue';
 import AddressCreateModal, { type AddressCreateForm } from '@/components/modals/addresses/AddressCreateModal.vue';
+import FilterPanel from '@/components/filters/FilterPanel.vue';
 import { vueLang } from '@erag/lang-sync-inertia';
 
 interface AddressItem {
@@ -33,10 +34,18 @@ interface PaginatedAddresses {
     links: PaginationLinks[];
 }
 
+interface AddressFilters {
+    search: string;
+    currency: string;
+    network: string;
+    is_active: boolean;
+}
+
 interface Props {
     addresses: PaginatedAddresses;
     currencyOptions: { value: string; label: string }[];
     networkOptions: { value: string; label: string }[];
+    filters?: Partial<AddressFilters>;
 }
 
 const props = defineProps<Props>();
@@ -47,6 +56,90 @@ const createForm = useForm<AddressCreateForm>({
     network: '',
     address: '',
 });
+const filterDefaults: AddressFilters = {
+    search: '',
+    currency: '',
+    network: '',
+    is_active: false,
+};
+const filters = useForm<AddressFilters>({
+    ...filterDefaults,
+    ...(props.filters ?? {}),
+});
+const filtersModel = computed({
+    get: () => ({
+        ...filterDefaults,
+        ...filters.data(),
+    }),
+    set: (value: AddressFilters) => {
+        filters.search = value.search ?? '';
+        filters.currency = value.currency ?? '';
+        filters.network = value.network ?? '';
+        filters.is_active = Boolean(value.is_active);
+    },
+});
+const filterFields = computed(() => [
+    {
+        key: 'search',
+        type: 'text',
+        label: __('frontend.addresses.filters.search'),
+        placeholder: __('frontend.addresses.filters.search_placeholder'),
+    },
+    {
+        key: 'currency',
+        type: 'select',
+        label: __('frontend.addresses.filters.currency'),
+        options: props.currencyOptions,
+    },
+    {
+        key: 'network',
+        type: 'select',
+        label: __('frontend.addresses.filters.network'),
+        options: props.networkOptions,
+    },
+    {
+        key: 'is_active',
+        type: 'checkpoint',
+        label: __('frontend.addresses.filters.is_active'),
+    },
+]);
+
+function buildFilterPayload(extra: Record<string, unknown> = {}) {
+    const payload = {
+        ...filters.data(),
+        ...extra,
+    };
+
+    return Object.fromEntries(
+        Object.entries(payload).filter(([key, value]) => {
+            if (key === 'page') return true;
+            if (typeof value === 'boolean') {
+                return value ? ((payload[key] = 1), true) : false;
+            }
+            return value !== undefined && value !== null && String(value).length > 0;
+        }),
+    );
+}
+
+function applyFilters() {
+    filters
+        .transform(() => buildFilterPayload({ page: 1 }))
+        .get('/addresses', {
+            preserveScroll: true,
+            preserveState: true,
+            replace: true,
+            onFinish: () => filters.transform(data => data),
+        });
+}
+
+function resetFilters() {
+    filters.search = filterDefaults.search;
+    filters.currency = filterDefaults.currency;
+    filters.network = filterDefaults.network;
+    filters.is_active = filterDefaults.is_active;
+
+    applyFilters();
+}
 
 function closeCreate() {
     showCreate.value = false;
@@ -100,6 +193,20 @@ function toIso(input: string | null | undefined): string {
         </template>
 
         <div class="grid gap-6">
+            <FilterPanel
+                v-model="filtersModel"
+                :fields="filterFields"
+                :title="__('frontend.addresses.filters.title')"
+                :apply-label="__('frontend.addresses.filters.apply')"
+                :reset-label="__('frontend.addresses.filters.reset')"
+                :show-label="__('frontend.addresses.filters.show')"
+                :hide-label="__('frontend.addresses.filters.hide')"
+                :any-option-label="__('frontend.addresses.filters.any')"
+                :loading="filters.processing"
+                @apply="applyFilters"
+                @reset="resetFilters"
+            />
+
             <div class="lg:card lg:bg-base-100 lg:shadow">
                 <div class="lg:card-body">
                     <h2 class="hidden lg:block card-title">{{ __('frontend.addresses.list.title') }}</h2>

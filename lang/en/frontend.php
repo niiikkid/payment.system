@@ -29,6 +29,19 @@ return [
         'list' => [
             'title' => 'Addresses list',
         ],
+        'filters' => [
+            'title' => 'Filters',
+            'search' => 'Search',
+            'search_placeholder' => 'ID or address',
+            'currency' => 'Currency',
+            'network' => 'Network',
+            'is_active' => 'Only active',
+            'apply' => 'Apply',
+            'reset' => 'Reset',
+            'show' => 'Show filters',
+            'hide' => 'Hide filters',
+            'any' => 'Any value',
+        ],
         'modals' => [
             'create' => [
                 'title' => 'Add new address',

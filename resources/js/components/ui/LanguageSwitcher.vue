@@ -27,6 +27,7 @@ const locales: LocaleOption[] = [
     { code: 'fr', label: 'Français', flag: 'FR' },
     { code: 'it', label: 'Italiano', flag: 'IT' },
     { code: 'es', label: 'Español', flag: 'ES' },
+    { code: 'es-MX', label: 'Español (México)', flag: 'MX' },
     { code: 'pt', label: 'Português', flag: 'PT' },
     { code: 'en', label: 'English', flag: 'US' },
     { code: 'ar', label: 'العربية', flag: 'AE' },
