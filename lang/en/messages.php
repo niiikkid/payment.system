@@ -55,6 +55,17 @@ return [
             'invalid_balance' => 'Balance must be a non-negative decimal string.',
         ],
     ],
+    'merchants' => [
+        'created' => 'Merchant created',
+        'updated' => 'Merchant updated',
+        'create_failed' => 'Failed to create merchant.',
+        'update_failed' => 'Failed to update merchant.',
+        'errors' => [
+            'logo_invalid' => 'Unable to read the logo file.',
+            'logo_not_square' => 'Logo must be square.',
+            'logo_too_large' => 'Logo must not exceed 500x500 pixels.',
+        ],
+    ],
     'settings' => [
         'max_limit_exceeded' => 'The maximum amount cannot exceed :amount USDT.',
     ],

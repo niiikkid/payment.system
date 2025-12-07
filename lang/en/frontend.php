@@ -7,6 +7,7 @@ return [
         'page_titles' => [
             'dashboard' => 'Dashboard',
             'addresses' => 'Addresses',
+            'merchants' => 'Merchants',
             'invoices' => 'Invoices',
             'callback_logs' => 'Callback logs',
             'app_settings' => 'Global settings',
@@ -83,6 +84,7 @@ return [
     'nav' => [
         'dashboard' => 'Dashboard',
         'addresses' => 'Addresses',
+        'merchants' => 'Merchants',
         'invoices' => 'Invoices',
         'callback_logs' => 'Callback logs',
         'users' => 'Users',
@@ -108,6 +110,41 @@ return [
         'balance' => 'Balance',
         'currency' => 'Currency',
         'active' => 'Active',
+        'created_at' => 'Created at',
+        'edit' => 'Edit',
+    ],
+    'merchants' => [
+        'list' => [
+            'title' => 'Merchants',
+        ],
+        'actions' => [
+            'create' => 'Add merchant',
+            'add' => 'Add',
+            'save' => 'Save',
+        ],
+        'fields' => [
+            'name' => 'Name',
+            'name_placeholder' => 'e.g. CryptoCoffee',
+            'description' => 'Description',
+            'description_placeholder' => 'Short description',
+            'initials' => 'Initials',
+            'initials_placeholder' => 'e.g. CC',
+            'initials_hint' => '2–3 letters for the avatar circle',
+            'logo' => 'Logo',
+            'logo_hint' => 'Square up to 500x500, PNG/JPG/WebP',
+            'logo_current' => 'Current logo',
+        ],
+        'modals' => [
+            'create' => [
+                'title' => 'Add merchant',
+                'description' => 'Fill in data for a new merchant',
+            ],
+            'edit' => [
+                'title' => 'Edit merchant',
+                'description' => 'Update merchant data',
+            ],
+        ],
+        'empty' => 'No merchants yet',
     ],
     'settings' => [
         'title' => 'Account settings',

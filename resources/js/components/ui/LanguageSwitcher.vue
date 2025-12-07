@@ -12,9 +12,11 @@ type LocaleOption = {
 const locales: LocaleOption[] = [
     { code: 'ru', label: 'Русский', flag: 'RU' },
     { code: 'kk', label: 'Қазақша', flag: 'KZ' },
+    { code: 'ky', label: 'Кыргызча', flag: 'KG' },
     { code: 'uz', label: "O'zbekcha", flag: 'UZ' },
     { code: 'uk', label: 'Українська', flag: 'UA' },
     { code: 'en', label: 'English', flag: 'US' },
+    { code: 'hi', label: 'हिन्दी', flag: 'IN' },
     { code: 'zh', label: '中文', flag: 'CN' },
 ];
 

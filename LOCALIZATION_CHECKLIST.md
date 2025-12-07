@@ -65,30 +65,6 @@
 - pl — Польша
 
 ## Чек-листы по языкам
-### zh (китайский)
-- [ ] Переводы: `lang/zh` + `lang/zh.json`, ключи как в `en/ru`, перевести, плейсхолдеры сохранить.
-- [ ] Маршрут: добавить `zh` в `$available` в `routes/web.php`.
-- [ ] Фронтенд: опция в `resources/js/components/ui/LanguageSwitcher.vue` (`code: 'zh'`, label, flag).
-- [ ] Проверка: переключение без 404, строки отображаются.
-
-### Казахстан
-- [x] Переводы: `lang/{locale}` + `lang/{locale}.json`, структура `en/ru`, перевести, плейсхолдеры сохранить.
-- [x] Маршрут: добавить `{locale}` в `$available` в `routes/web.php`.
-- [x] Фронтенд: опция в `LanguageSwitcher.vue` (`code`, label, flag).
-- [x] Проверка: переключение без 404, строки отображаются.
-
-### Узбекистан
-- [x] Переводы: `lang/{locale}` + `lang/{locale}.json`, структура `en/ru`, перевести, плейсхолдеры сохранить.
-- [x] Маршрут: добавить `{locale}` в `$available` в `routes/web.php`.
-- [x] Фронтенд: опция в `LanguageSwitcher.vue` (`code`, label, flag).
-- [x] Проверка: переключение без 404, строки отображаются.
-
-### Кыргызстан
-- [ ] Переводы: `lang/{locale}` + `lang/{locale}.json`, структура `en/ru`, перевести, плейсхолдеры сохранить.
-- [ ] Маршрут: добавить `{locale}` в `$available` в `routes/web.php`.
-- [ ] Фронтенд: опция в `LanguageSwitcher.vue` (`code`, label, flag).
-- [ ] Проверка: переключение без 404, строки отображаются.
-
 ### Беларусь
 - [ ] Переводы: `lang/{locale}` + `lang/{locale}.json`, структура `en/ru`, перевести, плейсхолдеры сохранить.
 - [ ] Маршрут: добавить `{locale}` в `$available` в `routes/web.php`.

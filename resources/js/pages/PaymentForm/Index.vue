@@ -114,13 +114,13 @@ const whiteLabelInfo: WhiteLabelInfo = {
   <PaymentFormLayout>
     <div class="min-h-screen flex justify-center px-4">
       <div class="mx-auto w-full max-w-7xl py-10 space-y-6">
-        <div class="sm:flex items-center justify-between gap-4">
-          <h1 class="text-xl font-semibold flex items-center gap-2">
-            {{ __('frontend.payment_form.page_title', { id: '' }) }}
-            <UidCopy v-if="invoice?.id" :uid="invoice.id" size="xl" class="text-primary" />
-          </h1>
-          <div class="badge" :class="statusBadgeClass">{{ statusText }}</div>
-        </div>
+            <div class="sm:flex items-center justify-between gap-4">
+                <h1 class="text-xl font-semibold flex items-center gap-2">
+                    {{ __('frontend.payment_form.page_title', { id: '' }) }}
+                    <UidCopy v-if="invoice?.id" :uid="invoice.id" size="xl" class="text-primary" />
+                </h1>
+                <div class="badge" :class="statusBadgeClass">{{ statusText }}</div>
+            </div>
 
         <div class="grid gap-6 lg:grid-cols-[1fr_1.05fr] items-start">
           <div class="card bg-base-100 shadow h-full">
@@ -172,61 +172,61 @@ const whiteLabelInfo: WhiteLabelInfo = {
 
             <!-- Обычная карточка для остальных статусов -->
             <div v-else class="card bg-base-100 shadow">
-              <div class="card-body p-4 lg:p-6">
-                <div class="grid gap-6 md:grid-cols-1">
-                  <div class="grid gap-4">
-                    <div class="flex items-center gap-2">
-                      <span class="text-error">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-                          <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" />
-                        </svg>
-                      </span>
-                      <span class="text-base-content text-xs sm:text-sm lg:text-base">{{ __('frontend.payment_form.important') }}</span>
-                    </div>
-                    <PaymentQrSection
-                      :qr-url="qrUrl"
-                      :currency-label="invoice.currency_label"
-                      :currency="invoice.currency"
-                      :network-label="invoice.network_label"
-                      :network="invoice.network"
-                      :address="invoice.address"
-                    />
+                <div class="card-body p-4 lg:p-6">
+                    <div class="grid gap-6 md:grid-cols-1">
+                        <div class="grid gap-4">
+                            <div class="flex items-center gap-2">
+                                <span class="text-error">
+                                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" />
+                                  </svg>
+                                </span>
+                                <span class="text-base-content text-xs sm:text-sm lg:text-base">{{ __('frontend.payment_form.important') }}</span>
+                            </div>
+                            <PaymentQrSection
+                                :qr-url="qrUrl"
+                                :currency-label="invoice.currency_label"
+                                :currency="invoice.currency"
+                                :network-label="invoice.network_label"
+                                :network="invoice.network"
+                                :address="invoice.address"
+                            />
 
-                    <PaymentAmountSection
-                      :amount="invoice.amount"
-                      :currency-label="invoice.currency_label"
-                      :currency="invoice.currency"
-                      :network-label="invoice.network_label"
-                      :network="invoice.network"
-                    />
+                            <PaymentAmountSection
+                                :amount="invoice.amount"
+                                :currency-label="invoice.currency_label"
+                                :currency="invoice.currency"
+                                :network-label="invoice.network_label"
+                                :network="invoice.network"
+                            />
 
-                    <PaymentAddressSection
-                      v-if="invoice.address"
-                      :address="invoice.address"
-                    />
+                            <PaymentAddressSection
+                                v-if="invoice.address"
+                                :address="invoice.address"
+                            />
 
-                    <PaymentCountdownSection
-                      :expires-at="invoice.expires_at"
-                    />
+                            <PaymentCountdownSection
+                                :expires-at="invoice.expires_at"
+                            />
 
-                    <PaymentTransactionSection
-                      :txid="invoice.txid"
-                      :tx-explorer-url="invoice.tx_explorer_url"
-                    />
+                            <PaymentTransactionSection
+                                :txid="invoice.txid"
+                                :tx-explorer-url="invoice.tx_explorer_url"
+                            />
 
-                    <div class="divider my-0"></div>
-                    <div class="text-sm opacity-70">
-                      {{ __('frontend.payment_form.rules.exact_amount') }}<br />
-                      {{ __('frontend.payment_form.rules.network_match') }}<br />
-                      {{ __('frontend.payment_form.rules.auto_refresh') }}
+                            <div class="divider my-0"></div>
+                            <div class="text-sm opacity-70">
+                                {{ __('frontend.payment_form.rules.exact_amount') }}<br />
+                                {{ __('frontend.payment_form.rules.network_match') }}<br />
+                                {{ __('frontend.payment_form.rules.auto_refresh') }}
                     </div>
                   </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-              </div>
             </div>
-          </div>
         </div>
-      </div>
     </div>
   </PaymentFormLayout>
 </template>

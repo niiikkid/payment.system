@@ -7,6 +7,7 @@ return [
         'page_titles' => [
             'dashboard' => 'Главная',
             'addresses' => 'Адреса',
+            'merchants' => 'Мерчанты',
             'invoices' => 'Инвойсы',
             'callback_logs' => 'Callback логи',
             'app_settings' => 'Глобальные настройки',
@@ -83,6 +84,7 @@ return [
     'nav' => [
         'dashboard' => 'Главная',
         'addresses' => 'Адреса',
+        'merchants' => 'Мерчанты',
         'invoices' => 'Инвойсы',
         'callback_logs' => 'Callback логи',
         'users' => 'Пользователи',
@@ -108,6 +110,41 @@ return [
         'balance' => 'Баланс',
         'currency' => 'Валюта',
         'active' => 'Активен',
+        'created_at' => 'Создан',
+        'edit' => 'Редактировать',
+    ],
+    'merchants' => [
+        'list' => [
+            'title' => 'Мерчанты',
+        ],
+        'actions' => [
+            'create' => 'Добавить мерчанта',
+            'add' => 'Добавить',
+            'save' => 'Сохранить',
+        ],
+        'fields' => [
+            'name' => 'Название',
+            'name_placeholder' => 'Например: CryptoCoffee',
+            'description' => 'Описание',
+            'description_placeholder' => 'Краткое описание мерчанта',
+            'initials' => 'Инициалы',
+            'initials_placeholder' => 'Например: CC',
+            'initials_hint' => '2–3 буквы для круга-аватара',
+            'logo' => 'Логотип',
+            'logo_hint' => 'Квадрат до 500x500, PNG/JPG/WebP',
+            'logo_current' => 'Текущий логотип',
+        ],
+        'modals' => [
+            'create' => [
+                'title' => 'Добавить мерчанта',
+                'description' => 'Заполните данные для нового мерчанта',
+            ],
+            'edit' => [
+                'title' => 'Редактировать мерчанта',
+                'description' => 'Обновите данные мерчанта',
+            ],
+        ],
+        'empty' => 'Мерчантов пока нет',
     ],
     'settings' => [
         'title' => 'Настройки аккаунта',

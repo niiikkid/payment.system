@@ -24,6 +24,7 @@ const { __ } = vueLang();
 
 const isDashboardActive = computed(() => page.url === '/dashboard');
 const isAddressesActive = computed(() => page.url.startsWith('/addresses'));
+const isMerchantsActive = computed(() => page.url.startsWith('/merchants'));
 const isInvoicesActive = computed(() => page.url.startsWith('/invoices'));
 const isCallbackLogsActive = computed(() => page.url.startsWith('/callback-logs'));
 const isAppSettingsActive = computed(() => page.url.startsWith('/app-settings'));
@@ -44,6 +45,7 @@ const pageTitle = computed(() => {
     if (props.title) return props.title;
     if (isDashboardActive.value) return __('frontend.layout.page_titles.dashboard');
     if (isAddressesActive.value) return __('frontend.layout.page_titles.addresses');
+    if (isMerchantsActive.value) return __('frontend.layout.page_titles.merchants');
     if (isInvoicesActive.value) return __('frontend.layout.page_titles.invoices');
     if (isCallbackLogsActive.value) return __('frontend.layout.page_titles.callback_logs');
     if (isAppSettingsActive.value) return __('frontend.layout.page_titles.app_settings');
@@ -58,6 +60,9 @@ const pageIconPath = computed(() => {
     }
     if (isAddressesActive.value) {
         return 'M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25';
+    }
+    if (isMerchantsActive.value) {
+        return 'M13.5 21v-7.5a.75.75 0 0 1 .75-.75h3a.75.75 0 0 1 .75.75V21m-4.5 0H2.36m11.14 0H18m0 0h3.64m-1.39 0V9.349M3.75 21V9.349m0 0a3.001 3.001 0 0 0 3.75-.615A2.993 2.993 0 0 0 9.75 9.75c.896 0 1.7-.393 2.25-1.016a2.993 2.993 0 0 0 2.25 1.016c.896 0 1.7-.393 2.25-1.015a3.001 3.001 0 0 0 3.75.614m-16.5 0a3.004 3.004 0 0 1-.621-4.72l1.189-1.19A1.5 1.5 0 0 1 5.378 3h13.243a1.5 1.5 0 0 1 1.06.44l1.19 1.189a3 3 0 0 1-.621 4.72M6.75 18h3.75a.75.75 0 0 0 .75-.75V13.5a.75.75 0 0 0-.75-.75H6.75a.75.75 0 0 0-.75.75v3.75c0 .414.336.75.75.75Z';
     }
     if (isInvoicesActive.value) {
         return 'M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m3.75 9v7.5m2.25-6.466a9.016 9.016 0 0 0-3.461-.203c-.536.072-.974.478-1.021 1.017a4.559 4.559 0 0 0-.018.402c0 .464.336.844.775.994l2.95 1.012c.44.15.775.53.775.994 0 .136-.006.27-.018.402-.047.539-.485.945-1.021 1.017a9.077 9.077 0 0 1-3.461-.203M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z';
@@ -163,6 +168,16 @@ const pageIconPath = computed(() => {
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25" />
                                         </svg>
                                         {{ __('frontend.nav.addresses') }}
+                                    </span>
+                                </Link>
+                            </li>
+                            <li>
+                                <Link href="/merchants" :class="{ 'menu-active': isMerchantsActive, active: isMerchantsActive }" aria-current="page">
+                                    <span class="flex items-center gap-2">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="size-5 opacity-30">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 21v-7.5a.75.75 0 0 1 .75-.75h3a.75.75 0 0 1 .75.75V21m-4.5 0H2.36m11.14 0H18m0 0h3.64m-1.39 0V9.349M3.75 21V9.349m0 0a3.001 3.001 0 0 0 3.75-.615A2.993 2.993 0 0 0 9.75 9.75c.896 0 1.7-.393 2.25-1.016a2.993 2.993 0 0 0 2.25 1.016c.896 0 1.7-.393 2.25-1.015a3.001 3.001 0 0 0 3.75.614m-16.5 0a3.004 3.004 0 0 1-.621-4.72l1.189-1.19A1.5 1.5 0 0 1 5.378 3h13.243a1.5 1.5 0 0 1 1.06.44l1.19 1.189a3 3 0 0 1-.621 4.72M6.75 18h3.75a.75.75 0 0 0 .75-.75V13.5a.75.75 0 0 0-.75-.75H6.75a.75.75 0 0 0-.75.75v3.75c0 .414.336.75.75.75Z" />
+                                        </svg>
+                                        {{ __('frontend.nav.merchants') }}
                                     </span>
                                 </Link>
                             </li>

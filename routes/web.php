@@ -10,12 +10,13 @@ use App\Http\Controllers\ApiController;
 use App\Http\Controllers\Dev\CallbackSandboxController;
 use App\Http\Controllers\Admin\UsersController;
 use App\Http\Controllers\ImpersonationController;
+use App\Http\Controllers\MerchantController;
 use Inertia\Inertia;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
 Route::get('lang/{locale}', function (string $locale) {
-    $available = ['en', 'ru', 'uk', 'zh', 'kk', 'uz'];
+    $available = ['en', 'ru', 'uk', 'zh', 'kk', 'ky', 'uz', 'hi'];
 
     if (! in_array($locale, $available, true)) {
         abort(404);
@@ -40,6 +41,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('addresses', [AddressController::class, 'index'])->name('addresses.index');
     Route::post('addresses', [AddressController::class, 'store'])->name('addresses.store');
     Route::patch('addresses/{address}', [AddressController::class, 'update'])->name('addresses.update');
+
+    // Merchants
+    Route::get('merchants', [MerchantController::class, 'index'])->name('merchants.index');
+    Route::post('merchants', [MerchantController::class, 'store'])->name('merchants.store');
+    Route::patch('merchants/{merchant}', [MerchantController::class, 'update'])->name('merchants.update');
 
     // Invoices
     Route::get('invoices', [InvoiceController::class, 'index'])->name('invoices.index');

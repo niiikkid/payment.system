@@ -21,6 +21,10 @@ use App\Contracts\IpGeolocation\IpGeolocationServiceContract;
 use App\Services\IpGeolocation\IpGeolocationService;
 use App\Contracts\LoginHistory\LoginHistoryServiceContract;
 use App\Services\LoginHistory\LoginHistoryService;
+use App\Contracts\Merchant\MerchantServiceContract;
+use App\Services\Merchant\MerchantService;
+use App\Contracts\Store\StoreServiceContract;
+use App\Services\Store\StoreService;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\ServiceProvider;
 
@@ -40,6 +44,8 @@ class AppServiceProvider extends ServiceProvider
         $this->app->singleton(AppSettingsServiceContract::class, AppSettingsService::class);
         $this->app->singleton(IpGeolocationServiceContract::class, IpGeolocationService::class);
         $this->app->singleton(LoginHistoryServiceContract::class, LoginHistoryService::class);
+        $this->app->singleton(MerchantServiceContract::class, MerchantService::class);
+        $this->app->singleton(StoreServiceContract::class, StoreService::class);
     }
 
     /**
