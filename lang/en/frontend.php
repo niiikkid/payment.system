@@ -789,7 +789,9 @@ return [
             'channel' => 'Channel',
             'status' => 'Status',
             'created_at' => 'Created at',
+            'empty' => 'No notifications yet.',
         ],
+        'rules_empty' => 'No rules yet.',
     ],
     'welcome' => [
         'title' => 'Welcome',

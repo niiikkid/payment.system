@@ -296,7 +296,7 @@ const eventRequiresStatus = computed(() => ruleForm.event === 'invoice.status_ch
                 {{ __('frontend.notifications.actions.mark_all_read') }}
               </button>
             </div>
-            <div class="overflow-x-auto">
+            <div class="hidden lg:block overflow-x-auto">
               <table class="table table-zebra">
                 <thead>
                   <tr>
@@ -349,8 +349,57 @@ const eventRequiresStatus = computed(() => ruleForm.event === 'invoice.status_ch
                       </div>
                     </td>
                   </tr>
+                  <tr v-if="notifications.data.length === 0">
+                    <td colspan="6" class="text-center text-sm opacity-70 py-6">
+                      {{ __('frontend.notifications.list.empty') }}
+                    </td>
+                  </tr>
                 </tbody>
               </table>
+            </div>
+
+            <div class="lg:hidden space-y-3">
+              <div v-for="notification in notifications.data" :key="notification.id" class="card bg-base-100 shadow-sm">
+                <div class="card-body p-4 space-y-3">
+                  <div class="flex items-start justify-between gap-3">
+                    <div>
+                      <div class="font-semibold flex items-center gap-2">
+                        <span v-if="notification.read_at === null" class="badge badge-primary badge-xs"></span>
+                        {{ notification.title }}
+                      </div>
+                      <div class="text-sm opacity-70 whitespace-pre-wrap">{{ notification.body }}</div>
+                    </div>
+                    <div class="text-xs opacity-70">
+                      <DateTimeFormat :value="notification.created_at" />
+                    </div>
+                  </div>
+                  <div class="flex flex-wrap gap-2">
+                    <span class="badge badge-ghost">{{ eventLabel(notification.event) }}</span>
+                    <span class="badge badge-outline">{{ channelLabel(notification.channel) }}</span>
+                    <span
+                      class="badge badge-sm"
+                      :class="{
+                        'badge-success': notification.status === 'delivered',
+                        'badge-error': notification.status === 'failed',
+                        'badge-ghost': notification.status === 'pending',
+                      }"
+                    >
+                      {{ statusLabel(notification.status) }}
+                    </span>
+                  </div>
+                  <div class="flex justify-end gap-2">
+                    <button v-if="notification.read_at === null" class="btn btn-primary btn-xs" @click="markRead(notification)">
+                      {{ __('frontend.notifications.actions.mark_read') }}
+                    </button>
+                    <button v-else class="btn btn-ghost btn-xs" @click="markUnread(notification)">
+                      {{ __('frontend.notifications.actions.mark_unread') }}
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <div v-if="notifications.data.length === 0" class="text-center text-sm opacity-70 py-6">
+                {{ __('frontend.notifications.list.empty') }}
+              </div>
             </div>
             <Pagination :links="notifications.links" />
           </div>
@@ -438,25 +487,74 @@ const eventRequiresStatus = computed(() => ruleForm.event === 'invoice.status_ch
               <h3 class="card-title text-lg">{{ __('frontend.notifications.rules.title') }}</h3>
               <span class="badge badge-outline">{{ rules.length }}</span>
             </div>
-            <div class="divide-y divide-base-200">
-              <div v-for="rule in rules" :key="rule.id" class="py-3 flex flex-col gap-2">
-                <div class="flex items-center justify-between gap-2">
-                  <div class="flex items-center gap-2">
-                    <span class="badge badge-primary badge-outline uppercase">{{ rule.currency }}</span>
-                    <span class="badge badge-ghost">{{ eventLabel(rule.event) }}</span>
+            <div class="hidden lg:block overflow-x-auto">
+              <table class="table table-zebra">
+                <thead>
+                  <tr>
+                    <th>{{ __('frontend.notifications.form.event') }}</th>
+                    <th>{{ __('frontend.notifications.form.currency') }}</th>
+                    <th>{{ __('frontend.notifications.rules.min_amount', { amount: '', currency: '' }).replace(' :', '') }}</th>
+                    <th>{{ __('frontend.notifications.form.statuses') }}</th>
+                    <th>{{ __('frontend.notifications.form.channels') }}</th>
+                    <th>{{ __('frontend.notifications.form.enabled') }}</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="rule in rules" :key="rule.id">
+                    <td><span class="badge badge-ghost">{{ eventLabel(rule.event) }}</span></td>
+                    <td><span class="badge badge-primary badge-outline uppercase">{{ rule.currency }}</span></td>
+                    <td>{{ rule.min_amount }} {{ rule.currency }}</td>
+                    <td>{{ rule.statuses?.length ? rule.statuses.join(', ') : '—' }}</td>
+                    <td>{{ rule.channels.map(channelLabel).join(', ') }}</td>
+                    <td>
+                      <span class="badge badge-sm" :class="rule.enabled ? 'badge-success' : 'badge-ghost'">
+                        {{ rule.enabled ? __('frontend.notifications.rules.enabled') : __('frontend.notifications.rules.disabled') }}
+                      </span>
+                    </td>
+                    <td class="text-right">
+                      <div class="flex justify-end gap-2">
+                        <button class="btn btn-ghost btn-xs" @click="editRule(rule)">{{ __('frontend.notifications.rules.edit') }}</button>
+                        <button class="btn btn-outline btn-xs" @click="toggleRule(rule)">{{ rule.enabled ? __('frontend.notifications.rules.disable') : __('frontend.notifications.rules.enable') }}</button>
+                        <button class="btn btn-error btn-xs" @click="deleteRule(rule)">{{ __('frontend.notifications.rules.delete') }}</button>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr v-if="rules.length === 0">
+                    <td colspan="7" class="text-center text-sm opacity-70 py-6">
+                      {{ __('frontend.notifications.rules.empty') }}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="lg:hidden space-y-3">
+              <div v-for="rule in rules" :key="rule.id" class="card bg-base-100 shadow-sm">
+                <div class="card-body p-4 space-y-3">
+                  <div class="flex items-center justify-between gap-2">
+                    <div class="flex items-center gap-2">
+                      <span class="badge badge-primary badge-outline uppercase">{{ rule.currency }}</span>
+                      <span class="badge badge-ghost">{{ eventLabel(rule.event) }}</span>
+                    </div>
+                    <span class="badge badge-sm" :class="rule.enabled ? 'badge-success' : 'badge-ghost'">
+                      {{ rule.enabled ? __('frontend.notifications.rules.enabled') : __('frontend.notifications.rules.disabled') }}
+                    </span>
                   </div>
-                  <div class="flex items-center gap-2">
+                  <div class="flex flex-wrap gap-2 text-sm opacity-80">
+                    <span>{{ __('frontend.notifications.rules.min_amount', { amount: rule.min_amount, currency: rule.currency }) }}</span>
+                    <span v-if="rule.statuses.length">{{ __('frontend.notifications.rules.statuses') }}: {{ rule.statuses.join(', ') }}</span>
+                    <span>{{ __('frontend.notifications.rules.channels') }}: {{ rule.channels.map(channelLabel).join(', ') }}</span>
+                  </div>
+                  <div class="flex flex-wrap gap-2 justify-end">
                     <button class="btn btn-ghost btn-xs" @click="editRule(rule)">{{ __('frontend.notifications.rules.edit') }}</button>
                     <button class="btn btn-outline btn-xs" @click="toggleRule(rule)">{{ rule.enabled ? __('frontend.notifications.rules.disable') : __('frontend.notifications.rules.enable') }}</button>
                     <button class="btn btn-error btn-xs" @click="deleteRule(rule)">{{ __('frontend.notifications.rules.delete') }}</button>
                   </div>
                 </div>
-                <div class="flex flex-wrap gap-2 text-sm opacity-80">
-                  <span>{{ __('frontend.notifications.rules.min_amount', { amount: rule.min_amount, currency: rule.currency }) }}</span>
-                  <span v-if="rule.statuses.length">{{ __('frontend.notifications.rules.statuses') }}: {{ rule.statuses.join(', ') }}</span>
-                  <span>{{ __('frontend.notifications.rules.channels') }}: {{ rule.channels.map(channelLabel).join(', ') }}</span>
-                  <span>{{ rule.enabled ? __('frontend.notifications.rules.enabled') : __('frontend.notifications.rules.disabled') }}</span>
-                </div>
+              </div>
+              <div v-if="rules.length === 0" class="text-center text-sm opacity-70 py-6">
+                {{ __('frontend.notifications.rules.empty') }}
               </div>
             </div>
           </div>
