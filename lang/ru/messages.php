@@ -111,11 +111,21 @@ return [
         ],
         'channels' => [
             'in_app' => 'Внутренние',
+            'telegram' => 'Telegram',
         ],
         'delivery_statuses' => [
             'pending' => 'Ожидает отправки',
             'delivered' => 'Доставлено',
             'failed' => 'Не доставлено',
+        ],
+        'telegram' => [
+            'link_refreshed' => 'Ссылка для Telegram обновлена. Нажмите Start в боте, чтобы включить уведомления.',
+            'not_linked' => 'Telegram не подключён. Обновите ссылку и нажмите Start в боте.',
+            'delivery_failed' => 'Не удалось доставить сообщение в Telegram.',
+            'invalid_token' => 'Токен привязки недействителен. Сгенерируйте новую ссылку в панели.',
+            'start_success' => 'Бот запущен — здесь вы будете получать уведомления.',
+            'start_error' => 'Не удалось обработать команду. Попробуйте позже.',
+            'start_missing_token' => 'Для привязки используйте ссылку из личного кабинета и нажмите Start.',
         ],
         'templates' => [
             'invoice_created' => [

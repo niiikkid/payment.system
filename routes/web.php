@@ -14,12 +14,15 @@ use App\Http\Controllers\ImpersonationController;
 use App\Http\Controllers\MerchantController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\NotificationRuleController;
+use App\Http\Controllers\TelegramSettingsController;
+use App\Http\Controllers\TelegramWebhookController;
 use App\Http\Controllers\ApiTokenAllowedIpController;
 use App\Contracts\Lang\LanguageSettingsServiceContract;
 use App\Support\LocaleOptions;
 use Inertia\Inertia;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
+Route::post('telegram/webhook', TelegramWebhookController::class)->name('telegram.webhook');
 
 Route::get('lang/{locale}', function (string $locale, LanguageSettingsServiceContract $languageSettingsService) {
     $normalizedLocale = LocaleOptions::normalize($locale);
@@ -75,6 +78,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('notifications/rules', [NotificationRuleController::class, 'store'])->name('notifications.rules.store');
     Route::patch('notifications/rules/{notificationRule}', [NotificationRuleController::class, 'update'])->name('notifications.rules.update');
     Route::delete('notifications/rules/{notificationRule}', [NotificationRuleController::class, 'destroy'])->name('notifications.rules.destroy');
+    Route::post('notifications/telegram/link', [TelegramSettingsController::class, 'refreshLink'])->name('notifications.telegram.refresh');
 
     // Callback Logs
     Route::get('callback-logs', [CallbackLogController::class, 'index'])->name('callback-logs.index');

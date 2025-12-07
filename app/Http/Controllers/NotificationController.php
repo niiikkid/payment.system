@@ -9,9 +9,11 @@ use App\Enums\InvoiceStatus;
 use App\Enums\NotificationChannel;
 use App\Enums\NotificationDeliveryStatus;
 use App\Enums\NotificationEvent;
+use App\Contracts\Telegram\TelegramServiceContract;
 use App\Http\Requests\NotificationFilterRequest;
 use App\Http\Resources\NotificationResource;
 use App\Http\Resources\NotificationRuleResource;
+use App\Http\Resources\TelegramAccountResource;
 use App\Models\Notification;
 use App\Models\NotificationRule;
 use Illuminate\Http\RedirectResponse;
@@ -24,6 +26,9 @@ class NotificationController extends Controller
     {
         $filters = $request->filters();
         $userId = Auth::id();
+        $user = Auth::user();
+        $telegramService = app(TelegramServiceContract::class);
+        $telegramAccount = $user ? $telegramService->getOrCreateForUser($user) : null;
 
         $notifications = Notification::query()
             ->where('user_id', $userId)
@@ -46,6 +51,7 @@ class NotificationController extends Controller
             'notifications' => $notifications,
             'rules' => $rules,
             'filters' => $filters,
+            'telegram' => $telegramAccount ? (new TelegramAccountResource($telegramAccount))->resolve() : null,
             'events' => collect(NotificationEvent::cases())->map(fn ($event) => [
                 'value' => $event->value,
                 'label' => $event->label(),

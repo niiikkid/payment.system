@@ -111,11 +111,21 @@ return [
         ],
         'channels' => [
             'in_app' => 'In-app',
+            'telegram' => 'Telegram',
         ],
         'delivery_statuses' => [
             'pending' => 'Pending',
             'delivered' => 'Delivered',
             'failed' => 'Failed',
+        ],
+        'telegram' => [
+            'link_refreshed' => 'Telegram link updated. Press Start in the bot to enable notifications.',
+            'not_linked' => 'Telegram is not linked. Refresh the link and press Start in the bot.',
+            'delivery_failed' => 'Failed to deliver message to Telegram.',
+            'invalid_token' => 'Link token is invalid. Generate a new link in the panel.',
+            'start_success' => 'Bot started — you will receive notifications here.',
+            'start_error' => 'Could not process the command. Please try again later.',
+            'start_missing_token' => 'Use the link from your account and press Start to link Telegram.',
         ],
         'templates' => [
             'invoice_created' => [

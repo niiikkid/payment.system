@@ -37,6 +37,18 @@ type NotificationRule = {
   created_at: string | null;
 };
 
+type TelegramState = {
+  is_active: boolean;
+  chat_id: string | null;
+  username: string | null;
+  first_name: string | null;
+  last_name: string | null;
+  linked_at: string | null;
+  link_token: string;
+  start_link: string | null;
+  bot_username: string | null;
+};
+
 type FilterModel = {
   event: string;
   channel: string;
@@ -54,6 +66,7 @@ const channels = computed<Option[]>(() => (page.props.channels as Option[]) ?? [
 const invoiceStatuses = computed<Option[]>(() => (page.props.invoice_statuses as Option[]) ?? []);
 const deliveryStatuses = computed<Option[]>(() => (page.props.delivery_statuses as Option[]) ?? []);
 const currencies = computed<Option[]>(() => (page.props.currencies as Option[]) ?? []);
+const telegram = computed<TelegramState | null>(() => (page.props.telegram as TelegramState | null) ?? null);
 const filtersFromPage = computed<Partial<FilterModel>>(() => (page.props.filters as Partial<FilterModel> | undefined) ?? {});
 
 function findLabel(list: Option[], value: string | undefined | null): string {
@@ -98,6 +111,10 @@ const ruleForm = useForm({
   min_amount: '0',
   enabled: true,
 });
+const telegramLinkForm = useForm({});
+const telegramCopying = ref(false);
+const telegramCopied = ref(false);
+const telegramCopyError = ref<string | null>(null);
 
 const selectedRuleId = ref<number | null>(null);
 const markAllForm = useForm({});
@@ -175,6 +192,36 @@ function resetFilters() {
   filterForm.delivery_status = filterDefaults.delivery_status;
   filterForm.only_unread = filterDefaults.only_unread;
   applyFilters();
+}
+
+function refreshTelegramLink() {
+  telegramCopied.value = false;
+  telegramCopyError.value = null;
+  telegramLinkForm.post('/notifications/telegram/link', {
+    preserveScroll: true,
+  });
+}
+
+async function copyTelegramLink() {
+  if (!telegram.value?.start_link || !navigator?.clipboard) {
+    telegramCopyError.value = __('frontend.notifications.telegram.copy_failed');
+    return;
+  }
+
+  telegramCopyError.value = null;
+  telegramCopying.value = true;
+
+  try {
+    await navigator.clipboard.writeText(telegram.value.start_link);
+    telegramCopied.value = true;
+    setTimeout(() => {
+      telegramCopied.value = false;
+    }, 1500);
+  } catch (error) {
+    telegramCopyError.value = __('frontend.notifications.telegram.copy_failed');
+  } finally {
+    telegramCopying.value = false;
+  }
 }
 
 function submitRule() {
@@ -407,6 +454,54 @@ const eventRequiresStatus = computed(() => ruleForm.event === 'invoice.status_ch
       </div>
 
       <div v-show="activeTab === 'settings'" class="space-y-4">
+        <div class="card bg-base-100 shadow-sm">
+          <div class="card-body space-y-3">
+            <div class="flex items-start justify-between gap-3">
+              <div>
+                <h3 class="card-title text-lg">{{ __('frontend.notifications.telegram.title') }}</h3>
+                <p class="text-sm opacity-70">{{ __('frontend.notifications.telegram.description') }}</p>
+              </div>
+              <span class="badge" :class="telegram?.is_active ? 'badge-success' : 'badge-ghost'">
+                {{ telegram?.is_active ? __('frontend.notifications.telegram.status_connected') : __('frontend.notifications.telegram.status_disconnected') }}
+              </span>
+            </div>
+
+            <div v-if="telegram?.bot_username" class="space-y-3">
+              <FormControl>
+                <Label>{{ __('frontend.notifications.telegram.start_link') }}</Label>
+                <div class="join w-full">
+                  <Input class="join-item w-full" :model-value="telegram?.start_link ?? ''" :readonly="true" />
+                  <button class="btn btn-outline join-item" :disabled="!telegram?.start_link || telegramCopying" @click="copyTelegramLink">
+                    <span class="loading loading-spinner loading-xs mr-2" v-if="telegramCopying" />
+                    {{ telegramCopied ? __('frontend.notifications.telegram.copied') : __('frontend.notifications.telegram.copy_link') }}
+                  </button>
+                </div>
+                <p class="text-xs opacity-70 mt-1">{{ __('frontend.notifications.telegram.start_hint') }}</p>
+                <p v-if="telegramCopyError" class="text-error text-sm mt-1">{{ telegramCopyError }}</p>
+              </FormControl>
+              <div class="flex flex-wrap gap-2">
+                <a
+                  v-if="telegram?.start_link"
+                  class="btn btn-secondary btn-sm"
+                  :href="telegram.start_link"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  {{ __('frontend.notifications.telegram.open_bot') }}
+                </a>
+                <button class="btn btn-primary btn-sm" :disabled="telegramLinkForm.processing" @click="refreshTelegramLink">
+                  <span v-if="telegramLinkForm.processing" class="loading loading-spinner loading-xs mr-2" />
+                  {{ __('frontend.notifications.telegram.refresh_link') }}
+                </button>
+              </div>
+            </div>
+            <template v-else>
+              <div class="alert alert-warning">
+                {{ __('frontend.notifications.telegram.bot_not_configured') }}
+              </div>
+            </template>
+          </div>
+        </div>
         <div class="card bg-base-100 shadow-sm">
           <div class="card-body">
             <h2 class="card-title text-lg">{{ selectedRuleId ? __('frontend.notifications.form.update_title') : __('frontend.notifications.form.create_title') }}</h2>

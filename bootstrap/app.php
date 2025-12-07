@@ -24,6 +24,7 @@ return Application::configure(basePath: dirname(__DIR__))
         // Отключаем CSRF для dev callback sandbox
         $middleware->validateCsrfTokens(except: [
             'dev/callback-sandbox',
+            'telegram/webhook',
         ]);
 
         $middleware->web(append: [

@@ -5,12 +5,13 @@ namespace App\Models;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use App\Models\UserLoginHistory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laratrust\Contracts\LaratrustUser;
 use Laratrust\Traits\HasRolesAndPermissions;
 use Laravel\Fortify\TwoFactorAuthenticatable;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class User extends Authenticatable implements LaratrustUser
 {
@@ -77,6 +78,11 @@ class User extends Authenticatable implements LaratrustUser
     public function loginHistories(): HasMany
     {
         return $this->hasMany(UserLoginHistory::class);
+    }
+
+    public function telegramAccount(): HasOne
+    {
+        return $this->hasOne(TelegramAccount::class);
     }
 
     public function canImpersonate(): bool

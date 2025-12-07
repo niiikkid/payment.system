@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Requests;
 
 use App\Enums\Currency;
+use App\Enums\NotificationChannel;
 use App\Enums\NotificationEvent;
 use App\Contracts\Money\MoneyServiceContract;
 use App\Services\Money\MoneyAmount;
@@ -41,7 +42,9 @@ class NotificationRuleRequest extends FormRequest
             ],
             'statuses.*' => ['string', 'max:32'],
             'channels' => ['required', 'array', 'min:1'],
-            'channels.*' => ['string', 'max:32'],
+            'channels.*' => ['string', 'max:32', Rule::in(
+                collect(NotificationChannel::cases())->map(fn ($channel) => $channel->value)->all()
+            )],
             'min_amount' => ['required', 'numeric', 'min:0'],
             'enabled' => ['nullable', 'boolean'],
         ];

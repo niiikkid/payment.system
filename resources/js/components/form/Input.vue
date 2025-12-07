@@ -17,11 +17,13 @@ interface Props {
     min?: string | number;
     max?: string | number;
     size?: InputSize;
+    readonly?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
     type: 'text',
     size: 'md',
+    readonly: false,
 });
 
 const emit = defineEmits<{
@@ -44,6 +46,7 @@ function handleInput(event: Event) {
         :value="props.modelValue"
         :placeholder="props.placeholder"
         :required="props.required"
+        :readonly="props.readonly"
         :disabled="props.disabled"
         :autofocus="props.autofocus"
         :autocomplete="props.autocomplete"
