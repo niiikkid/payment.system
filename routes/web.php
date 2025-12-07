@@ -15,7 +15,7 @@ use Inertia\Inertia;
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
 Route::get('lang/{locale}', function (string $locale) {
-    $available = ['en', 'ru'];
+    $available = ['en', 'ru', 'uk'];
 
     if (! in_array($locale, $available, true)) {
         abort(404);
