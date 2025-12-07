@@ -146,7 +146,7 @@ const whiteLabelInfo = computed<WhiteLabelInfo | null>(() => {
       </div>
     <div class="min-h-screen flex justify-center p-4">
       <div class="mx-auto w-full pb-10 space-b-6" :class="hasMerchantWhiteLabel ? 'max-w-7xl' : 'lg:max-w-xl'">
-            <div class="sm:flex items-center justify-between gap-4">
+            <div class="sm:flex items-center justify-between gap-4 mb-3">
                 <h1 class="text-xl font-semibold flex items-center gap-2">
                     {{ __('frontend.payment_form.page_title', { id: '' }) }}
                     <UidCopy v-if="invoice?.id" :uid="invoice.id" size="xl" class="text-primary" />
@@ -154,7 +154,7 @@ const whiteLabelInfo = computed<WhiteLabelInfo | null>(() => {
                 <div class="badge" :class="statusBadgeClass">{{ statusText }}</div>
             </div>
 
-        <div class="grid items-start" :class="hasMerchantWhiteLabel ? 'lg:grid-cols-[1fr_1.05fr]' : 'lg:grid-cols-1'">
+        <div class="grid gap-6 items-start" :class="hasMerchantWhiteLabel ? 'lg:grid-cols-[1fr_1.05fr]' : 'lg:grid-cols-1'">
           <div v-if="whiteLabelInfo" class="card bg-base-100 shadow h-full" >
             <div class="card-body p-5 lg:p-6 flex flex-col h-full space-y-4 lg:space-y-5">
               <div class="space-y-4 lg:space-y-5">

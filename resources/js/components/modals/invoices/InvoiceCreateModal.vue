@@ -6,14 +6,25 @@ import Label from '@/components/form/Label.vue'
 import Input from '@/components/form/Input.vue'
 import Select from '@/components/form/Select.vue'
 import Textarea from '@/components/form/Textarea.vue'
+import MerchantSelect from '@/components/merchants/MerchantSelect.vue'
 import { vueLang } from '@erag/lang-sync-inertia'
 
 interface Option { value: string; label: string }
+
+interface MerchantOption {
+    value: string | number
+    label: string
+    initials?: string | null
+    logo_url?: string | null
+    description?: string | null
+    disabled?: boolean
+}
 
 export interface InvoiceCreateForm {
     currency: string
     network: string
     amount: string
+    merchant_id: string | number | null
     external_invoice_id: string
     callback_url: string
     tag: string
@@ -27,6 +38,7 @@ interface Props {
     form: InvoiceCreateForm
     currencyOptions: Option[]
     networkOptions: Option[]
+    merchantOptions: MerchantOption[]
     errors: InvoiceCreateErrors | null
     loading: boolean
 }
@@ -38,6 +50,7 @@ const props = withDefaults(defineProps<Props>(), {
         currency: '',
         network: '',
         amount: '',
+        merchant_id: null,
         external_invoice_id: '',
         callback_url: '',
         tag: '',
@@ -45,6 +58,7 @@ const props = withDefaults(defineProps<Props>(), {
     }),
     currencyOptions: () => [],
     networkOptions: () => [],
+    merchantOptions: () => [],
     errors: () => ({} as InvoiceCreateErrors),
 })
 
@@ -93,6 +107,16 @@ function submit() {
         @close="close"
     >
         <form class="mt-4 grid gap-4" @submit.prevent="submit">
+            <FormControl :hint="__('frontend.invoices.fields.merchant_hint')" :error="fieldErrors.merchant_id">
+                <Label for="merchant_id">{{ __('frontend.invoices.fields.merchant') }}</Label>
+                <MerchantSelect
+                    id="merchant_id"
+                    v-model="form.merchant_id"
+                    :options="merchantOptions"
+                    :placeholder="__('frontend.invoices.fields.merchant_placeholder')"
+                    :empty-label="__('frontend.invoices.fields.merchant_empty')"
+                />
+            </FormControl>
             <FormControl :hint="__('frontend.invoices.fields.currency_hint')" :error="fieldErrors.currency">
                 <Label for="currency" required>{{ __('frontend.invoices.fields.currency') }}</Label>
                 <Select

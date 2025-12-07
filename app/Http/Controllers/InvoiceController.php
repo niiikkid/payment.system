@@ -12,7 +12,9 @@ use App\Enums\Network;
 use App\Http\Requests\UpdateInvoiceRequest;
 use App\Http\Requests\StoreInvoiceRequest;
 use App\Http\Resources\InvoiceResource;
+use App\Http\Resources\MerchantResource;
 use App\Models\Invoice;
+use App\Models\Merchant;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
@@ -29,18 +31,32 @@ class InvoiceController extends Controller
     {
         $paginator = Invoice::query()
             ->where('user_id', Auth::id())
-            ->with('address')
+            ->with(['address', 'merchant'])
             ->latest('id')
             ->paginate(20)
             ->through(fn ($invoice) => (new InvoiceResource($invoice))->resolve());
 
         $currencyOptions = array_map(fn (Currency $c) => ['value' => $c->value, 'label' => $c->value], Currency::cases());
         $networkOptions = array_map(fn (Network $n) => ['value' => $n->value, 'label' => strtoupper($n->value)], Network::cases());
+        $merchantOptions = Merchant::query()
+            ->where('user_id', Auth::id())
+            ->latest('id')
+            ->get()
+            ->map(fn (Merchant $merchant) => (new MerchantResource($merchant))->resolve())
+            ->map(fn (array $merchant) => [
+                'value' => (string) ($merchant['id'] ?? ''),
+                'label' => (string) ($merchant['name'] ?? ''),
+                'initials' => $merchant['initials'] ?? '',
+                'logo_url' => $merchant['logo_url'] ?? null,
+                'description' => $merchant['description'] ?? null,
+            ])
+            ->values();
 
         return $this->inertia('invoices/Index', [
             'invoices' => $paginator,
             'currencyOptions' => $currencyOptions,
             'networkOptions' => $networkOptions,
+            'merchantOptions' => $merchantOptions,
             'statuses' => [
                 'active' => InvoiceStatus::active(),
                 'final' => InvoiceStatus::final(),
@@ -59,13 +75,14 @@ class InvoiceController extends Controller
                 $request->input('external_invoice_id'),
                 $request->input('callback_url'),
                 $request->input('tag'),
-                (array) $request->input('metadata', [])
+                (array) $request->input('metadata', []),
+                $request->merchant()
             );
 
             if ($request->expectsJson()) {
                 return response()->json([
                     'success' => true,
-                    'invoice' => (new InvoiceResource($invoice))->resolve(),
+                    'invoice' => (new InvoiceResource($invoice->load(['address', 'merchant'])))->resolve(),
                 ]);
             }
 
@@ -89,7 +106,7 @@ class InvoiceController extends Controller
     {
         $this->authorizeInvoice($invoice);
 
-        return (new InvoiceResource($invoice))->resolve();
+        return (new InvoiceResource($invoice->load(['address', 'merchant'])))->resolve();
     }
 
     public function public(Invoice $invoice): Response
@@ -97,7 +114,7 @@ class InvoiceController extends Controller
         $invoice->load('address');
 
         return $this->inertia('PaymentForm/Index', [
-            'invoice' => (new InvoiceResource($invoice))->resolve(),
+            'invoice' => (new InvoiceResource($invoice->loadMissing('merchant')))->resolve(),
             'appName' => config('app.name'),
             'statuses' => [
                 'active' => InvoiceStatus::active(),
@@ -108,7 +125,7 @@ class InvoiceController extends Controller
 
     public function publicData(Invoice $invoice): array
     {
-        $invoice->load('address');
+        $invoice->load(['address', 'merchant']);
 
         return (new InvoiceResource($invoice))->resolve();
     }

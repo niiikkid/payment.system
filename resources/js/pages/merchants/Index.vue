@@ -6,6 +6,7 @@ import { vueLang } from '@erag/lang-sync-inertia';
 import MerchantModal, { type MerchantForm } from '@/components/modals/merchants/MerchantModal.vue';
 import Pagination from '@/components/ui/Pagination.vue';
 import DateTimeFormat from '@/components/ui/DateTimeFormat.vue';
+import MerchantAvatar from '@/components/merchants/MerchantAvatar.vue';
 
 interface Merchant {
     id: number;
@@ -139,16 +140,7 @@ function submit() {
                                     <td class="whitespace-nowrap">#{{ merchant.id }}</td>
                                     <td>
                                         <div class="flex items-center gap-3">
-                                            <div class="avatar placeholder">
-                                                <div class="bg-primary text-primary-content rounded-full w-10 h-10">
-                                                <img v-if="merchant.logo_url" :src="merchant.logo_url" alt="logo" class="w-full h-full object-cover rounded-full" />
-                                                <span v-else class="flex items-center justify-center w-full h-full">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="w-6 h-6">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 21v-7.5a.75.75 0 0 1 .75-.75h3a.75.75 0 0 1 .75.75V21m-4.5 0H2.36m11.14 0H18m0 0h3.64m-1.39 0V9.349M3.75 21V9.349m0 0a3.001 3.001 0 0 0 3.75-.615A2.993 2.993 0 0 0 9.75 9.75c.896 0 1.7-.393 2.25-1.016a2.993 2.993 0 0 0 2.25 1.016c.896 0 1.7-.393 2.25-1.015a3.001 3.001 0 0 0 3.75.614m-16.5 0a3.004 3.004 0 0 1-.621-4.72l1.189-1.19A1.5 1.5 0 0 1 5.378 3h13.243a1.5 1.5 0 0 1 1.06.44l1.19 1.189a3 3 0 0 1-.621 4.72M6.75 18h3.75a.75.75 0 0 0 .75-.75V13.5a.75.75 0 0 0-.75-.75H6.75a.75.75 0 0 0-.75.75v3.75c0 .414.336.75.75.75Z" />
-                                                    </svg>
-                                                </span>
-                                                </div>
-                                            </div>
+                                            <MerchantAvatar :name="merchant.name" :initials="merchant.initials" :logo-url="merchant.logo_url" size="md" />
                                             <div>
                                             <div class="flex items-center gap-1.5 font-semibold">
                                                 <span>{{ merchant.name }}</span>
@@ -187,16 +179,7 @@ function submit() {
                         <div v-for="merchant in props.merchants.data" :key="merchant.id" class="card bg-base-100 shadow-sm">
                             <div class="card-body p-4 space-y-3">
                                 <div class="flex items-center gap-3">
-                                    <div class="avatar placeholder">
-                                        <div class="bg-primary text-primary-content rounded-full w-12 h-12">
-                                            <img v-if="merchant.logo_url" :src="merchant.logo_url" alt="logo" class="w-full h-full object-cover rounded-full" />
-                                            <span v-else class="flex items-center justify-center w-full h-full">
-                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="w-6 h-6">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 21v-7.5a.75.75 0 0 1 .75-.75h3a.75.75 0 0 1 .75.75V21m-4.5 0H2.36m11.14 0H18m0 0h3.64m-1.39 0V9.349M3.75 21V9.349m0 0a3.001 3.001 0 0 0 3.75-.615A2.993 2.993 0 0 0 9.75 9.75c.896 0 1.7-.393 2.25-1.016a2.993 2.993 0 0 0 2.25 1.016c.896 0 1.7-.393 2.25-1.015a3.001 3.001 0 0 0 3.75.614m-16.5 0a3.004 3.004 0 0 1-.621-4.72l1.189-1.19A1.5 1.5 0 0 1 5.378 3h13.243a1.5 1.5 0 0 1 1.06.44l1.19 1.189a3 3 0 0 1-.621 4.72M6.75 18h3.75a.75.75 0 0 0 .75-.75V13.5a.75.75 0 0 0-.75-.75H6.75a.75.75 0 0 0-.75.75v3.75c0 .414.336.75.75.75Z" />
-                                                </svg>
-                                            </span>
-                                        </div>
-                                    </div>
+                                    <MerchantAvatar :name="merchant.name" :initials="merchant.initials" :logo-url="merchant.logo_url" size="lg" />
                                     <div class="space-y-0.5 min-w-0">
                                         <div class="flex items-center gap-1.5 font-semibold">
                                             <span>{{ merchant.name }}</span>

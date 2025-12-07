@@ -34,12 +34,20 @@ type Invoice = {
 }
 
 interface Option { value: string; label: string }
+interface MerchantOption {
+  value: string | number;
+  label: string;
+  initials?: string | null;
+  logo_url?: string | null;
+  description?: string | null;
+}
 
 const page = usePage();
 const invoices = computed(() => page.props.invoices as any);
 const statuses = computed(() => page.props.statuses as { active: string[]; final: string[] });
 const currencyOptions = computed(() => page.props.currencyOptions as Option[]);
 const networkOptions = computed(() => page.props.networkOptions as Option[]);
+const merchantOptions = computed(() => page.props.merchantOptions as MerchantOption[]);
 const { __ } = vueLang();
 
 const selected: any = ref<Invoice | null>(null);
@@ -119,6 +127,7 @@ const createForm = useForm<InvoiceCreateForm>({
   currency: '',
   network: '',
   amount: '',
+  merchant_id: '',
   external_invoice_id: '',
   callback_url: '',
   tag: '',
@@ -134,6 +143,7 @@ function updateCreatePayload(payload: InvoiceCreateForm) {
   createForm.currency = payload.currency;
   createForm.network = payload.network;
   createForm.amount = payload.amount;
+  createForm.merchant_id = payload.merchant_id;
   createForm.external_invoice_id = payload.external_invoice_id;
   createForm.callback_url = payload.callback_url;
   createForm.tag = payload.tag;
@@ -159,6 +169,7 @@ function submitCreate() {
   createForm
     .transform((data) => ({
       ...data,
+      merchant_id: data.merchant_id || null,
       external_invoice_id: data.external_invoice_id || null,
       callback_url: data.callback_url || null,
       tag: data.tag || null,
@@ -436,6 +447,7 @@ watch(invoices, (collection: any) => {
       :form="createForm"
       :currency-options="currencyOptions"
       :network-options="networkOptions"
+      :merchant-options="merchantOptions"
       :errors="createForm.errors"
       :loading="createForm.processing"
       @update:form="updateCreatePayload"

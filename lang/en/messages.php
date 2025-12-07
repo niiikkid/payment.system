@@ -64,6 +64,7 @@ return [
             'logo_invalid' => 'Unable to read the logo file.',
             'logo_not_square' => 'Logo must be square.',
             'logo_too_large' => 'Logo must not exceed 500x500 pixels.',
+            'not_owner' => 'Merchant does not belong to the current user.',
         ],
     ],
     'settings' => [

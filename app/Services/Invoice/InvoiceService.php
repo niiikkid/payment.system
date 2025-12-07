@@ -17,6 +17,7 @@ use App\Enums\Currency;
 use App\Enums\InvoiceStatus;
 use App\Enums\Network;
 use App\Models\Invoice;
+use App\Models\Merchant;
 use App\Models\User;
 use App\Services\Money\MoneyAmount;
 use Illuminate\Support\Carbon;
@@ -31,7 +32,7 @@ class InvoiceService implements InvoiceServiceContract
     ) {
     }
 
-    public function create(User $user, Currency $currency, Network $network, MoneyAmount $amount, ?string $externalInvoiceId = null, ?string $callbackUrl = null, ?string $tag = null, array $metadata = []): Invoice
+    public function create(User $user, Currency $currency, Network $network, MoneyAmount $amount, ?string $externalInvoiceId = null, ?string $callbackUrl = null, ?string $tag = null, array $metadata = [], ?Merchant $merchant = null): Invoice
     {
         // Проверка суммы по глобальным App Settings
         $settings = $this->appSettings->get($currency);
@@ -52,12 +53,17 @@ class InvoiceService implements InvoiceServiceContract
         if ($address->user_id !== $user->id) {
             throw new \RuntimeException(__('messages.addresses.errors.not_owner'));
         }
+
+        if ($merchant !== null && $merchant->user_id !== $user->id) {
+            throw new \RuntimeException(__('messages.merchants.errors.not_owner'));
+        }
         $amountMinor = $this->money->toMinor($amount);
 
         $expiresAt = now()->addMinutes(30);
 
         $invoice = Invoice::query()->create([
             'user_id' => $user->id,
+            'merchant_id' => $merchant?->id,
             'external_invoice_id' => $externalInvoiceId,
             'address_id' => $address->id,
             'amount' => $amountMinor,

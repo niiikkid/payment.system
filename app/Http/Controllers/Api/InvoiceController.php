@@ -28,10 +28,11 @@ class InvoiceController extends Controller
                 $request->input('external_invoice_id'),
                 $request->input('callback_url'),
                 $request->input('tag'),
-                (array) $request->input('metadata', [])
+                (array) $request->input('metadata', []),
+                $request->merchant()
             );
 
-            return response()->json((new InvoiceResource($invoice))->resolve());
+            return response()->json((new InvoiceResource($invoice->load(['address', 'merchant'])))->resolve());
         } catch (\Throwable $e) {
             return response()->json([
                 'message' => $e->getMessage(),
@@ -43,7 +44,7 @@ class InvoiceController extends Controller
     {
         $this->authorizeInvoice($invoice);
 
-        return (new InvoiceResource($invoice))->resolve();
+        return (new InvoiceResource($invoice->load(['address', 'merchant'])))->resolve();
     }
 
     public function status(Invoice $invoice): array
@@ -67,7 +68,7 @@ class InvoiceController extends Controller
     {
         $this->authorizeInvoice($invoice);
 
-        $invoice->load('address');
+        $invoice->load(['address', 'merchant']);
 
         return (new InvoiceResource($invoice))->resolve();
     }
