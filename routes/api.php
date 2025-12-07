@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\InvoiceController;
+use App\Http\Controllers\Api\MerchantController;
 
 Route::prefix('v1')
     ->middleware(['api.key'])
@@ -16,6 +17,9 @@ Route::prefix('v1')
 
         // Отмена активного инвойса (до поступления платежа)
         Route::post('invoices/{invoice}/cancel', [InvoiceController::class, 'cancel']);
+
+        // Мерчанты текущего пользователя
+        Route::get('merchants', [MerchantController::class, 'index']);
     });
 
 

@@ -420,6 +420,7 @@ return [
                 'public' => 'GET /invoices/{id}/public: public data (address, etc.).',
                 'qr' => 'GET /invoices/{id}/qr: PNG QR of the address.',
                 'cancel' => 'POST /invoices/{id}/cancel: cancel an active invoice.',
+                'merchants' => 'GET /merchants: list all merchants of the current user.',
             ],
         ],
         'token' => [
@@ -432,7 +433,7 @@ return [
         ],
         'requests' => [
             'create_title' => 'POST /invoices — Create invoice',
-            'create_description' => 'Creates an invoice and returns the object. Required: currency, network, amount. Optional: external_invoice_id, callback_url, tag, metadata.',
+            'create_description' => 'Creates an invoice and returns the object. Required: currency, network, amount. Optional: external_invoice_id, callback_url, tag, metadata, merchant_id, product_name, product_description.',
             'fields' => [
                 'currency' => 'Currency',
                 'network' => 'Network',
@@ -441,6 +442,9 @@ return [
                 'callback_url' => 'Callback URL',
                 'tag' => 'Tag',
                 'metadata' => 'Metadata (JSON)',
+                'merchant' => 'Merchant',
+                'product_name' => 'Product name',
+                'product_description' => 'Product description',
             ],
             'send' => 'Send',
             'response' => 'Response',
@@ -454,6 +458,7 @@ return [
             'cancel_title' => 'POST /invoices/{id}/cancel — Cancel (expire)',
             'cancel' => 'Cancel',
             'invoice_id' => 'Invoice ID',
+            'merchants_load_failed' => 'Failed to load merchants.',
         ],
     ],
     'appearance' => [

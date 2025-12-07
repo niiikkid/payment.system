@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { reactive, ref } from 'vue';
+import { onMounted, reactive, ref } from 'vue';
 import { vueLang } from '@erag/lang-sync-inertia';
+import MerchantSelect from '@/components/merchants/MerchantSelect.vue';
 
 interface Props {
     apiKey: string;
@@ -9,6 +10,14 @@ interface Props {
 
 const props = defineProps<Props>();
 const { __ } = vueLang();
+
+type MerchantOption = {
+    value: string | number;
+    label: string;
+    initials?: string | null;
+    logo_url?: string | null;
+    description?: string | null;
+};
 
 function pretty(obj: unknown) {
     try {
@@ -49,9 +58,44 @@ const createForm = reactive({
     external_invoice_id: 'ORDER-123',
     callback_url: '',
     tag: '',
-    metadata: '{"note":"vip"}',
+    merchant_id: '',
+    product_name: '',
+    product_description: '',
+    metadata: '',
 });
 const createResult = ref<string>('');
+const merchants = ref<MerchantOption[]>([]);
+const merchantsLoading = ref(false);
+const merchantsError = ref<string>('');
+
+async function loadMerchants() {
+    merchantsLoading.value = true;
+    merchantsError.value = '';
+    const res = await requestJson('/merchants');
+    merchantsLoading.value = false;
+
+    if (!res.ok) {
+        merchants.value = [];
+        merchantsError.value = __('frontend.api.requests.merchants_load_failed');
+        return;
+    }
+
+    const list = Array.isArray(res.body)
+        ? res.body
+        : Array.isArray(res.body?.merchants)
+            ? res.body.merchants
+            : [];
+
+    merchants.value = list.map((merchant: any) => ({
+        value: merchant.id,
+        label: merchant.name,
+        initials: merchant.initials ?? null,
+        logo_url: merchant.logo_url ?? null,
+        description: merchant.description ?? '',
+    }));
+}
+
+onMounted(loadMerchants);
 
 async function createInvoice() {
     let metadata: unknown = undefined;
@@ -65,6 +109,9 @@ async function createInvoice() {
         external_invoice_id: createForm.external_invoice_id || undefined,
         callback_url: createForm.callback_url || undefined,
         tag: createForm.tag || undefined,
+        merchant_id: createForm.merchant_id || undefined,
+        product_name: createForm.product_name || undefined,
+        product_description: createForm.product_description || undefined,
         metadata: metadata,
     };
     const res = await requestJson('/invoices', { method: 'POST', body: JSON.stringify(payload) });
@@ -157,6 +204,34 @@ async function cancelInvoice() {
                         <label class="floating-label">
                             <span>{{ __('frontend.api.requests.fields.tag') }}</span>
                             <input class="input input-md w-full" v-model="createForm.tag" placeholder="vip" />
+                        </label>
+                        <div class="space-y-2">
+                            <span class="text-sm font-medium">{{ __('frontend.api.requests.fields.merchant') }}</span>
+                            <MerchantSelect
+                                v-model="createForm.merchant_id"
+                                :options="merchants"
+                                :placeholder="__('frontend.invoices.fields.merchant_placeholder')"
+                                :empty-label="__('frontend.invoices.fields.merchant_empty')"
+                                :disabled="merchantsLoading"
+                            />
+                            <p v-if="merchantsError" class="text-error text-sm">{{ merchantsError }}</p>
+                        </div>
+                        <label class="floating-label">
+                            <span>{{ __('frontend.api.requests.fields.product_name') }}</span>
+                            <input
+                                class="input input-md w-full"
+                                v-model="createForm.product_name"
+                                :placeholder="__('frontend.invoices.fields.product_name_placeholder')"
+                            />
+                        </label>
+                        <label class="floating-label">
+                            <span>{{ __('frontend.api.requests.fields.product_description') }}</span>
+                            <textarea
+                                class="textarea textarea-md textarea-bordered w-full"
+                                v-model="createForm.product_description"
+                                rows="3"
+                                :placeholder="__('frontend.invoices.fields.product_description_placeholder')"
+                            ></textarea>
                         </label>
                         <label class="floating-label">
                             <span>{{ __('frontend.api.requests.fields.metadata') }}</span>

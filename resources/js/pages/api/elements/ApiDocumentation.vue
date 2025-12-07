@@ -24,6 +24,7 @@ defineProps<Props>();
                 <li>{{ __('frontend.api.documentation.endpoints.public') }}</li>
                 <li>{{ __('frontend.api.documentation.endpoints.qr') }}</li>
                 <li>{{ __('frontend.api.documentation.endpoints.cancel') }}</li>
+                <li>{{ __('frontend.api.documentation.endpoints.merchants') }}</li>
             </ul>
         </div>
     </div>

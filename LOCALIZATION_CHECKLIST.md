@@ -3,7 +3,6 @@
 ## Статус по языкам
 - [ ] Беларусь
 - [ ] Молдова
-- [ ] Турция
 - [ ] ОАЭ
 - [ ] Вьетнам
 - [ ] Индонезия
@@ -13,14 +12,8 @@
 - [ ] Аргентина
 - [ ] Мексика
 - [ ] Польша
-- [ ] Deutsch
-- [x] Français
-- [x] Español
-- [x] Português
-- [ ] Italiano
 - [ ] 日本語
 - [ ] 한국어
-- [ ] Türkçe
 - [ ] العربية
 
 ## Общий регламент для каждого нового языка
@@ -56,12 +49,6 @@
 - [ ] Проверка: переключение без 404, строки отображаются.
 
 ### Молдова
-- [ ] Переводы: `lang/{locale}` + `lang/{locale}.json`, структура `en/ru`, перевести, плейсхолдеры сохранить.
-- [ ] Маршрут: добавить `{locale}` в `$available` в `routes/web.php`.
-- [ ] Фронтенд: опция в `LanguageSwitcher.vue` (`code`, label, flag).
-- [ ] Проверка: переключение без 404, строки отображаются.
-
-### Турция / Türkçe
 - [ ] Переводы: `lang/{locale}` + `lang/{locale}.json`, структура `en/ru`, перевести, плейсхолдеры сохранить.
 - [ ] Маршрут: добавить `{locale}` в `$available` в `routes/web.php`.
 - [ ] Фронтенд: опция в `LanguageSwitcher.vue` (`code`, label, flag).
@@ -127,36 +114,6 @@
 - [ ] Фронтенд: опция в `LanguageSwitcher.vue` (`code`, label, flag).
 - [ ] Проверка: переключение без 404, строки отображаются.
 
-### Deutsch
-- [ ] Переводы: `lang/{locale}` + `lang/{locale}.json`, структура `en/ru`, перевести, плейсхолдеры сохранить.
-- [ ] Маршрут: добавить `{locale}` в `$available` в `routes/web.php`.
-- [ ] Фронтенд: опция в `LanguageSwitcher.vue` (`code`, label, flag).
-- [ ] Проверка: переключение без 404, строки отображаются.
-
-### Français
-- [x] Переводы: `lang/{locale}` + `lang/{locale}.json`, структура `en/ru`, перевести, плейсхолдеры сохранить.
-- [x] Маршрут: добавить `{locale}` в `$available` в `routes/web.php`.
-- [x] Фронтенд: опция в `LanguageSwitcher.vue` (`code`, label, flag).
-- [x] Проверка: переключение без 404, строки отображаются.
-
-### Español
-- [x] Переводы: `lang/{locale}` + `lang/{locale}.json`, структура `en/ru`, перевести, плейсхолдеры сохранить.
-- [x] Маршрут: добавить `{locale}` в `$available` в `routes/web.php`.
-- [x] Фронтенд: опция в `LanguageSwitcher.vue` (`code`, label, flag).
-- [x] Проверка: переключение без 404, строки отображаются.
-
-### Português
-- [x] Переводы: `lang/{locale}` + `lang/{locale}.json`, структура `en/ru`, перевести, плейсхолдеры сохранить.
-- [x] Маршрут: добавить `{locale}` в `$available` в `routes/web.php`.
-- [x] Фронтенд: опция в `LanguageSwitcher.vue` (`code`, label, flag).
-- [x] Проверка: переключение без 404, строки отображаются.
-
-### Italiano
-- [ ] Переводы: `lang/{locale}` + `lang/{locale}.json`, структура `en/ru`, перевести, плейсхолдеры сохранить.
-- [ ] Маршрут: добавить `{locale}` в `$available` в `routes/web.php`.
-- [ ] Фронтенд: опция в `LanguageSwitcher.vue` (`code`, label, flag).
-- [ ] Проверка: переключение без 404, строки отображаются.
-
 ### 日本語
 - [ ] Переводы: `lang/{locale}` + `lang/{locale}.json`, структура `en/ru`, перевести, плейсхолдеры сохранить.
 - [ ] Маршрут: добавить `{locale}` в `$available` в `routes/web.php`.
@@ -164,12 +121,6 @@
 - [ ] Проверка: переключение без 404, строки отображаются.
 
 ### 한국어
-- [ ] Переводы: `lang/{locale}` + `lang/{locale}.json`, структура `en/ru`, перевести, плейсхолдеры сохранить.
-- [ ] Маршрут: добавить `{locale}` в `$available` в `routes/web.php`.
-- [ ] Фронтенд: опция в `LanguageSwitcher.vue` (`code`, label, flag).
-- [ ] Проверка: переключение без 404, строки отображаются.
-
-### Türkçe
 - [ ] Переводы: `lang/{locale}` + `lang/{locale}.json`, структура `en/ru`, перевести, плейсхолдеры сохранить.
 - [ ] Маршрут: добавить `{locale}` в `$available` в `routes/web.php`.
 - [ ] Фронтенд: опция в `LanguageSwitcher.vue` (`code`, label, flag).

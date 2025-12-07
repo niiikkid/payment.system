@@ -420,6 +420,7 @@ return [
                 'public' => 'GET /invoices/{id}/public: публичные данные (адрес и т.п.).',
                 'qr' => 'GET /invoices/{id}/qr: PNG‑QR адреса.',
                 'cancel' => 'POST /invoices/{id}/cancel: отменить активный инвойс.',
+                'merchants' => 'GET /merchants: список мерчантов текущего пользователя.',
             ],
         ],
         'token' => [
@@ -432,7 +433,7 @@ return [
         ],
         'requests' => [
             'create_title' => 'POST /invoices — Создать инвойс',
-            'create_description' => 'Создаёт инвойс и возвращает объект. Требует: currency, network, amount. Опционально: external_invoice_id, callback_url, tag, metadata.',
+            'create_description' => 'Создаёт инвойс и возвращает объект. Требует: currency, network, amount. Опционально: external_invoice_id, callback_url, tag, metadata, merchant_id, product_name, product_description.',
             'fields' => [
                 'currency' => 'Валюта',
                 'network' => 'Сеть',
@@ -441,6 +442,9 @@ return [
                 'callback_url' => 'Callback URL',
                 'tag' => 'Тег',
                 'metadata' => 'Metadata (JSON)',
+                'merchant' => 'Мерчант',
+                'product_name' => 'Название товара',
+                'product_description' => 'Описание товара',
             ],
             'send' => 'Отправить',
             'response' => 'Ответ',
@@ -454,6 +458,7 @@ return [
             'cancel_title' => 'POST /invoices/{id}/cancel — Отменить (expire)',
             'cancel' => 'Отменить',
             'invoice_id' => 'ID инвойса',
+            'merchants_load_failed' => 'Не удалось загрузить мерчантов.',
         ],
     ],
     'appearance' => [
