@@ -13,6 +13,7 @@ const locales: LocaleOption[] = [
     { code: 'ru', label: 'Русский', flag: 'RU' },
     { code: 'uk', label: 'Українська', flag: 'UA' },
     { code: 'en', label: 'English', flag: 'US' },
+    { code: 'zh', label: '中文', flag: 'CN' },
 ];
 
 const page = usePage();
