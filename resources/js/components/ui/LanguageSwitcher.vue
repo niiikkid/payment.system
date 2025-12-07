@@ -14,7 +14,7 @@ const props = defineProps<{
     align?: 'start' | 'center' | 'end';
 }>();
 
-const locales: LocaleOption[] = [
+const fallbackLocales: LocaleOption[] = [
     { code: 'ru', label: 'Русский', flag: 'RU' },
     { code: 'az', label: 'Azərbaycan', flag: 'AZ' },
     { code: 'kk', label: 'Қазақша', flag: 'KZ' },
@@ -37,8 +37,24 @@ const locales: LocaleOption[] = [
 
 const page = usePage();
 
-const currentLocale = computed(() => ((page.props as any)?.locale as string) || 'ru');
-const current = computed<LocaleOption>(() => locales.find((l) => l.code === currentLocale.value) ?? locales[0]);
+const sharedLocales = computed(() => (page.props as any)?.locales as { available?: LocaleOption[]; enabled?: string[] } | undefined);
+
+const availableLocales = computed<LocaleOption[]>(() => {
+    const available = sharedLocales.value?.available ?? [];
+    if (available.length === 0) {
+        return fallbackLocales;
+    }
+
+    const enabled = sharedLocales.value?.enabled ?? [];
+    const enabledSet = enabled.length > 0 ? new Set(enabled) : null;
+    const filtered = enabledSet ? available.filter((item) => enabledSet.has(item.code)) : available;
+
+    return filtered.length > 0 ? filtered : available;
+});
+
+const currentLocale = computed(() => ((page.props as any)?.locale as string) || availableLocales.value[0]?.code || 'ru');
+const current = computed<LocaleOption>(() => availableLocales.value.find((l) => l.code === currentLocale.value) ?? availableLocales.value[0] ?? fallbackLocales[0]);
+
 const dropdownDirectionClass = computed(() => {
     switch (props.direction) {
         case 'down':
@@ -66,6 +82,8 @@ const dropdownAlignClass = computed(() => {
 
 function switchLocale(code: string) {
     if (code === currentLocale.value) return;
+    const allowedCodes = new Set(availableLocales.value.map((locale) => locale.code));
+    if (!allowedCodes.has(code)) return;
     router.get(`/lang/${code}`, {}, { preserveScroll: true, preserveState: false });
 }
 </script>
@@ -77,7 +95,7 @@ function switchLocale(code: string) {
             <span class="font-semibold">{{ current.label }}</span>
         </div>
         <ul tabindex="0" class="dropdown-content menu bg-base-100 rounded-box z-[1] w-52 p-2 shadow">
-            <li v-for="locale in locales" :key="locale.code">
+            <li v-for="locale in availableLocales" :key="locale.code">
                 <button type="button" class="flex items-center gap-2" :class="{ active: locale.code === currentLocale }" @click="switchLocale(locale.code)">
                     <FlagIcon :code="locale.flag" size="S" />
                     <span>{{ locale.label }}</span>

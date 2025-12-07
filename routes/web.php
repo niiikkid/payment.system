@@ -12,19 +12,27 @@ use App\Http\Controllers\Admin\UsersController;
 use App\Http\Controllers\ImpersonationController;
 use App\Http\Controllers\MerchantController;
 use App\Http\Controllers\ApiTokenAllowedIpController;
+use App\Contracts\Lang\LanguageSettingsServiceContract;
+use App\Support\LocaleOptions;
 use Inertia\Inertia;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
-Route::get('lang/{locale}', function (string $locale) {
-    $available = ['en', 'de', 'fr', 'it', 'pl', 'ru', 'az', 'uk', 'zh', 'kk', 'ky', 'uz', 'hi', 'tr', 'es', 'es-MX', 'pt', 'ar'];
+Route::get('lang/{locale}', function (string $locale, LanguageSettingsServiceContract $languageSettingsService) {
+    $normalizedLocale = LocaleOptions::normalize($locale);
 
-    if (! in_array($locale, $available, true)) {
+    if (! $normalizedLocale) {
         abort(404);
     }
 
-    session(['locale' => $locale]);
-    app()->setLocale($locale);
+    $allowedLocales = $languageSettingsService->enabledLocaleCodes();
+
+    if (! in_array($normalizedLocale, $allowedLocales, true)) {
+        abort(404);
+    }
+
+    session(['locale' => $normalizedLocale]);
+    app()->setLocale($normalizedLocale);
 
     return back();
 })->name('locale.switch');
@@ -62,6 +70,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::middleware('role:admin')->group(function () {
         Route::get('app-settings', [\App\Http\Controllers\AppSettingsController::class, 'index'])->name('app-settings.index');
         Route::put('app-settings', [\App\Http\Controllers\AppSettingsController::class, 'update'])->name('app-settings.update');
+            Route::put('app-settings/locales', [\App\Http\Controllers\AppSettingsController::class, 'updateLocales'])->name('app-settings.locales.update');
     });
 
     // API Docs & Playground (не в настройках)

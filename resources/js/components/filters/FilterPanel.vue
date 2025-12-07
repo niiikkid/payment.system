@@ -44,6 +44,53 @@ const emit = defineEmits<{
 }>();
 
 const collapsed = ref(false);
+const storageKey = computed(() => {
+  if (typeof window === 'undefined') {
+    return null;
+  }
+
+  return `filter-panel-collapsed:${encodeURIComponent(window.location.pathname)}`;
+});
+
+function readCollapsedState() {
+  if (typeof document === 'undefined') {
+    return false;
+  }
+
+  const key = storageKey.value;
+  if (!key) {
+    return false;
+  }
+
+  const cookies = document.cookie ? document.cookie.split(';') : [];
+  const matched = cookies
+    .map((cookie) => cookie.trim())
+    .find((cookie) => cookie.startsWith(`${key}=`));
+
+  if (!matched) {
+    return false;
+  }
+
+  const [, value] = matched.split('=');
+  return value === '1';
+}
+
+function persistCollapsedState(value: boolean) {
+  if (typeof document === 'undefined') {
+    return;
+  }
+
+  const key = storageKey.value;
+  if (!key) {
+    return;
+  }
+
+  document.cookie = `${key}=${value ? '1' : '0'}; path=/`;
+}
+
+if (typeof document !== 'undefined') {
+  collapsed.value = readCollapsedState();
+}
 
 const hasActiveFilters = computed(() => {
   return props.fields.some((field) => {
@@ -66,7 +113,9 @@ function updateField(key: string, value: unknown) {
 }
 
 function toggle() {
-  collapsed.value = !collapsed.value;
+  const nextValue = !collapsed.value;
+  collapsed.value = nextValue;
+  persistCollapsedState(nextValue);
 }
 
 function submit() {

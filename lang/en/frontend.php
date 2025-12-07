@@ -575,6 +575,15 @@ return [
         'min_amount' => 'Minimum amount ({currency})',
         'max_amount' => 'Maximum amount ({currency})',
         'save' => 'Save',
+        'languages' => [
+            'title' => 'Languages',
+            'subtitle' => 'Select which languages appear in the switcher. If none are selected, all languages will be shown.',
+            'selected' => 'Selected: {count}',
+            'select_all' => 'Select all',
+            'language' => 'Language',
+            'enabled' => 'Enabled',
+            'save' => 'Save languages',
+        ],
     ],
     'auth' => [
         'login' => [

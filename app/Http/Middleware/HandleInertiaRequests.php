@@ -2,12 +2,15 @@
 
 namespace App\Http\Middleware;
 
+use App\Contracts\Lang\LanguageSettingsServiceContract;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 
 class HandleInertiaRequests extends Middleware
 {
+    private const LOCALE_SHARE_KEY = 'locales';
+
     /**
      * The root template that's loaded on the first page visit.
      *
@@ -42,6 +45,7 @@ class HandleInertiaRequests extends Middleware
         }
 
         [$message, $author] = str(Inspiring::quotes()->random())->explode('-');
+        $languageSettingsService = app(LanguageSettingsServiceContract::class);
 
         return [
             ...parent::share($request),
@@ -59,6 +63,10 @@ class HandleInertiaRequests extends Middleware
                 'error' => fn () => $request->session()->get('error'),
             ],
             'locale' => app()->getLocale(),
+            self::LOCALE_SHARE_KEY => [
+                'available' => $languageSettingsService->availableLocales(),
+                'enabled' => $languageSettingsService->enabledLocaleCodes(),
+            ],
         ];
     }
 }
