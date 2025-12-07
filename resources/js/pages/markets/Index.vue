@@ -40,11 +40,14 @@ const { __ } = vueLang();
 interface MarketConfig {
     code: string;
     note: string;
+    refreshable: boolean;
     visibleFields: {
         rows: boolean;
         pay_types: boolean;
         bybit_payment_method: boolean;
         bybit_amount: boolean;
+        manual_buy_price: boolean;
+        manual_sell_price: boolean;
         polling_interval_seconds: boolean;
         is_enabled: boolean;
     };
@@ -53,11 +56,14 @@ interface MarketConfig {
 const defaultConfig: MarketConfig = {
     code: 'BINANCE',
     note: '',
+    refreshable: true,
     visibleFields: {
         rows: true,
         pay_types: true,
         bybit_payment_method: false,
         bybit_amount: false,
+        manual_buy_price: false,
+        manual_sell_price: false,
         polling_interval_seconds: true,
         is_enabled: true,
     },
@@ -67,11 +73,14 @@ const marketConfigs: Record<string, MarketConfig> = {
     BINANCE: {
         code: 'BINANCE',
         note: __('frontend.markets.notes.binance'),
+        refreshable: true,
         visibleFields: {
             rows: true,
             pay_types: true,
             bybit_payment_method: false,
             bybit_amount: false,
+            manual_buy_price: false,
+            manual_sell_price: false,
             polling_interval_seconds: true,
             is_enabled: true,
         },
@@ -79,11 +88,14 @@ const marketConfigs: Record<string, MarketConfig> = {
     RAPIRA: {
         code: 'RAPIRA',
         note: __('frontend.markets.notes.rapira'),
+        refreshable: true,
         visibleFields: {
             rows: false,
             pay_types: false,
             bybit_payment_method: false,
             bybit_amount: false,
+            manual_buy_price: false,
+            manual_sell_price: false,
             polling_interval_seconds: true,
             is_enabled: true,
         },
@@ -91,12 +103,30 @@ const marketConfigs: Record<string, MarketConfig> = {
     BYBIT: {
         code: 'BYBIT',
         note: __('frontend.markets.notes.bybit'),
+        refreshable: true,
         visibleFields: {
             rows: true,
             pay_types: false,
             bybit_payment_method: true,
             bybit_amount: true,
+            manual_buy_price: false,
+            manual_sell_price: false,
             polling_interval_seconds: true,
+            is_enabled: true,
+        },
+    },
+    MANUAL: {
+        code: 'MANUAL',
+        note: __('frontend.markets.notes.manual'),
+        refreshable: false,
+        visibleFields: {
+            rows: false,
+            pay_types: false,
+            bybit_payment_method: false,
+            bybit_amount: false,
+            manual_buy_price: true,
+            manual_sell_price: true,
+            polling_interval_seconds: false,
             is_enabled: true,
         },
     },
@@ -125,6 +155,8 @@ const buildForms = (fiats: MarketFiat[]) => {
             bybit_amount: fiat.bybit_amount ?? '',
             polling_interval_seconds: fiat.polling_interval_seconds,
             is_enabled: fiat.is_enabled,
+            manual_buy_price: String(fiat.price?.buy_price ?? ''),
+            manual_sell_price: String(fiat.price?.sell_price ?? ''),
         });
     });
 };
@@ -156,6 +188,27 @@ const normalizePayTypes = (value: string): string[] => {
         .filter((item) => Boolean(item));
 };
 
+const normalizeManualPrice = (value: unknown): string | null => {
+    if (value === null || value === undefined) {
+        return null;
+    }
+
+    const prepared = String(value).trim().replace(/\s+/g, '').replace(',', '.');
+    if (prepared === '') {
+        return null;
+    }
+
+    return prepared;
+};
+
+const canRefresh = (marketCode: string): boolean => {
+    const config = marketConfigs[marketCode];
+    if (config === undefined) {
+        return true;
+    }
+    return config.refreshable;
+};
+
 const submitUpdate = (fiatId: number) => {
     const form = editForms[fiatId];
     form
@@ -166,6 +219,8 @@ const submitUpdate = (fiatId: number) => {
             bybit_amount: data.bybit_amount === '' || data.bybit_amount === null || Number.isNaN(Number(data.bybit_amount))
                 ? null
                 : Number(data.bybit_amount),
+            manual_buy_price: normalizeManualPrice(data.manual_buy_price),
+            manual_sell_price: normalizeManualPrice(data.manual_sell_price),
         }))
         .patch(`/markets/${fiatId}`, {
             preserveScroll: true,
@@ -288,6 +343,7 @@ const closeSettings = () => {
                                             </svg>
                                         </button>
                                         <button
+                                            v-if="canRefresh(fiat.market)"
                                             class="btn btn-ghost btn-sm btn-square"
                                             :aria-label="__('frontend.markets.actions.refresh')"
                                             @click="refreshFiat(fiat.id)"
@@ -339,6 +395,7 @@ const closeSettings = () => {
                                             </svg>
                                         </button>
                                         <button
+                                            v-if="canRefresh(fiat.market)"
                                             class="btn btn-ghost btn-sm btn-square"
                                             :aria-label="__('frontend.markets.actions.refresh')"
                                             @click="refreshFiat(fiat.id)"

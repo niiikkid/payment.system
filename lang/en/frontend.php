@@ -234,6 +234,8 @@ return [
         'market_names' => [
             'binance' => 'Binance P2P',
             'rapira' => 'Rapira',
+            'bybit' => 'Bybit P2P',
+            'manual' => 'Manual market',
         ],
         'table' => [
             'empty' => 'No fiats yet. Add one to start parsing.',
@@ -241,10 +243,15 @@ return [
         'hints' => [
             'rows' => 'How many ads to average from the top of the list.',
             'pay_types' => 'Leave empty to include all payment methods.',
+            'bybit_payment_method' => 'Bybit payment method ID, leave empty to include all.',
+            'bybit_amount' => 'Optional amount filter for Bybit offers.',
+            'manual_price' => 'Only digits with dot or comma, up to 8 decimals.',
         ],
         'notes' => [
             'binance' => 'Binance: averaging P2P ads by count and pay types.',
             'rapira' => 'Rapira: order book for USDT/RUB, average of top 5 asks/bids.',
+            'bybit' => 'Bybit: averaging top-N P2P ads, payment method and amount filters available.',
+            'manual' => 'Manual market: set buy/sell price yourself, polling is disabled.',
         ],
         'no_settings' => 'No configurable fields for this market.',
     ],

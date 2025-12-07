@@ -9,6 +9,7 @@ enum MarketEnum: string
     case BINANCE = 'BINANCE';
     case RAPIRA = 'RAPIRA';
     case BYBIT = 'BYBIT';
+    case MANUAL = 'MANUAL';
 
     public function label(): string
     {
@@ -17,6 +18,7 @@ enum MarketEnum: string
                 self::BINANCE => 'frontend.markets.market_names.binance',
                 self::RAPIRA => 'frontend.markets.market_names.rapira',
                 self::BYBIT => 'frontend.markets.market_names.bybit',
+                self::MANUAL => 'frontend.markets.market_names.manual',
             }
         );
     }

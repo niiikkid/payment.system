@@ -23,7 +23,9 @@ interface MarketServiceContract
         int $pollingInterval,
         bool $isEnabled,
         ?string $bybitPaymentMethod = null,
-        ?float $bybitAmount = null
+        ?float $bybitAmount = null,
+        ?float $manualBuyPrice = null,
+        ?float $manualSellPrice = null,
     ): MarketFiat;
 
     /** Обновить настройки фиатной валюты */
@@ -34,7 +36,9 @@ interface MarketServiceContract
         int $pollingInterval,
         bool $isEnabled,
         ?string $bybitPaymentMethod = null,
-        ?float $bybitAmount = null
+        ?float $bybitAmount = null,
+        ?float $manualBuyPrice = null,
+        ?float $manualSellPrice = null,
     ): MarketFiat;
 
     /** Запустить парсинг по всем доступным валютам для рынка */

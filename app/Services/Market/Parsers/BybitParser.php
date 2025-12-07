@@ -53,8 +53,6 @@ final class BybitParser implements MarketParserContract
 
         try {
             $response = Http::asJson()
-                ->retry(2, 200)
-                ->timeout(10)
                 ->withHeaders([
                     'Accept' => '*/*',
                     'Accept-Encoding' => 'gzip, deflate, br',

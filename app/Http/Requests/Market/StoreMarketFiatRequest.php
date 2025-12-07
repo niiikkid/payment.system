@@ -15,6 +15,8 @@ use Illuminate\Validation\Rule;
  * @property-read array<int, string> $pay_types Список payTypes Binance
  * @property-read string|null $bybit_payment_method Метод оплаты Bybit (ID)
  * @property-read float|null $bybit_amount Фильтр суммы Bybit
+ * @property-read float|null $manual_buy_price Ручная цена покупки
+ * @property-read float|null $manual_sell_price Ручная цена продажи
  * @property-read int $polling_interval_seconds Интервал парсинга в секундах
  * @property-read bool $is_enabled Признак включения парсера
  */
@@ -43,6 +45,8 @@ class StoreMarketFiatRequest extends FormRequest
             'bybit_amount' => ['nullable', 'numeric', 'min:0'],
             'polling_interval_seconds' => ['required', 'integer', 'min:5', 'max:3600'],
             'is_enabled' => ['sometimes', 'boolean'],
+            'manual_buy_price' => $this->manualPriceRules(),
+            'manual_sell_price' => $this->manualPriceRules(),
         ];
     }
 
@@ -57,6 +61,8 @@ class StoreMarketFiatRequest extends FormRequest
             'bybit_amount' => $this->prepareBybitAmount(),
             'polling_interval_seconds' => (int) $this->input('polling_interval_seconds', 30),
             'is_enabled' => $this->boolean('is_enabled', true),
+            'manual_buy_price' => $this->prepareManualPrice('manual_buy_price'),
+            'manual_sell_price' => $this->prepareManualPrice('manual_sell_price'),
         ];
     }
 
@@ -97,6 +103,36 @@ class StoreMarketFiatRequest extends FormRequest
         }
 
         return (float) $value;
+    }
+
+    private function manualPriceRules(): array
+    {
+        return [
+            'nullable',
+            Rule::requiredIf($this->isManualMarket() && $this->boolean('is_enabled', true)),
+            'string',
+            'regex:/^\d+(?:[.,]\d{0,8})?$/',
+        ];
+    }
+
+    private function prepareManualPrice(string $key): ?float
+    {
+        $value = $this->input($key);
+        if ($value === null || $value === '') {
+            return null;
+        }
+
+        $normalized = str_replace(',', '.', (string) $value);
+        if (! preg_match('/^\d+(?:\.\d{0,8})?$/', $normalized)) {
+            return null;
+        }
+
+        return (float) $normalized;
+    }
+
+    private function isManualMarket(): bool
+    {
+        return MarketEnum::tryFrom($this->marketValue()) === MarketEnum::MANUAL;
     }
 }
 

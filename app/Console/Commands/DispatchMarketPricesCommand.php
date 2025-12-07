@@ -24,6 +24,11 @@ class DispatchMarketPricesCommand extends Command
             return self::FAILURE;
         }
 
+        if ($market === MarketEnum::MANUAL) {
+            $this->info('Ручной маркет не требует автоматического опроса.');
+            return self::SUCCESS;
+        }
+
         $now = now();
         $fiats = MarketFiat::query()
             ->where('is_enabled', true)

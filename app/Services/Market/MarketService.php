@@ -9,6 +9,7 @@ use App\Enums\MarketEnum;
 use App\Models\MarketFiat;
 use App\Models\MarketPrice;
 use App\Contracts\Market\MarketParserContract;
+use App\Services\Market\Exceptions\MarketException;
 use App\Services\Market\Parsers\BinanceParser;
 use App\Services\Market\Parsers\BybitParser;
 use App\Services\Market\Parsers\RapiraParser;
@@ -43,10 +44,12 @@ final class MarketService implements MarketServiceContract
         int $pollingInterval,
         bool $isEnabled,
         ?string $bybitPaymentMethod = null,
-        ?float $bybitAmount = null
+        ?float $bybitAmount = null,
+        ?float $manualBuyPrice = null,
+        ?float $manualSellPrice = null
     ): MarketFiat
     {
-        return MarketFiat::query()->create([
+        $fiat = MarketFiat::query()->create([
             'market' => $market->value,
             'code' => strtoupper($code),
             'rows' => $rows,
@@ -56,6 +59,12 @@ final class MarketService implements MarketServiceContract
             'bybit_payment_method' => $bybitPaymentMethod,
             'bybit_amount' => $bybitAmount,
         ]);
+
+        if ($market === MarketEnum::MANUAL) {
+            $this->saveManualPrices($fiat, $manualBuyPrice, $manualSellPrice);
+        }
+
+        return $fiat;
     }
 
     public function updateFiat(
@@ -65,7 +74,9 @@ final class MarketService implements MarketServiceContract
         int $pollingInterval,
         bool $isEnabled,
         ?string $bybitPaymentMethod = null,
-        ?float $bybitAmount = null
+        ?float $bybitAmount = null,
+        ?float $manualBuyPrice = null,
+        ?float $manualSellPrice = null
     ): MarketFiat
     {
         $fiat->fill([
@@ -79,11 +90,21 @@ final class MarketService implements MarketServiceContract
 
         $fiat->save();
 
-        return $fiat->refresh();
+        $fiat->refresh();
+
+        if ($fiat->market === MarketEnum::MANUAL->value) {
+            $this->saveManualPrices($fiat, $manualBuyPrice, $manualSellPrice);
+        }
+
+        return $fiat;
     }
 
     public function loadDuePrices(MarketEnum $market): int
     {
+        if ($market === MarketEnum::MANUAL) {
+            return 0;
+        }
+
         $now = now();
         $fiats = MarketFiat::query()
             ->where('is_enabled', true)
@@ -113,6 +134,13 @@ final class MarketService implements MarketServiceContract
                 'requested_market' => $market->value,
             ]);
             return null;
+        }
+
+        if ($market === MarketEnum::MANUAL) {
+            return MarketPrice::query()->where([
+                'market_fiat_id' => $fiat->id,
+                'market' => $market->value,
+            ])->first();
         }
 
         $parser = $this->parserFor($market);
@@ -146,12 +174,42 @@ final class MarketService implements MarketServiceContract
             MarketEnum::BINANCE => $this->binanceParser,
             MarketEnum::RAPIRA => $this->rapiraParser,
             MarketEnum::BYBIT => $this->bybitParser,
+            default => throw new MarketException("Парсер для маркета {$market->value} не поддерживается."),
         };
     }
 
     private function normalizePrice(float $price): string
     {
         return BigDecimal::of((string) $price)->toScale(6, RoundingMode::DOWN)->__toString();
+    }
+
+    private function saveManualPrices(
+        MarketFiat $fiat,
+        ?float $buyPrice,
+        ?float $sellPrice
+    ): ?MarketPrice {
+        if ($buyPrice === null && $sellPrice === null) {
+            return null;
+        }
+
+        $result = tap(
+            MarketPrice::query()->firstOrNew([
+                'market_fiat_id' => $fiat->id,
+                'market' => MarketEnum::MANUAL->value,
+            ]),
+            function (MarketPrice $model) use ($buyPrice, $sellPrice): void {
+                $model->asset = 'USDT';
+                $model->buy_price = $buyPrice !== null ? $this->normalizePrice($buyPrice) : null;
+                $model->sell_price = $sellPrice !== null ? $this->normalizePrice($sellPrice) : null;
+                $model->fetched_at = now();
+                $model->save();
+            }
+        );
+
+        $fiat->last_polled_at = now();
+        $fiat->save();
+
+        return $result;
     }
 }
 

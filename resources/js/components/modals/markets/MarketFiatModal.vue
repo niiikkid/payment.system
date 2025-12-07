@@ -12,6 +12,8 @@ export interface MarketFiatForm {
     pay_types: string;
     bybit_payment_method?: string | null;
     bybit_amount?: number | string | null;
+    manual_buy_price?: number | string | null;
+    manual_sell_price?: number | string | null;
     polling_interval_seconds: number;
     is_enabled: boolean;
 }
@@ -23,6 +25,8 @@ interface VisibleFields {
     pay_types?: boolean;
     bybit_payment_method?: boolean;
     bybit_amount?: boolean;
+    manual_buy_price?: boolean;
+    manual_sell_price?: boolean;
     polling_interval_seconds?: boolean;
     is_enabled?: boolean;
 }
@@ -51,6 +55,8 @@ const props = withDefaults(defineProps<Props>(), {
         pay_types: '',
         bybit_payment_method: '',
         bybit_amount: '',
+        manual_buy_price: '',
+        manual_sell_price: '',
         polling_interval_seconds: 30,
         is_enabled: true,
     }),
@@ -60,6 +66,8 @@ const props = withDefaults(defineProps<Props>(), {
         pay_types: true,
         bybit_payment_method: false,
         bybit_amount: false,
+        manual_buy_price: false,
+        manual_sell_price: false,
         polling_interval_seconds: true,
         is_enabled: true,
     }),
@@ -86,6 +94,8 @@ const fieldsVisibility = computed<Required<VisibleFields>>(() => ({
     pay_types: Boolean(props.visibleFields?.pay_types),
     bybit_payment_method: Boolean(props.visibleFields?.bybit_payment_method),
     bybit_amount: Boolean(props.visibleFields?.bybit_amount),
+    manual_buy_price: Boolean(props.visibleFields?.manual_buy_price),
+    manual_sell_price: Boolean(props.visibleFields?.manual_sell_price),
     polling_interval_seconds: Boolean(props.visibleFields?.polling_interval_seconds),
     is_enabled: Boolean(props.visibleFields?.is_enabled),
 }));
@@ -183,6 +193,30 @@ function toIso(input: string | null | undefined): string {
                         step="0.01"
                     />
                     <p class="text-xs opacity-70 mt-1">{{ __('frontend.markets.hints.bybit_amount') }}</p>
+                </FormControl>
+
+                <FormControl v-if="fieldsVisibility.manual_buy_price" :error="fieldErrors.manual_buy_price">
+                    <Label for="manual-buy">{{ __('frontend.markets.fields.buy_price') }}</Label>
+                    <Input
+                        id="manual-buy"
+                        v-model="form.manual_buy_price"
+                        type="text"
+                        inputmode="decimal"
+                        placeholder="0,00"
+                    />
+                    <p class="text-xs opacity-70 mt-1">{{ __('frontend.markets.hints.manual_price') }}</p>
+                </FormControl>
+
+                <FormControl v-if="fieldsVisibility.manual_sell_price" :error="fieldErrors.manual_sell_price">
+                    <Label for="manual-sell">{{ __('frontend.markets.fields.sell_price') }}</Label>
+                    <Input
+                        id="manual-sell"
+                        v-model="form.manual_sell_price"
+                        type="text"
+                        inputmode="decimal"
+                        placeholder="0,00"
+                    />
+                    <p class="text-xs opacity-70 mt-1">{{ __('frontend.markets.hints.manual_price') }}</p>
                 </FormControl>
 
                 <div v-if="fieldsVisibility.is_enabled" class="form-control">
