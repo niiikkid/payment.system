@@ -7,6 +7,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class ApiToken extends Model
 {
@@ -22,6 +23,11 @@ class ApiToken extends Model
     protected $casts = [
         'last_used_at' => 'datetime',
     ];
+
+    public function allowedIps(): HasMany
+    {
+        return $this->hasMany(ApiTokenAllowedIp::class);
+    }
 
     public function user(): BelongsTo
     {

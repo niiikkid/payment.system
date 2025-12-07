@@ -87,6 +87,7 @@ return [
     ],
     'api' => [
         'callback_failed' => 'Callback request failed with status :status.',
+        'ip_not_allowed' => 'Requests from this IP are not allowed for the current token.',
     ],
     'money' => [
         'empty_string' => 'Empty money string.',

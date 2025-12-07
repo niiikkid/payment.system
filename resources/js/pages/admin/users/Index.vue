@@ -6,8 +6,10 @@ import Pagination from '@/components/ui/Pagination.vue';
 import ModalDialog from '@/components/ui/modal/ModalDialog.vue';
 import DateTimeFormat from '@/components/ui/DateTimeFormat.vue';
 import { vueLang } from '@erag/lang-sync-inertia';
+import FilterPanel from '@/components/filters/FilterPanel.vue';
 
 type RoleOption = { value: string; label: string };
+type FilterType = 'text' | 'select' | 'checkpoint';
 
 type UserItem = {
     id: number;
@@ -22,10 +24,13 @@ type UserItem = {
 
 type PaginationLink = { url: string | null; label: string; active: boolean };
 type PaginatedUsers = { data: UserItem[]; links: PaginationLink[] };
+type UserFilters = { search: string; role: string };
+type FilterField = { key: keyof UserFilters; type: FilterType; label: string; placeholder?: string; options?: { value: string; label: string }[] };
 
 const page = usePage();
 const users = computed(() => page.props.users as PaginatedUsers);
 const roleOptions = computed(() => page.props.roleOptions as RoleOption[]);
+const pageFilters = computed(() => (page.props.filters as Partial<UserFilters> | undefined) ?? {});
 const { __ } = vueLang();
 
 const showCreate = ref(false);
@@ -49,6 +54,78 @@ const editForm = useForm({
 });
 
 const impersonateForm = useForm({});
+const filterDefaults: UserFilters = {
+    search: '',
+    role: '',
+};
+const filters = useForm<UserFilters>({
+    ...filterDefaults,
+    ...pageFilters.value,
+});
+const filtersModel = computed({
+    get: () => ({
+        ...filterDefaults,
+        ...filters.data(),
+    }),
+    set: (value: UserFilters) => {
+        filters.search = value.search ?? '';
+        filters.role = value.role ?? '';
+    },
+});
+const filterFields = computed<FilterField[]>(() => [
+    {
+        key: 'search',
+        type: 'text',
+        label: __('frontend.admin_users.filters.search'),
+        placeholder: __('frontend.admin_users.filters.search_placeholder'),
+    },
+    {
+        key: 'role',
+        type: 'select',
+        label: __('frontend.admin_users.filters.role'),
+        options: [{ value: '', label: __('frontend.admin_users.filters.any') }, ...roleOptions.value],
+    },
+]);
+
+function buildFilterPayload(extra: Record<string, unknown> = {}) {
+    const payload = {
+        ...filters.data(),
+        ...extra,
+    };
+
+    const cleaned: Record<string, unknown> = {};
+
+    Object.entries(payload).forEach(([key, value]) => {
+        if (key === 'page') {
+            cleaned[key] = value;
+            return;
+        }
+
+        if (value !== undefined && value !== null && String(value).length > 0) {
+            cleaned[key] = value;
+        }
+    });
+
+    return cleaned;
+}
+
+function applyFilters() {
+    filters
+        .transform(() => buildFilterPayload({ page: 1 }))
+        .get('/admin/users', {
+            preserveScroll: true,
+            preserveState: true,
+            replace: true,
+            onFinish: () => filters.transform(data => data),
+        });
+}
+
+function resetFilters() {
+    filters.search = filterDefaults.search;
+    filters.role = filterDefaults.role;
+
+    applyFilters();
+}
 
 function openCreate() {
     createForm.reset();
@@ -131,6 +208,20 @@ function impersonate(user: UserItem) {
         </template>
 
         <div class="grid gap-6">
+            <FilterPanel
+                v-model="filtersModel"
+                :fields="filterFields"
+                :title="__('frontend.admin_users.filters.title')"
+                :apply-label="__('frontend.admin_users.filters.apply')"
+                :reset-label="__('frontend.admin_users.filters.reset')"
+                :show-label="__('frontend.admin_users.filters.show')"
+                :hide-label="__('frontend.admin_users.filters.hide')"
+                :any-option-label="__('frontend.admin_users.filters.any')"
+                :loading="filters.processing"
+                @apply="applyFilters"
+                @reset="resetFilters"
+            />
+
             <div class="lg:card lg:bg-base-100 lg:shadow">
                 <div class="lg:card-body">
                     <h2 class="hidden lg:block card-title">{{ __('frontend.admin_users.list_title') }}</h2>

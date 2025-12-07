@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers;
 
 use App\Models\ApiToken;
+use App\Http\Resources\ApiTokenAllowedIpResource;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
@@ -26,9 +27,17 @@ class ApiController extends Controller
             }
         }
 
+        $allowedIps = $token
+            ? ApiTokenAllowedIpResource::collection(
+                $token->allowedIps()->orderByDesc('created_at')->get()
+            )->resolve()
+            : [];
+
         return $this->inertia('api/Index', [
             'publicApiKey' => $token?->token ?? '',
             'apiBaseUrl' => url('/api/v1'),
+            'apiTokenId' => $token?->id,
+            'allowedIps' => $allowedIps,
         ]);
     }
 

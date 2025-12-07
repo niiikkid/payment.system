@@ -7,6 +7,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\StoreUserRequest;
 use App\Http\Requests\Admin\UpdateUserRequest;
+use App\Http\Requests\Admin\UserFilterRequest;
 use App\Http\Resources\Admin\UserResource;
 use App\Models\Role;
 use App\Models\User;
@@ -15,6 +16,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Database\Eloquent\Builder;
 use Inertia\Inertia;
 use Inertia\Response;
 use Laravel\Fortify\Contracts\CreatesNewUsers;
@@ -22,12 +24,27 @@ use Symfony\Component\HttpFoundation\Response as HttpResponse;
 
 class UsersController extends Controller
 {
-    public function index(): Response
+    public function index(UserFilterRequest $request): Response
     {
+        $filters = $request->filters();
+
         $paginator = User::query()
             ->with('roles:id,name')
+            ->when($filters['role'], function (Builder $query, string $role) {
+                $query->whereHas('roles', fn (Builder $q) => $q->where('name', $role));
+            })
+            ->when($filters['search'], function (Builder $query, string $search) {
+                $term = '%' . $search . '%';
+                $query->where(function (Builder $nested) use ($term) {
+                    $nested
+                        ->where('name', 'like', $term)
+                        ->orWhere('email', 'like', $term)
+                        ->orWhere('id', 'like', $term);
+                });
+            })
             ->latest('id')
             ->paginate(20)
+            ->withQueryString()
             ->through(fn (User $user) => (new UserResource($user))->resolve());
 
         return $this->inertia('admin/users/Index', [
@@ -37,6 +54,7 @@ class UsersController extends Controller
                 ['value' => 'user', 'label' => __('messages.users.roles.user')],
             ],
             'currentUserId' => Auth::id(),
+            'filters' => $filters,
         ]);
     }
 

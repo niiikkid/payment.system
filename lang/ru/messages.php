@@ -87,6 +87,7 @@ return [
     ],
     'api' => [
         'callback_failed' => 'Callback-запрос завершился со статусом :status.',
+        'ip_not_allowed' => 'Запрос с этого IP-адреса запрещён для текущего токена.',
     ],
     'money' => [
         'empty_string' => 'Пустая строка суммы.',

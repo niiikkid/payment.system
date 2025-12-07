@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import AppLayout from '@/layouts/AppLayout.vue';
-import { usePage } from '@inertiajs/vue3';
+import { usePage, useForm } from '@inertiajs/vue3';
 import { computed, ref } from 'vue';
 import DateTimeFormat from '@/components/ui/DateTimeFormat.vue';
 import CallbackDetailsModal from '@/components/modals/callbacks/CallbackDetailsModal.vue';
 import UidCopy from '@/components/ui/UidCopy.vue';
 import Pagination from '@/components/ui/Pagination.vue';
 import { vueLang } from '@erag/lang-sync-inertia';
+import FilterPanel from '@/components/filters/FilterPanel.vue';
 
 type CallbackLog = {
   id: string
@@ -21,12 +22,145 @@ type CallbackLog = {
   created_at: string | null
 }
 
+type StatusGroup = '' | 'success' | 'error';
+
+interface CallbackFilters {
+  search: string;
+  status_group: StatusGroup;
+  event: string;
+  invoice_id: string;
+  has_error: boolean;
+}
+
+type FilterField = {
+  key: keyof CallbackFilters;
+  type: 'text' | 'select' | 'checkpoint';
+  label: string;
+  placeholder?: string;
+  options?: { value: string; label: string }[];
+};
+
 const page = usePage();
 const logs = computed(() => page.props.logs as any);
+const pageFilters = computed(() => (page.props.filters as Partial<CallbackFilters> | undefined) ?? {});
 const { __ } = vueLang();
 
 const selected = ref<CallbackLog | null>(null);
 const showModal = ref(false);
+
+const filterDefaults: CallbackFilters = {
+  search: '',
+  status_group: '',
+  event: '',
+  invoice_id: '',
+  has_error: false,
+};
+
+const filters = useForm<CallbackFilters>({
+  ...filterDefaults,
+  ...pageFilters.value,
+});
+
+const filtersModel = computed({
+  get: () => ({
+    ...filterDefaults,
+    ...filters.data(),
+  }),
+  set: (value: CallbackFilters) => {
+    filters.search = value.search ?? '';
+    filters.status_group = (value.status_group ?? '') as StatusGroup;
+    filters.event = value.event ?? '';
+    filters.invoice_id = value.invoice_id ?? '';
+    filters.has_error = Boolean(value.has_error);
+  },
+});
+
+const statusOptions = computed(() => [
+  { value: 'success', label: __('frontend.callbacks.filters.status_success') },
+  { value: 'error', label: __('frontend.callbacks.filters.status_error') },
+]);
+
+const filterFields = computed<FilterField[]>(() => [
+  {
+    key: 'search',
+    type: 'text',
+    label: __('frontend.callbacks.filters.search'),
+    placeholder: __('frontend.callbacks.filters.search_placeholder'),
+  },
+  {
+    key: 'invoice_id',
+    type: 'text',
+    label: __('frontend.callbacks.filters.invoice_id'),
+    placeholder: __('frontend.callbacks.filters.invoice_id_placeholder'),
+  },
+  {
+    key: 'event',
+    type: 'text',
+    label: __('frontend.callbacks.filters.event'),
+    placeholder: __('frontend.callbacks.filters.event_placeholder'),
+  },
+  {
+    key: 'status_group',
+    type: 'select',
+    label: __('frontend.callbacks.filters.status_group'),
+    options: statusOptions.value,
+  },
+  {
+    key: 'has_error',
+    type: 'checkpoint',
+    label: __('frontend.callbacks.filters.has_error'),
+  },
+]);
+
+function buildFilterPayload(extra: Record<string, unknown> = {}) {
+  const payload = {
+    ...filters.data(),
+    ...extra,
+  };
+
+  const cleaned: Record<string, unknown> = {};
+
+  Object.entries(payload).forEach(([key, value]) => {
+    if (key === 'page') {
+      cleaned[key] = value;
+      return;
+    }
+
+    if (typeof value === 'boolean') {
+      if (value) {
+        cleaned[key] = 1;
+      }
+      return;
+    }
+
+    if (value !== undefined && value !== null && String(value).length > 0) {
+      cleaned[key] = value;
+    }
+  });
+
+  return cleaned;
+}
+
+function applyFilters() {
+  filters
+    .transform(() => buildFilterPayload({ page: 1 }))
+    .get('/callback-logs', {
+      preserveScroll: true,
+      preserveState: true,
+      replace: true,
+      onFinish: () => filters.transform(data => data),
+    });
+}
+
+function resetFilters() {
+  filters.search = filterDefaults.search;
+  filters.status_group = filterDefaults.status_group;
+  filters.event = filterDefaults.event;
+  filters.invoice_id = filterDefaults.invoice_id;
+  filters.has_error = filterDefaults.has_error;
+
+  applyFilters();
+}
 
 function openDetails(log: CallbackLog) {
   selected.value = log;
@@ -54,6 +188,20 @@ function formatDuration(ms: number | null | undefined): string {
 <template>
   <AppLayout :breadcrumbs="[{ title: __('frontend.callbacks.breadcrumb.home'), href: '/' }, { title: __('frontend.callbacks.breadcrumb.title'), href: '/callback-logs' }]">
     <div class="grid gap-6">
+      <FilterPanel
+        v-model="filtersModel"
+        :fields="filterFields"
+        :title="__('frontend.callbacks.filters.title')"
+        :apply-label="__('frontend.callbacks.filters.apply')"
+        :reset-label="__('frontend.callbacks.filters.reset')"
+        :show-label="__('frontend.callbacks.filters.show')"
+        :hide-label="__('frontend.callbacks.filters.hide')"
+        :any-option-label="__('frontend.callbacks.filters.any')"
+        :loading="filters.processing"
+        @apply="applyFilters"
+        @reset="resetFilters"
+      />
+
       <!-- List -->
       <div class="lg:card lg:bg-base-100 lg:shadow">
         <div class="lg:card-body">

@@ -11,6 +11,7 @@ use App\Http\Controllers\Dev\CallbackSandboxController;
 use App\Http\Controllers\Admin\UsersController;
 use App\Http\Controllers\ImpersonationController;
 use App\Http\Controllers\MerchantController;
+use App\Http\Controllers\ApiTokenAllowedIpController;
 use Inertia\Inertia;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
@@ -65,6 +66,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // API Docs & Playground (не в настройках)
     Route::get('api', ApiController::class)->name('api.docs');
+    Route::post('api/allowed-ips', [ApiTokenAllowedIpController::class, 'store'])->name('api.allowed-ips.store');
+    Route::delete('api/allowed-ips/{allowedIp}', [ApiTokenAllowedIpController::class, 'destroy'])->name('api.allowed-ips.destroy');
 });
 
 Route::middleware(['auth', 'verified', 'role:admin'])
