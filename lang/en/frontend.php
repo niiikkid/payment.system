@@ -138,6 +138,17 @@ return [
         'list' => [
             'title' => 'Merchants',
         ],
+        'filters' => [
+            'title' => 'Filters',
+            'search' => 'Search',
+            'search_placeholder' => 'Name, initials or description',
+            'white_label_enabled' => 'White label enabled',
+            'apply' => 'Apply',
+            'reset' => 'Reset',
+            'show' => 'Show filters',
+            'hide' => 'Hide filters',
+            'any' => 'Any value',
+        ],
         'actions' => [
             'create' => 'Add merchant',
             'add' => 'Add',

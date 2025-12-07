@@ -9,12 +9,14 @@ use App\Exceptions\Merchant\MerchantLogoInvalidException;
 use App\Exceptions\Merchant\MerchantLogoNotSquareException;
 use App\Exceptions\Merchant\MerchantLogoTooLargeException;
 use App\Exceptions\Merchant\MerchantServiceException;
+use App\Http\Requests\Merchant\MerchantFilterRequest;
 use App\Http\Requests\Merchant\MerchantStoreRequest;
 use App\Http\Requests\Merchant\MerchantUpdateRequest;
 use App\Http\Resources\MerchantResource;
 use App\Models\Merchant;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Response as InertiaResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -22,18 +24,33 @@ use Throwable;
 
 class MerchantController extends Controller
 {
-    public function index(): InertiaResponse
+    public function index(MerchantFilterRequest $request): InertiaResponse
     {
         $userId = Auth::id();
+        $filters = $request->filters();
 
         $merchants = Merchant::query()
             ->where('user_id', $userId)
+            ->when($filters['white_label_enabled'], fn (Builder $query) => $query->where('white_label_enabled', true))
+            ->when($filters['search'], function (Builder $query, string $search) {
+                $term = '%' . $search . '%';
+
+                $query->where(function (Builder $nested) use ($term) {
+                    $nested
+                        ->where('name', 'like', $term)
+                        ->orWhere('description', 'like', $term)
+                        ->orWhere('initials', 'like', $term)
+                        ->orWhere('id', 'like', $term);
+                });
+            })
             ->latest('id')
             ->paginate(20)
+            ->withQueryString()
             ->through(fn ($merchant) => (new MerchantResource($merchant))->resolve());
 
         return $this->inertia('merchants/Index', [
             'merchants' => $merchants,
+            'filters' => $filters,
         ]);
     }
 

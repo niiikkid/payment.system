@@ -1,12 +1,24 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import AppLayout from '@/layouts/AppLayout.vue';
 import { useForm } from '@inertiajs/vue3';
+// @ts-ignore пока нет типов для пакета в TS проверке
 import { vueLang } from '@erag/lang-sync-inertia';
 import MerchantModal, { type MerchantForm } from '@/components/modals/merchants/MerchantModal.vue';
 import Pagination from '@/components/ui/Pagination.vue';
 import DateTimeFormat from '@/components/ui/DateTimeFormat.vue';
 import MerchantAvatar from '@/components/merchants/MerchantAvatar.vue';
+import FilterPanel from '@/components/filters/FilterPanel.vue';
+
+type FilterType = 'text' | 'select' | 'checkpoint';
+
+interface FilterField {
+    key: keyof MerchantFilters;
+    type: FilterType;
+    label: string;
+    placeholder?: string;
+    options?: { value: string | number; label: string }[];
+}
 
 interface Merchant {
     id: number;
@@ -30,8 +42,14 @@ interface PaginatedMerchants {
     links: PaginationLinks[];
 }
 
+interface MerchantFilters {
+    search: string;
+    white_label_enabled: boolean;
+}
+
 interface Props {
     merchants: PaginatedMerchants;
+    filters?: Partial<MerchantFilters>;
 }
 
 const props = defineProps<Props>();
@@ -48,6 +66,84 @@ const merchantForm = useForm<MerchantForm>({
     white_label_enabled: true,
     logo: null,
 });
+const filterDefaults: MerchantFilters = {
+    search: '',
+    white_label_enabled: false,
+};
+const filters = useForm<MerchantFilters>({
+    ...filterDefaults,
+    ...(props.filters ?? {}),
+});
+const filtersModel = computed({
+    get: () => ({
+        ...filterDefaults,
+        ...filters.data(),
+    }),
+    set: (value: MerchantFilters) => {
+        filters.search = value.search ?? '';
+        filters.white_label_enabled = Boolean(value.white_label_enabled);
+    },
+});
+const filterFields = computed<FilterField[]>(() => [
+    {
+        key: 'search',
+        type: 'text',
+        label: __('frontend.merchants.filters.search'),
+        placeholder: __('frontend.merchants.filters.search_placeholder'),
+    },
+    {
+        key: 'white_label_enabled',
+        type: 'checkpoint',
+        label: __('frontend.merchants.filters.white_label_enabled'),
+    },
+]);
+
+function buildFilterPayload(extra: Record<string, unknown> = {}) {
+    const payload = {
+        ...filters.data(),
+        ...extra,
+    };
+
+    const cleaned: Record<string, unknown> = {};
+
+    Object.entries(payload).forEach(([key, value]) => {
+        if (key === 'page') {
+            cleaned[key] = value;
+            return;
+        }
+
+        if (typeof value === 'boolean') {
+            if (value) {
+                cleaned[key] = 1;
+            }
+            return;
+        }
+
+        if (value !== undefined && value !== null && String(value).length > 0) {
+            cleaned[key] = value;
+        }
+    });
+
+    return cleaned;
+}
+
+function applyFilters() {
+    filters
+        .transform(() => buildFilterPayload({ page: 1 }))
+        .get('/merchants', {
+            preserveScroll: true,
+            preserveState: true,
+            replace: true,
+            onFinish: () => filters.transform(data => data),
+        });
+}
+
+function resetFilters() {
+    filters.search = filterDefaults.search;
+    filters.white_label_enabled = filterDefaults.white_label_enabled;
+
+    applyFilters();
+}
 
 function resetForm() {
     merchantForm.reset();
@@ -118,6 +214,20 @@ function submit() {
         </template>
 
         <div class="grid gap-6">
+            <FilterPanel
+                v-model="filtersModel"
+                :fields="filterFields"
+                :title="__('frontend.merchants.filters.title')"
+                :apply-label="__('frontend.merchants.filters.apply')"
+                :reset-label="__('frontend.merchants.filters.reset')"
+                :show-label="__('frontend.merchants.filters.show')"
+                :hide-label="__('frontend.merchants.filters.hide')"
+                :any-option-label="__('frontend.merchants.filters.any')"
+                :loading="filters.processing"
+                @apply="applyFilters"
+                @reset="resetFilters"
+            />
+
             <div class="lg:card lg:bg-base-100 lg:shadow">
                 <div class="lg:card-body">
                     <h2 class="hidden lg:block card-title">{{ __('frontend.merchants.list.title') }}</h2>
