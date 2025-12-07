@@ -11,10 +11,12 @@ use App\Enums\Currency;
 use App\Enums\Network;
 use App\Http\Requests\UpdateInvoiceRequest;
 use App\Http\Requests\StoreInvoiceRequest;
+use App\Http\Requests\InvoiceFilterRequest;
 use App\Http\Resources\InvoiceResource;
 use App\Http\Resources\MerchantResource;
 use App\Models\Invoice;
 use App\Models\Merchant;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
@@ -27,13 +29,32 @@ use Throwable;
 
 class InvoiceController extends Controller
 {
-    public function index(): Response
+    public function index(InvoiceFilterRequest $request): Response
     {
+        $filters = $request->filters();
+
         $paginator = Invoice::query()
             ->where('user_id', Auth::id())
             ->with(['address', 'merchant'])
+            ->when($filters['status'], fn (Builder $query, string $status) => $query->where('status', InvoiceStatus::from($status)))
+            ->when($filters['currency'], fn (Builder $query, string $currency) => $query->where('currency', Currency::from($currency)))
+            ->when($filters['network'], fn (Builder $query, string $network) => $query->where('network', Network::from($network)))
+            ->when($filters['merchant_id'], fn (Builder $query, string $merchantId) => $query->where('merchant_id', $merchantId))
+            ->when($filters['has_callback'], fn (Builder $query) => $query->whereNotNull('callback_url'))
+            ->when($filters['search'], function (Builder $query, string $search) {
+                $term = '%' . $search . '%';
+
+                $query->where(function (Builder $nested) use ($term) {
+                    $nested
+                        ->where('id', 'like', $term)
+                        ->orWhere('external_invoice_id', 'like', $term)
+                        ->orWhere('tag', 'like', $term)
+                        ->orWhereHas('address', fn (Builder $address) => $address->where('address', 'like', $term));
+                });
+            })
             ->latest('id')
             ->paginate(20)
+            ->withQueryString()
             ->through(fn ($invoice) => (new InvoiceResource($invoice))->resolve());
 
         $currencyOptions = array_map(fn (Currency $c) => ['value' => $c->value, 'label' => $c->value], Currency::cases());
@@ -61,6 +82,7 @@ class InvoiceController extends Controller
                 'active' => InvoiceStatus::active(),
                 'final' => InvoiceStatus::final(),
             ],
+            'filters' => $filters,
         ]);
     }
 

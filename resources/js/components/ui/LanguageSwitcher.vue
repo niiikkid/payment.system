@@ -23,11 +23,13 @@ const locales: LocaleOption[] = [
     { code: 'uk', label: 'Українська', flag: 'UA' },
     { code: 'tr', label: 'Türkçe', flag: 'TR' },
     { code: 'de', label: 'Deutsch', flag: 'DE' },
+    { code: 'pl', label: 'Polski', flag: 'PL' },
     { code: 'fr', label: 'Français', flag: 'FR' },
     { code: 'it', label: 'Italiano', flag: 'IT' },
     { code: 'es', label: 'Español', flag: 'ES' },
     { code: 'pt', label: 'Português', flag: 'PT' },
     { code: 'en', label: 'English', flag: 'US' },
+    { code: 'ar', label: 'العربية', flag: 'AE' },
     { code: 'hi', label: 'हिन्दी', flag: 'IN' },
     { code: 'zh', label: '中文', flag: 'CN' },
 ];

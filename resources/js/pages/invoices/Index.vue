@@ -11,6 +11,7 @@ import Pagination from '@/components/ui/Pagination.vue';
 import InvoiceDetailsModal from '@/components/modals/invoices/InvoiceDetailsModal.vue';
 import InvoiceEditModal, { type InvoiceEditForm } from '@/components/modals/invoices/InvoiceEditModal.vue';
 import InvoiceCreateModal, { type InvoiceCreateForm } from '@/components/modals/invoices/InvoiceCreateModal.vue';
+import FilterPanel from '@/components/filters/FilterPanel.vue';
 import { vueLang } from '@erag/lang-sync-inertia';
 
 type Invoice = {
@@ -42,12 +43,31 @@ interface MerchantOption {
   description?: string | null;
 }
 
+interface InvoiceFilters {
+  search: string;
+  status: string;
+  currency: string;
+  network: string;
+  merchant_id: string;
+  has_callback: boolean;
+}
+
+type FilterFieldType = 'text' | 'select' | 'checkpoint';
+type FilterField = {
+  key: keyof InvoiceFilters;
+  type: FilterFieldType;
+  label: string;
+  placeholder?: string;
+  options?: { value: string | number; label: string }[];
+};
+
 const page = usePage();
 const invoices = computed(() => page.props.invoices as any);
 const statuses = computed(() => page.props.statuses as { active: string[]; final: string[] });
 const currencyOptions = computed(() => page.props.currencyOptions as Option[]);
 const networkOptions = computed(() => page.props.networkOptions as Option[]);
 const merchantOptions = computed(() => page.props.merchantOptions as MerchantOption[]);
+const pageFilters = computed(() => (page.props.filters as Partial<InvoiceFilters> | undefined) ?? {});
 const { __ } = vueLang();
 
 const selected: any = ref<Invoice | null>(null);
@@ -59,6 +79,69 @@ const sendError = ref<string | null>(null);
 const sendSuccess = ref(false);
 
 const editForm = useForm<InvoiceEditForm>({ status: '', txid: null });
+const filterDefaults: InvoiceFilters = {
+  search: '',
+  status: '',
+  currency: '',
+  network: '',
+  merchant_id: '',
+  has_callback: false,
+};
+const filters = useForm<InvoiceFilters>({
+  ...filterDefaults,
+  ...pageFilters.value,
+});
+const filtersModel = computed({
+  get: () => ({
+    ...filterDefaults,
+    ...filters.data(),
+  }),
+  set: (value: InvoiceFilters) => {
+    filters.search = value.search ?? '';
+    filters.status = value.status ?? '';
+    filters.currency = value.currency ?? '';
+    filters.network = value.network ?? '';
+    filters.merchant_id = value.merchant_id ?? '';
+    filters.has_callback = Boolean(value.has_callback);
+  },
+});
+const filterFields = computed<FilterField[]>(() => [
+  {
+    key: 'search',
+    type: 'text',
+    label: __('frontend.invoices_page.filters.search'),
+    placeholder: __('frontend.invoices_page.filters.search_placeholder'),
+  },
+  {
+    key: 'status',
+    type: 'select',
+    label: __('frontend.invoices_page.filters.status'),
+    options: allStatusOptions.value,
+  },
+  {
+    key: 'currency',
+    type: 'select',
+    label: __('frontend.invoices_page.filters.currency'),
+    options: currencyOptions.value,
+  },
+  {
+    key: 'network',
+    type: 'select',
+    label: __('frontend.invoices_page.filters.network'),
+    options: networkOptions.value,
+  },
+  {
+    key: 'merchant_id',
+    type: 'select',
+    label: __('frontend.invoices_page.filters.merchant'),
+    options: merchantOptions.value,
+  },
+  {
+    key: 'has_callback',
+    type: 'checkpoint',
+    label: __('frontend.invoices_page.filters.has_callback'),
+  },
+]);
 
 function updateEditPayload(payload: InvoiceEditForm) {
   editForm.status = payload.status;
@@ -71,6 +154,45 @@ const allStatusOptions = computed(() => {
   const merged = Array.from(new Set([...a, ...f]));
   return merged.map(s => ({ value: s, label: s }));
 });
+
+function buildFilterPayload(extra: Record<string, unknown> = {}) {
+  const payload = {
+    ...filters.data(),
+    ...extra,
+  };
+
+  return Object.fromEntries(
+    Object.entries(payload).filter(([key, value]) => {
+      if (key === 'page') return true;
+      if (typeof value === 'boolean') return value;
+      return value !== undefined && value !== null && String(value).length > 0;
+    })
+  );
+}
+
+function applyFilters() {
+  filters
+    .transform(() => buildFilterPayload({ page: 1 }))
+    .get('/invoices', {
+      preserveScroll: true,
+      preserveState: true,
+      replace: true,
+      onFinish: () => {
+        filters.transform(data => data);
+      },
+    });
+}
+
+function resetFilters() {
+  filters.search = filterDefaults.search;
+  filters.status = filterDefaults.status;
+  filters.currency = filterDefaults.currency;
+  filters.network = filterDefaults.network;
+  filters.merchant_id = filterDefaults.merchant_id;
+  filters.has_callback = filterDefaults.has_callback;
+
+  applyFilters();
+}
 
 function openDetails(inv: Invoice) {
   selected.value = inv;
@@ -223,6 +345,20 @@ watch(invoices, (collection: any) => {
     </template>
 
     <div class="grid gap-6">
+      <FilterPanel
+        v-model="filtersModel"
+        :fields="filterFields"
+        :title="__('frontend.invoices_page.filters.title')"
+        :apply-label="__('frontend.invoices_page.filters.apply')"
+        :reset-label="__('frontend.invoices_page.filters.reset')"
+        :show-label="__('frontend.invoices_page.filters.show')"
+        :hide-label="__('frontend.invoices_page.filters.hide')"
+        :any-option-label="__('frontend.invoices_page.filters.any')"
+        :loading="filters.processing"
+        @apply="applyFilters"
+        @reset="resetFilters"
+      />
+
       <!-- List -->
       <div class="lg:card lg:bg-base-100 lg:shadow">
         <div class="lg:card-body">
