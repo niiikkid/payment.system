@@ -96,38 +96,42 @@ function reset() {
       <form v-if="!collapsed" class="mt-4 space-y-4" @submit.prevent="submit">
         <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           <div v-for="field in props.fields" :key="field.key" class="form-control gap-2">
-            <Label :for="`filter-${field.key}`" class="label-text">{{ field.label }}</Label>
+            <template v-if="field.type !== 'checkpoint'">
+              <Label :for="`filter-${field.key}`" class="label-text">{{ field.label }}</Label>
 
-            <Input
-              v-if="field.type === 'text'"
-              :id="`filter-${field.key}`"
-              :name="field.key"
-              :model-value="(props.modelValue?.[field.key] as string | number | '') ?? ''"
-              :placeholder="field.placeholder"
-              autocomplete="off"
-              @update:model-value="updateField(field.key, $event)"
-              @keyup.enter.prevent="submit"
-            />
-
-            <Select
-              v-else-if="field.type === 'select'"
-              :id="`filter-${field.key}`"
-              :name="field.key"
-              :model-value="(props.modelValue?.[field.key] as string | number | '') ?? ''"
-              :options="[{ value: '', label: props.anyOptionLabel }, ...(field.options ?? [])]"
-              @update:model-value="updateField(field.key, $event)"
-            />
-
-            <label v-else class="label cursor-pointer justify-start gap-3">
-              <input
+              <Input
+                v-if="field.type === 'text'"
                 :id="`filter-${field.key}`"
-                type="checkbox"
-                class="toggle toggle-primary"
-                :checked="Boolean(props.modelValue?.[field.key])"
-                @change="updateField(field.key, ($event.target as HTMLInputElement).checked)"
+                :name="field.key"
+                :model-value="(props.modelValue?.[field.key] as string | number | '') ?? ''"
+                :placeholder="field.placeholder"
+                autocomplete="off"
+                @update:model-value="updateField(field.key, $event)"
+                @keyup.enter.prevent="submit"
               />
-              <span class="label-text">{{ field.label }}</span>
-            </label>
+
+              <Select
+                v-else
+                :id="`filter-${field.key}`"
+                :name="field.key"
+                :model-value="(props.modelValue?.[field.key] as string | number | '') ?? ''"
+                :options="[{ value: '', label: props.anyOptionLabel }, ...(field.options ?? [])]"
+                @update:model-value="updateField(field.key, $event)"
+              />
+            </template>
+
+            <template v-else>
+              <div class="flex items-center gap-3 cursor-pointer h-full min-h-[3rem]">
+                <input
+                  :id="`filter-${field.key}`"
+                  type="checkbox"
+                  class="toggle toggle-primary"
+                  :checked="Boolean(props.modelValue?.[field.key])"
+                  @change="updateField(field.key, ($event.target as HTMLInputElement).checked)"
+                />
+                <span class="label-text">{{ field.label }}</span>
+              </div>
+            </template>
           </div>
         </div>
 
