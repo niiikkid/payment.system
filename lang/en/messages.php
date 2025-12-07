@@ -67,6 +67,11 @@ return [
             'not_owner' => 'Merchant does not belong to the current user.',
         ],
     ],
+    'markets' => [
+        'created' => 'Fiat added',
+        'updated' => 'Settings saved',
+        'refreshed' => 'Prices refreshed',
+    ],
     'settings' => [
         'max_limit_exceeded' => 'The maximum amount cannot exceed :amount USDT.',
     ],

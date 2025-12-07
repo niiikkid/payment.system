@@ -7,6 +7,7 @@ use App\Http\Controllers\AddressController;
 use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\CallbackLogController;
 use App\Http\Controllers\ApiController;
+use App\Http\Controllers\MarketController;
 use App\Http\Controllers\Dev\CallbackSandboxController;
 use App\Http\Controllers\Admin\UsersController;
 use App\Http\Controllers\ImpersonationController;
@@ -71,6 +72,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('app-settings', [\App\Http\Controllers\AppSettingsController::class, 'index'])->name('app-settings.index');
         Route::put('app-settings', [\App\Http\Controllers\AppSettingsController::class, 'update'])->name('app-settings.update');
             Route::put('app-settings/locales', [\App\Http\Controllers\AppSettingsController::class, 'updateLocales'])->name('app-settings.locales.update');
+            // Markets
+            Route::get('markets', [MarketController::class, 'index'])->name('markets.index');
+            Route::post('markets', [MarketController::class, 'store'])->name('markets.store');
+            Route::patch('markets/{marketFiat}', [MarketController::class, 'update'])->name('markets.update');
+            Route::post('markets/{marketFiat}/refresh', [MarketController::class, 'refresh'])->name('markets.refresh');
     });
 
     // API Docs & Playground (не в настройках)

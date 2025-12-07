@@ -13,6 +13,7 @@ return [
             'app_settings' => 'Global settings',
             'api_docs' => 'API & documentation',
             'users' => 'Users',
+            'markets' => 'Markets',
         ],
     ],
     'dashboard' => [
@@ -111,6 +112,7 @@ return [
         'users' => 'Users',
         'api_docs' => 'API & documentation',
         'app_settings' => 'Settings',
+        'markets' => 'Markets',
         'profile' => 'Profile',
         'impersonation_title' => 'Impersonation mode',
         'impersonation_description' => 'You are viewing the interface as another user.',
@@ -133,6 +135,29 @@ return [
         'active' => 'Active',
         'created_at' => 'Created at',
         'edit' => 'Edit',
+    ],
+    'time_ago' => [
+        'just_now' => 'Just now',
+        'second' => [
+            'one' => '{count} second ago',
+            'few' => '{count} seconds ago',
+            'many' => '{count} seconds ago',
+        ],
+        'minute' => [
+            'one' => '{count} minute ago',
+            'few' => '{count} minutes ago',
+            'many' => '{count} minutes ago',
+        ],
+        'hour' => [
+            'one' => '{count} hour ago',
+            'few' => '{count} hours ago',
+            'many' => '{count} hours ago',
+        ],
+        'day' => [
+            'one' => '{count} day ago',
+            'few' => '{count} days ago',
+            'many' => '{count} days ago',
+        ],
     ],
     'merchants' => [
         'list' => [
@@ -183,6 +208,35 @@ return [
             ],
         ],
         'empty' => 'No merchants yet',
+    ],
+    'markets' => [
+        'title' => 'Markets',
+        'subtitle' => 'Configure Binance P2P parsing for USDT/fiat pairs.',
+        'actions' => [
+            'add_fiat' => 'Add fiat',
+            'save' => 'Save',
+            'refresh' => 'Refresh now',
+            'settings' => 'Settings',
+        ],
+        'fields' => [
+            'code' => 'Fiat code',
+            'pair' => 'Pair',
+            'rows' => 'Ads to average',
+            'pay_types' => 'Pay types (comma separated, optional)',
+            'polling_interval_seconds' => 'Polling interval, sec',
+            'is_enabled' => 'Enabled',
+            'last_polled_at' => 'Last poll',
+            'buy_price' => 'Buy price',
+            'sell_price' => 'Sell price',
+            'updated_at' => 'Updated at',
+        ],
+        'table' => [
+            'empty' => 'No fiats yet. Add one to start parsing.',
+        ],
+        'hints' => [
+            'rows' => 'How many ads to average from the top of the list.',
+            'pay_types' => 'Leave empty to include all payment methods.',
+        ],
     ],
     'settings' => [
         'title' => 'Account settings',

@@ -1,4 +1,8 @@
 <script setup lang="ts">
+import { computed } from 'vue';
+
+type InputSize = 'xs' | 'sm' | 'md' | 'lg';
+
 interface Props {
     id?: string;
     modelValue: string | number;
@@ -12,15 +16,19 @@ interface Props {
     step?: string | number;
     min?: string | number;
     max?: string | number;
+    size?: InputSize;
 }
 
 const props = withDefaults(defineProps<Props>(), {
     type: 'text',
+    size: 'md',
 });
 
 const emit = defineEmits<{
     'update:modelValue': [value: string | number];
 }>();
+
+const inputClasses = computed(() => `input input-bordered w-full input-${props.size}`);
 
 function handleInput(event: Event) {
     const target = event.target as HTMLInputElement;
@@ -42,7 +50,7 @@ function handleInput(event: Event) {
         :step="props.step"
         :min="props.min"
         :max="props.max"
-        class="input input-bordered w-full"
+        :class="inputClasses"
         @input="handleInput"
     />
 </template>

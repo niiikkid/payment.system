@@ -10,3 +10,5 @@ Artisan::command('inspire', function () {
 
 // Планировщик: обновление балансов адресов каждую минуту
 Schedule::command('addresses:sync-balances --only-active=1')->everyMinute();
+// Планировщик: диспетчер задач парсинга курсов маркетов
+Schedule::command('markets:dispatch BINANCE')->everySecond();

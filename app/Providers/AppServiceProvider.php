@@ -15,6 +15,8 @@ use App\Contracts\Lang\LanguageSettingsServiceContract;
 use App\Services\Lang\LanguageSettingsService;
 use App\Contracts\Invoice\InvoiceServiceContract;
 use App\Services\Invoice\InvoiceService;
+use App\Contracts\Market\MarketServiceContract;
+use App\Services\Market\MarketService;
 use App\Contracts\Invoice\InvoiceCallbackServiceContract;
 use App\Services\Invoice\InvoiceCallbackService;
 use App\Contracts\AppSettings\AppSettingsServiceContract;
@@ -53,6 +55,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->singleton(LoginHistoryServiceContract::class, LoginHistoryService::class);
         $this->app->singleton(MerchantServiceContract::class, MerchantService::class);
         $this->app->singleton(StoreServiceContract::class, StoreService::class);
+        $this->app->singleton(MarketServiceContract::class, MarketService::class);
         $this->app->singleton(VendorLangService::class, LangService::class);
     }
 
