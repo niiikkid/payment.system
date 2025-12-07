@@ -98,5 +98,35 @@ return [
         'empty_string' => 'Empty money string.',
         'currency_mismatch' => 'Currencies must match.',
     ],
+    'notifications' => [
+        'marked_read' => 'Notification marked as read.',
+        'marked_unread' => 'Notification marked as unread.',
+        'all_read' => 'All notifications marked as read.',
+        'rule_created' => 'Notification rule created.',
+        'rule_updated' => 'Notification rule updated.',
+        'rule_deleted' => 'Notification rule deleted.',
+        'events' => [
+            'invoice_created' => 'Invoice created',
+            'invoice_status_changed' => 'Invoice status changed',
+        ],
+        'channels' => [
+            'in_app' => 'In-app',
+        ],
+        'delivery_statuses' => [
+            'pending' => 'Pending',
+            'delivered' => 'Delivered',
+            'failed' => 'Failed',
+        ],
+        'templates' => [
+            'invoice_created' => [
+                'title' => 'Invoice created (:channel)',
+                'body' => 'A new invoice for :amount :currency has been created.',
+            ],
+            'invoice_status_changed' => [
+                'title' => 'Invoice status changed (:channel)',
+                'body' => 'Status changed from :previous to :status for :amount :currency.',
+            ],
+        ],
+    ],
 ];
 

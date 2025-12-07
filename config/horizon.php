@@ -262,6 +262,19 @@ return [
             'timeout' => 60,
             'nice' => 0,
         ],
+        'supervisor-6' => [
+            'connection' => 'redis',
+            'queue' => ['notifications'],
+            'balance' => 'auto',
+            'autoScalingStrategy' => 'time',
+            'maxProcesses' => 1,
+            'maxTime' => 0,
+            'maxJobs' => 0,
+            'memory' => 128,
+            'tries' => 1,
+            'timeout' => 60,
+            'nice' => 0,
+        ],
     ],
 
     'environments' => [
@@ -291,6 +304,11 @@ return [
                 'balanceMaxShift' => 1,
                 'balanceCooldown' => 3,
             ],
+            'supervisor-6' => [
+                'maxProcesses' => 1,
+                'balanceMaxShift' => 1,
+                'balanceCooldown' => 3,
+            ],
         ],
 
         'local' => [
@@ -307,6 +325,9 @@ return [
                 'maxProcesses' => 1,
             ],
             'supervisor-5' => [
+                'maxProcesses' => 1,
+            ],
+            'supervisor-6' => [
                 'maxProcesses' => 1,
             ],
         ],

@@ -98,5 +98,35 @@ return [
         'empty_string' => 'Пустая строка суммы.',
         'currency_mismatch' => 'Валюты должны совпадать.',
     ],
+    'notifications' => [
+        'marked_read' => 'Уведомление отмечено прочитанным.',
+        'marked_unread' => 'Уведомление отмечено непрочитанным.',
+        'all_read' => 'Все уведомления отмечены прочитанными.',
+        'rule_created' => 'Правило уведомлений создано.',
+        'rule_updated' => 'Правило уведомлений обновлено.',
+        'rule_deleted' => 'Правило уведомлений удалено.',
+        'events' => [
+            'invoice_created' => 'Создание инвойса',
+            'invoice_status_changed' => 'Смена статуса инвойса',
+        ],
+        'channels' => [
+            'in_app' => 'Внутренние',
+        ],
+        'delivery_statuses' => [
+            'pending' => 'Ожидает отправки',
+            'delivered' => 'Доставлено',
+            'failed' => 'Не доставлено',
+        ],
+        'templates' => [
+            'invoice_created' => [
+                'title' => 'Создан инвойс (:channel)',
+                'body' => 'Создан новый инвойс на сумму :amount :currency.',
+            ],
+            'invoice_status_changed' => [
+                'title' => 'Статус инвойса изменён (:channel)',
+                'body' => 'Статус изменён с :previous на :status для суммы :amount :currency.',
+            ],
+        ],
+    ],
 ];
 

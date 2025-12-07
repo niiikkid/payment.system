@@ -12,6 +12,8 @@ use App\Http\Controllers\Dev\CallbackSandboxController;
 use App\Http\Controllers\Admin\UsersController;
 use App\Http\Controllers\ImpersonationController;
 use App\Http\Controllers\MerchantController;
+use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\NotificationRuleController;
 use App\Http\Controllers\ApiTokenAllowedIpController;
 use App\Contracts\Lang\LanguageSettingsServiceContract;
 use App\Support\LocaleOptions;
@@ -63,6 +65,16 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('invoices/{invoice}', [InvoiceController::class, 'show'])->name('invoices.show');
     Route::patch('invoices/{invoice}', [InvoiceController::class, 'update'])->name('invoices.update');
         Route::post('invoices/{invoice}/send-callback', [InvoiceController::class, 'sendCallback'])->name('invoices.send-callback');
+
+    // Notifications
+    Route::get('notifications', [NotificationController::class, 'index'])->name('notifications.index');
+    Route::post('notifications/mark-all-read', [NotificationController::class, 'markAllRead'])->name('notifications.mark-all-read');
+    Route::patch('notifications/{notification}/read', [NotificationController::class, 'markRead'])->name('notifications.mark-read');
+    Route::patch('notifications/{notification}/unread', [NotificationController::class, 'markUnread'])->name('notifications.mark-unread');
+
+    Route::post('notifications/rules', [NotificationRuleController::class, 'store'])->name('notifications.rules.store');
+    Route::patch('notifications/rules/{notificationRule}', [NotificationRuleController::class, 'update'])->name('notifications.rules.update');
+    Route::delete('notifications/rules/{notificationRule}', [NotificationRuleController::class, 'destroy'])->name('notifications.rules.destroy');
 
     // Callback Logs
     Route::get('callback-logs', [CallbackLogController::class, 'index'])->name('callback-logs.index');

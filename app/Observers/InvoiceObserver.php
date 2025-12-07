@@ -5,7 +5,10 @@ declare(strict_types=1);
 namespace App\Observers;
 
 use App\Contracts\Invoice\InvoiceCallbackServiceContract;
+use App\Contracts\Notification\NotificationServiceContract;
 use App\Models\Invoice;
+use App\Services\Notification\Events\InvoiceCreatedNotificationEvent;
+use App\Services\Notification\Events\InvoiceStatusChangedNotificationEvent;
 
 class InvoiceObserver
 {
@@ -15,6 +18,7 @@ class InvoiceObserver
     public function created(Invoice $invoice): void
     {
         app(InvoiceCallbackServiceContract::class)->send($invoice, 'created');
+        app(NotificationServiceContract::class)->dispatch(new InvoiceCreatedNotificationEvent($invoice));
     }
 
     /**
@@ -22,9 +26,14 @@ class InvoiceObserver
      */
     public function updated(Invoice $invoice): void
     {
-        if ($invoice->wasChanged('status')) {
-            app(InvoiceCallbackServiceContract::class)->send($invoice, 'status_changed');
+        if (!$invoice->wasChanged('status')) {
+            return;
         }
+
+        $previousStatus = $invoice->getOriginal('status');
+
+        app(InvoiceCallbackServiceContract::class)->send($invoice, 'status_changed');
+        app(NotificationServiceContract::class)->dispatch(new InvoiceStatusChangedNotificationEvent($invoice, $previousStatus));
     }
 }
 
