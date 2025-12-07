@@ -95,6 +95,8 @@ const pageIconPath = computed(() => {
     }
     return null;
 });
+
+const pageIconStrokeWidth = computed(() => (isNotificationsActive.value ? 1.5 : 2));
 </script>
 
 <template>
@@ -136,7 +138,7 @@ const pageIconPath = computed(() => {
             <div class="p-4 lg:p-6">
                 <div v-if="pageTitle" class="flex items-center justify-between gap-4 mb-6">
                     <h1 class="text-xl font-semibold flex items-center gap-2 py-0.5">
-                        <svg v-if="pageIconPath" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="size-5 opacity-60">
+                        <svg v-if="pageIconPath" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" :stroke-width="pageIconStrokeWidth" stroke="currentColor" class="size-5 opacity-60">
                             <path v-if="typeof pageIconPath === 'string'" stroke-linecap="round" stroke-linejoin="round" :d="pageIconPath" />
                             <template v-else-if="Array.isArray(pageIconPath)">
                                 <path v-for="(path, idx) in pageIconPath" :key="idx" stroke-linecap="round" stroke-linejoin="round" :d="path" />
