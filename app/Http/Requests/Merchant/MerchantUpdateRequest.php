@@ -23,6 +23,7 @@ class MerchantUpdateRequest extends FormRequest
             'description' => ['nullable', 'string'],
             'initials' => ['required', 'string', 'max:16'],
             'logo' => ['nullable', 'image', 'mimes:png,jpg,jpeg,webp', 'max:2048', 'dimensions:max_width=500,max_height=500'],
+            'white_label_enabled' => ['sometimes', 'boolean'],
         ];
     }
 }

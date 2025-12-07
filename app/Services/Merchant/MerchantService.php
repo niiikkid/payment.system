@@ -24,6 +24,7 @@ final class MerchantService implements MerchantServiceContract
         string $name,
         ?string $description,
         string $initials,
+        bool $whiteLabelEnabled,
         ?UploadedFile $logo = null
     ): Merchant {
         $logoPath = $this->storeLogo($logo);
@@ -34,6 +35,7 @@ final class MerchantService implements MerchantServiceContract
             'description' => $description,
             'initials' => $initials,
             'logo_path' => $logoPath,
+            'white_label_enabled' => $whiteLabelEnabled,
         ]);
     }
 
@@ -42,6 +44,7 @@ final class MerchantService implements MerchantServiceContract
         string $name,
         ?string $description,
         string $initials,
+        bool $whiteLabelEnabled,
         ?UploadedFile $logo = null
     ): Merchant {
         $logoPath = $logo ? $this->replaceLogo($merchant, $logo) : $merchant->logo_path;
@@ -51,6 +54,7 @@ final class MerchantService implements MerchantServiceContract
             'description' => $description,
             'initials' => $initials,
             'logo_path' => $logoPath,
+            'white_label_enabled' => $whiteLabelEnabled,
         ]);
 
         $merchant->save();

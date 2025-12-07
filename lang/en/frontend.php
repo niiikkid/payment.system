@@ -133,6 +133,12 @@ return [
             'logo' => 'Logo',
             'logo_hint' => 'Square up to 500x500, PNG/JPG/WebP',
             'logo_current' => 'Current logo',
+            'white_label_enabled' => 'White label',
+            'white_label_enabled_hint' => 'Show store block on the payment page',
+            'white_label_enabled_description' => 'Toggle whether store branding (logo, name, product info) is shown on the payment page.',
+            'white_label_disabled_hint' => 'White label is hidden on the payment page',
+            'white_label_enabled_on' => 'White label shown',
+            'white_label_enabled_off' => 'White label hidden',
         ],
         'modals' => [
             'create' => [

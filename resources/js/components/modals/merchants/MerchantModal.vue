@@ -12,6 +12,7 @@ export interface MerchantForm {
     name: string;
     description: string;
     initials: string;
+    white_label_enabled: boolean;
     logo: File | null;
 }
 
@@ -35,6 +36,7 @@ const props = withDefaults(defineProps<Props>(), {
         name: '',
         description: '',
         initials: '',
+        white_label_enabled: true,
         logo: null,
     }),
     errors: () => ({} as MerchantFormErrors),
@@ -121,6 +123,31 @@ function submit() {
                     rows="3"
                     :placeholder="__('frontend.merchants.fields.description_placeholder')"
                 />
+            </FormControl>
+
+            <FormControl :error="fieldErrors.white_label_enabled">
+                <div class="flex items-center justify-between">
+                    <Label for="merchant-white-label">{{ __('frontend.merchants.fields.white_label_enabled') }}</Label>
+                    <span class="text-xs text-base-content/70">{{ __('frontend.merchants.fields.white_label_enabled_hint') }}</span>
+                </div>
+                <div class="flex items-center gap-3">
+                    <input
+                        id="merchant-white-label"
+                        v-model="form.white_label_enabled"
+                        type="checkbox"
+                        class="toggle toggle-primary"
+                    />
+                    <span class="text-sm text-base-content/80">
+                        {{
+                            form.white_label_enabled
+                                ? __('frontend.merchants.fields.white_label_enabled_on')
+                                : __('frontend.merchants.fields.white_label_enabled_off')
+                        }}
+                    </span>
+                </div>
+                <p class="text-xs text-base-content/70 mt-1">
+                    {{ __('frontend.merchants.fields.white_label_enabled_description') }}
+                </p>
             </FormControl>
 
             <FormControl :error="fieldErrors.logo">

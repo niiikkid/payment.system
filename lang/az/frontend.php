@@ -133,6 +133,12 @@ return [
             'logo' => 'Loqo',
             'logo_hint' => 'Kvadrat, maksimum 500x500, PNG/JPG/WebP',
             'logo_current' => 'Cari loqo',
+            'white_label_enabled' => 'White label',
+            'white_label_enabled_hint' => 'Ödəniş səhifəsində mağaza blokunu göstərmək',
+            'white_label_enabled_description' => 'Show or hide store branding (logo, name, product info) on the payment page.',
+            'white_label_disabled_hint' => 'White label is hidden on the payment page',
+            'white_label_enabled_on' => 'White label shown',
+            'white_label_enabled_off' => 'White label hidden',
         ],
         'modals' => [
             'create' => [

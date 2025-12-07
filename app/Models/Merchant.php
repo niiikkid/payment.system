@@ -18,6 +18,11 @@ class Merchant extends Model
         'description',
         'initials',
         'logo_path',
+        'white_label_enabled',
+    ];
+
+    protected $casts = [
+        'white_label_enabled' => 'boolean',
     ];
 
     public function user(): BelongsTo

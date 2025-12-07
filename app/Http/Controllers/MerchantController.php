@@ -45,6 +45,7 @@ class MerchantController extends Controller
                 $request->string('name')->toString(),
                 $request->filled('description') ? $request->string('description')->toString() : null,
                 $request->string('initials')->toString(),
+                $request->boolean('white_label_enabled', true),
                 $request->file('logo')
             );
 
@@ -67,6 +68,7 @@ class MerchantController extends Controller
                 $request->string('name')->toString(),
                 $request->filled('description') ? $request->string('description')->toString() : null,
                 $request->string('initials')->toString(),
+                $request->boolean('white_label_enabled', true),
                 $request->file('logo')
             );
 

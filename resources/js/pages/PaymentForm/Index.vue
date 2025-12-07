@@ -14,11 +14,21 @@ import PaymentTransactionSection from './elements/PaymentTransactionSection.vue'
 import LanguageSwitcher from '@/components/ui/LanguageSwitcher.vue';
 import { vueLang } from '@erag/lang-sync-inertia';
 
+type MerchantInfo = {
+  id: number
+  name: string
+  description: string | null
+  initials: string
+  logo_url: string | null
+  white_label_enabled: boolean
+};
+
 type Invoice = {
   id: string
   external_invoice_id: string | null
   address_id: number
   address?: string | null
+  merchant?: MerchantInfo | null
   amount: number
   currency: string
   currency_label?: string
@@ -38,7 +48,9 @@ type Invoice = {
 }
 
 const page = usePage();
-const appName = computed(() => (page.props.appName as string) || (import.meta.env.VITE_APP_NAME as string) || 'App');
+const appName = computed(
+  () => (page.props.appName as string) || ((import.meta as any).env?.VITE_APP_NAME as string) || 'App'
+);
 const initial = page.props.invoice as Invoice;
 const statuses = computed(() => page.props.statuses as { active: string[]; final: string[] });
 const { __ } = vueLang();
@@ -95,31 +107,45 @@ type WhiteLabelInfo = {
   productName: string;
   productDescription: string;
   initials: string;
+  logoUrl: string | null;
   backUrl: string;
   backLabel: string;
 };
 
-const whiteLabelInfo: WhiteLabelInfo = {
-  storeName: __('frontend.payment_form.white_label.store_name'),
-  storeDescription: __('frontend.payment_form.white_label.store_description'),
-  productName: __('frontend.payment_form.white_label.product_name'),
-  productDescription: __('frontend.payment_form.white_label.product_description'),
-  initials: 'CC',
-  backUrl: '/',
-  backLabel: __('frontend.payment_form.white_label.back_label'),
-};
+const hasMerchantWhiteLabel = computed(() => {
+  const merchant = invoice.value.merchant;
+  return Boolean(merchant && merchant.white_label_enabled);
+});
+
+const whiteLabelInfo = computed<WhiteLabelInfo | null>(() => {
+  const merchant = invoice.value.merchant;
+  if (!merchant || !merchant.white_label_enabled) {
+    return null;
+  }
+
+  return {
+    storeName: merchant.name,
+    storeDescription: merchant.description ?? '',
+    productName: __('frontend.payment_form.white_label.product_name'),
+    productDescription: __('frontend.payment_form.white_label.product_description'),
+    initials: merchant.initials,
+    logoUrl: merchant.logo_url,
+    backUrl: '/',
+    backLabel: __('frontend.payment_form.white_label.back_label'),
+  };
+});
 
 </script>
 
 <template>
   <PaymentFormLayout>
-      <div class="mx-auto w-full max-w-7xl flex justify-end px-4 xl:px-0">
+      <div class="mx-auto  flex justify-end px-4 xl:px-0"  :class="hasMerchantWhiteLabel ? 'max-w-7xl w-full' : 'lg:max-w-xl mx-auto'">
           <div class="w-fit mt-2">
-              <LanguageSwitcher />
+              <LanguageSwitcher direction="down" align="end"/>
           </div>
       </div>
     <div class="min-h-screen flex justify-center p-4">
-      <div class="mx-auto w-full max-w-7xl pb-10 space-b-6">
+      <div class="mx-auto w-full pb-10 space-b-6" :class="hasMerchantWhiteLabel ? 'max-w-7xl' : 'lg:max-w-xl'">
             <div class="sm:flex items-center justify-between gap-4">
                 <h1 class="text-xl font-semibold flex items-center gap-2">
                     {{ __('frontend.payment_form.page_title', { id: '' }) }}
@@ -128,20 +154,28 @@ const whiteLabelInfo: WhiteLabelInfo = {
                 <div class="badge" :class="statusBadgeClass">{{ statusText }}</div>
             </div>
 
-        <div class="grid gap-6 lg:grid-cols-[1fr_1.05fr] items-start">
-          <div class="card bg-base-100 shadow h-full">
+        <div class="grid items-start" :class="hasMerchantWhiteLabel ? 'lg:grid-cols-[1fr_1.05fr]' : 'lg:grid-cols-1'">
+          <div v-if="whiteLabelInfo" class="card bg-base-100 shadow h-full" >
             <div class="card-body p-5 lg:p-6 flex flex-col h-full space-y-4 lg:space-y-5">
               <div class="space-y-4 lg:space-y-5">
                 <div class="flex items-center gap-3 lg:gap-4">
                   <div class="avatar placeholder">
-                    <div class="bg-primary text-primary-content rounded-full w-14 h-14 lg:w-16 lg:h-16">
-                      <span class="text-xl lg:text-2xl font-semibold">{{ whiteLabelInfo.initials }}</span>
+                    <div class="bg-primary text-primary-content rounded-full w-14 h-14 lg:w-16 lg:h-16 overflow-hidden">
+                      <img
+                        v-if="whiteLabelInfo.logoUrl"
+                        :src="whiteLabelInfo.logoUrl"
+                        alt="logo"
+                        class="w-full h-full object-cover"
+                      />
+                      <span v-else class="text-xl lg:text-2xl font-semibold flex items-center justify-center w-full h-full">
+                        {{ whiteLabelInfo.initials }}
+                      </span>
                     </div>
                   </div>
                   <div class="space-y-1">
                     <h2 class="text-lg lg:text-xl font-semibold leading-tight">{{ whiteLabelInfo.storeName }}</h2>
                     <p class="text-xs lg:text-sm text-base-content/70">
-                      {{ whiteLabelInfo.storeDescription }}
+                      {{ whiteLabelInfo.storeDescription || __('frontend.payment_form.white_label.store_description') }}
                     </p>
                   </div>
                 </div>
@@ -171,7 +205,7 @@ const whiteLabelInfo: WhiteLabelInfo = {
             </div>
           </div>
 
-          <div class="flex flex-col gap-4">
+          <div class="flex flex-col gap-4 w-full">
             <PaidInvoiceCard v-if="invoice.status === 'paid'" :tx-explorer-url="invoice.tx_explorer_url" />
 
             <ExpiredInvoiceCard v-else-if="invoice.status === 'expired'" />

@@ -133,6 +133,12 @@ return [
             'logo' => 'Логотип',
             'logo_hint' => 'Квадрат до 500x500, PNG/JPG/WebP',
             'logo_current' => 'Текущий логотип',
+            'white_label_enabled' => 'White label на странице оплаты',
+            'white_label_enabled_hint' => 'Показывать блок магазина на платежной странице',
+            'white_label_enabled_description' => 'Управляет показом блока с логотипом, названием и товарами магазина на странице оплаты.',
+            'white_label_disabled_hint' => 'White label скрыт на платежной странице',
+            'white_label_enabled_on' => 'White label отображается',
+            'white_label_enabled_off' => 'White label скрыт',
         ],
         'modals' => [
             'create' => [

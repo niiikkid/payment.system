@@ -23,6 +23,7 @@ class MerchantResource extends JsonResource
             'initials' => $this->initials,
             'logo_path' => $this->logo_path,
             'logo_url' => $this->logo_path ? Storage::disk('public')->url($this->logo_path) : null,
+            'white_label_enabled' => $this->white_label_enabled,
             'created_at' => optional($this->created_at)?->toISOString(),
             'updated_at' => optional($this->updated_at)?->toISOString(),
         ];

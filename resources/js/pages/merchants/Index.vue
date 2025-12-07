@@ -14,6 +14,7 @@ interface Merchant {
     initials: string;
     logo_path: string | null;
     logo_url: string | null;
+    white_label_enabled: boolean;
     created_at: string | null;
 }
 
@@ -43,6 +44,7 @@ const merchantForm = useForm<MerchantForm>({
     name: '',
     description: '',
     initials: '',
+    white_label_enabled: true,
     logo: null,
 });
 
@@ -64,6 +66,7 @@ function openEdit(item: Merchant) {
     merchantForm.name = item.name ?? '';
     merchantForm.description = item.description ?? '';
     merchantForm.initials = item.initials ?? '';
+    merchantForm.white_label_enabled = item.white_label_enabled;
     merchantForm.logo = null;
     merchantForm.clearErrors();
     currentLogoUrl.value = item.logo_url;
@@ -74,6 +77,7 @@ function updateFormPayload(payload: MerchantForm) {
     merchantForm.name = payload.name;
     merchantForm.description = payload.description;
     merchantForm.initials = payload.initials;
+    merchantForm.white_label_enabled = payload.white_label_enabled;
     merchantForm.logo = payload.logo;
 }
 
@@ -86,6 +90,7 @@ function submit() {
         name: (merchantForm.name ?? editing.value?.name ?? '').toString().trim(),
         description: (merchantForm.description ?? editing.value?.description ?? '').toString().trim(),
         initials: (merchantForm.initials ?? editing.value?.initials ?? '').toString().trim(),
+        white_label_enabled: Boolean(merchantForm.white_label_enabled ?? editing.value?.white_label_enabled),
         logo: merchantForm.logo ?? null,
     };
 
@@ -145,7 +150,19 @@ function submit() {
                                                 </div>
                                             </div>
                                             <div>
-                                                <div class="font-semibold">{{ merchant.name }}</div>
+                                            <div class="flex items-center gap-1.5 font-semibold">
+                                                <span>{{ merchant.name }}</span>
+                                                <div
+                                                    v-if="!merchant.white_label_enabled"
+                                                    class="tooltip tooltip-top text-error"
+                                                    :data-tip="__('frontend.merchants.fields.white_label_disabled_hint')"
+                                                >
+                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M9.568 3H5.25A2.25 2.25 0 0 0 3 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 0 0 5.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 0 0 9.568 3Z" />
+                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 6h.008v.008H6V6Z" />
+                                                    </svg>
+                                                </div>
+                                            </div>
                                             </div>
                                         </div>
                                     </td>
@@ -181,7 +198,19 @@ function submit() {
                                         </div>
                                     </div>
                                     <div class="space-y-0.5 min-w-0">
-                                        <div class="font-semibold">{{ merchant.name }}</div>
+                                        <div class="flex items-center gap-1.5 font-semibold">
+                                            <span>{{ merchant.name }}</span>
+                                            <div
+                                                v-if="!merchant.white_label_enabled"
+                                                class="tooltip tooltip-left text-error"
+                                                :data-tip="__('frontend.merchants.fields.white_label_disabled_hint')"
+                                            >
+                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M9.568 3H5.25A2.25 2.25 0 0 0 3 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 0 0 5.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 0 0 9.568 3Z" />
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 6h.008v.008H6V6Z" />
+                                                </svg>
+                                            </div>
+                                        </div>
                                         <div class="text-xs text-base-content/70 truncate max-w-xs">{{ merchant.description || '—' }}</div>
                                     </div>
                                     <div class="ml-auto">
