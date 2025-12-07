@@ -51,7 +51,7 @@ function submit() {
                         autofocus
                         tabindex="1"
                         autocomplete="email"
-                        placeholder="email@example.com"
+                        :placeholder="__('frontend.auth.login.email_placeholder')"
                         v-model="form.email"
                         class="input input-bordered w-full"
                     />
@@ -111,8 +111,6 @@ function submit() {
             </div>
         </form>
     </AuthBase>
-    
-    
 </template>
 
 

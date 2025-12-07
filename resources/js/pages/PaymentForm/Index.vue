@@ -11,6 +11,7 @@ import PaymentAmountSection from './elements/PaymentAmountSection.vue';
 import PaymentAddressSection from './elements/PaymentAddressSection.vue';
 import PaymentCountdownSection from './elements/PaymentCountdownSection.vue';
 import PaymentTransactionSection from './elements/PaymentTransactionSection.vue';
+import LanguageSwitcher from '@/components/ui/LanguageSwitcher.vue';
 import { vueLang } from '@erag/lang-sync-inertia';
 
 type Invoice = {
@@ -112,8 +113,13 @@ const whiteLabelInfo: WhiteLabelInfo = {
 
 <template>
   <PaymentFormLayout>
-    <div class="min-h-screen flex justify-center px-4">
-      <div class="mx-auto w-full max-w-7xl py-10 space-y-6">
+      <div class="mx-auto w-full max-w-7xl flex justify-end px-4 xl:px-0">
+          <div class="w-fit mt-2">
+              <LanguageSwitcher />
+          </div>
+      </div>
+    <div class="min-h-screen flex justify-center p-4">
+      <div class="mx-auto w-full max-w-7xl pb-10 space-b-6">
             <div class="sm:flex items-center justify-between gap-4">
                 <h1 class="text-xl font-semibold flex items-center gap-2">
                     {{ __('frontend.payment_form.page_title', { id: '' }) }}

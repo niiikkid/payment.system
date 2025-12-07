@@ -40,7 +40,7 @@ function submit() {
                         name="email"
                         autocomplete="off"
                         autofocus
-                        placeholder="email@example.com"
+                        :placeholder="__('frontend.auth.forgot.email_placeholder')"
                         v-model="form.email"
                         class="input input-bordered w-full"
                     />

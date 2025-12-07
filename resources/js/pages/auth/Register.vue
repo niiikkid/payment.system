@@ -59,7 +59,7 @@ function submit() {
                         tabindex="2"
                         autocomplete="email"
                         name="email"
-                        placeholder="email@example.com"
+                        :placeholder="__('frontend.auth.register.email_placeholder')"
                         v-model="form.email"
                         class="input input-bordered w-full"
                     />

@@ -9,8 +9,14 @@ type LocaleOption = {
     flag: string;
 };
 
+const props = defineProps<{
+    direction?: 'up' | 'down' | 'left' | 'right';
+    align?: 'start' | 'center' | 'end';
+}>();
+
 const locales: LocaleOption[] = [
     { code: 'ru', label: 'Русский', flag: 'RU' },
+    { code: 'az', label: 'Azərbaycan', flag: 'AZ' },
     { code: 'kk', label: 'Қазақша', flag: 'KZ' },
     { code: 'ky', label: 'Кыргызча', flag: 'KG' },
     { code: 'uz', label: "O'zbekcha", flag: 'UZ' },
@@ -24,6 +30,30 @@ const page = usePage();
 
 const currentLocale = computed(() => ((page.props as any)?.locale as string) || 'ru');
 const current = computed<LocaleOption>(() => locales.find((l) => l.code === currentLocale.value) ?? locales[0]);
+const dropdownDirectionClass = computed(() => {
+    switch (props.direction) {
+        case 'down':
+            return 'dropdown-bottom';
+        case 'left':
+            return 'dropdown-left';
+        case 'right':
+            return 'dropdown-right';
+        case 'up':
+        default:
+            return 'dropdown-top';
+    }
+});
+const dropdownAlignClass = computed(() => {
+    switch (props.align) {
+        case 'center':
+            return 'dropdown-center';
+        case 'end':
+            return 'dropdown-end';
+        case 'start':
+        default:
+            return 'dropdown-start';
+    }
+});
 
 function switchLocale(code: string) {
     if (code === currentLocale.value) return;
@@ -32,7 +62,7 @@ function switchLocale(code: string) {
 </script>
 
 <template>
-    <div class="dropdown dropdown-top w-full">
+    <div class="dropdown w-full" :class="[dropdownDirectionClass, dropdownAlignClass]">
         <div tabindex="0" role="button" class="btn btn-ghost w-full justify-start">
             <FlagIcon :code="current.flag" size="M" class="mr-2" />
             <span class="font-semibold">{{ current.label }}</span>
