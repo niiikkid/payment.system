@@ -99,13 +99,13 @@ type WhiteLabelInfo = {
 };
 
 const whiteLabelInfo: WhiteLabelInfo = {
-  storeName: 'CryptoCoffee',
-  storeDescription: 'Онлайн-магазин свежей обжарки кофе и сопутствующих товаров.',
-  productName: 'Premium Arabica Beans, 1kg',
-  productDescription: 'Свежая обжарка, средняя. Поставка в течение 3–5 дней.',
+  storeName: __('frontend.payment_form.white_label.store_name'),
+  storeDescription: __('frontend.payment_form.white_label.store_description'),
+  productName: __('frontend.payment_form.white_label.product_name'),
+  productDescription: __('frontend.payment_form.white_label.product_description'),
   initials: 'CC',
   backUrl: '/',
-  backLabel: 'Вернуться на сайт',
+  backLabel: __('frontend.payment_form.white_label.back_label'),
 };
 
 </script>
@@ -141,7 +141,7 @@ const whiteLabelInfo: WhiteLabelInfo = {
                 </div>
 
                 <div class="space-y-1.5">
-                  <p class="text-xs text-base-content/70">Описание товара</p>
+                  <p class="text-xs text-base-content/70">{{ __('frontend.payment_form.white_label.product_title') }}</p>
                   <p class="text-sm lg:text-base font-semibold text-base-content">
                     {{ whiteLabelInfo.productName }}
                     <span class="text-sm lg:text-base font-normal text-base-content/70">

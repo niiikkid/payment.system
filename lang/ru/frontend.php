@@ -385,6 +385,14 @@ return [
             'open_explorer' => 'Открыть в обозревателе',
             'open_explorer_short' => 'Открыть в обозревателе',
         ],
+        'white_label' => [
+            'store_name' => 'CryptoCoffee',
+            'store_description' => 'Онлайн-магазин свежей обжарки кофе и сопутствующих товаров.',
+            'product_title' => 'Описание товара',
+            'product_name' => 'Premium Arabica Beans, 1kg',
+            'product_description' => 'Свежая обжарка, средняя. Поставка в течение 3–5 дней.',
+            'back_label' => 'Вернуться на сайт',
+        ],
     ],
     'api' => [
         'breadcrumb' => 'API и документация',

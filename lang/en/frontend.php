@@ -385,6 +385,14 @@ return [
             'open_explorer' => 'Open in explorer',
             'open_explorer_short' => 'Open in explorer',
         ],
+        'white_label' => [
+            'store_name' => 'CryptoCoffee',
+            'store_description' => 'Online store of freshly roasted coffee and accessories.',
+            'product_title' => 'Product description',
+            'product_name' => 'Premium Arabica Beans, 1kg',
+            'product_description' => 'Fresh roast, medium. Delivery within 3–5 days.',
+            'back_label' => 'Back to site',
+        ],
     ],
     'api' => [
         'breadcrumb' => 'API & documentation',
