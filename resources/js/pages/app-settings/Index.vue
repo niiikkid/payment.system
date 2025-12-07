@@ -116,68 +116,69 @@ const breadcrumbs = computed<BreadcrumbItem[]>(() => [
                 </div>
             </form>
 
-            <form class="card bg-base-100 shadow" @submit.prevent="submitLocales">
-                <div class="card-body space-y-4">
-                    <div class="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
-                        <div>
-                            <h2 class="card-title">{{ __('frontend.app_settings_page.languages.title') }}</h2>
-                            <p class="text-sm opacity-70">
-                                {{ __('frontend.app_settings_page.languages.subtitle') }}
-                            </p>
-                        </div>
-                        <div class="flex items-center gap-2">
-                            <span class="text-sm opacity-70">
-                                {{ __('frontend.app_settings_page.languages.selected', { count: localesForm.locales.length }) }}
-                            </span>
-                            <button
-                                type="button"
-                                class="btn btn-ghost btn-sm"
-                                :disabled="localesForm.processing || isAllSelected"
-                                @click="resetLocales"
-                            >
-                                {{ __('frontend.app_settings_page.languages.select_all') }}
-                            </button>
-                        </div>
-                    </div>
+            <form @submit.prevent="submitLocales">
+                <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                    <div class="card bg-base-100 shadow">
+                        <div class="card-body space-y-4">
+                            <div class="grid gap-2">
+                                <div>
+                                    <h2 class="card-title">{{ __('frontend.app_settings_page.languages.title') }}</h2>
+                                    <p class="text-sm opacity-70">
+                                        {{ __('frontend.app_settings_page.languages.subtitle') }}
+                                    </p>
+                                </div>
+                            </div>
 
-                    <div class="overflow-x-auto">
-                        <table class="table">
-                            <thead>
-                                <tr>
-                                    <th>{{ __('frontend.app_settings_page.languages.language') }}</th>
-                                    <th class="text-right">{{ __('frontend.app_settings_page.languages.enabled') }}</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr v-for="locale in props.locales" :key="locale.code">
-                                    <td>
-                                        <div class="flex items-center gap-3">
-                                            <FlagIcon :code="locale.flag" size="M" />
-                                            <div>
-                                                <div class="font-semibold">{{ locale.label }}</div>
-                                                <div class="text-xs uppercase opacity-60">{{ locale.code }}</div>
+                            <div class="overflow-x-auto">
+                                <table class="table table-sm">
+                                    <thead>
+                                    <tr>
+                                        <th>{{ __('frontend.app_settings_page.languages.language') }}</th>
+                                        <th class="text-right">{{ __('frontend.app_settings_page.languages.enabled') }}</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr v-for="locale in props.locales" :key="locale.code">
+                                        <td>
+                                            <div class="flex items-center gap-3">
+                                                <FlagIcon :code="locale.flag" size="M" />
+                                                <div>
+                                                    <div class="font-semibold">{{ locale.label }}</div>
+                                                    <div class="text-xs uppercase opacity-60">{{ locale.code }}</div>
+                                                </div>
                                             </div>
-                                        </div>
-                                    </td>
-                                    <td class="text-right">
-                                        <input
-                                            type="checkbox"
-                                            class="toggle toggle-primary"
-                                            :checked="isLocaleEnabled(locale.code)"
-                                            :disabled="localesForm.processing"
-                                            @change="toggleLocale(locale.code)"
-                                        />
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
+                                        </td>
+                                        <td class="text-right">
+                                            <input
+                                                type="checkbox"
+                                                class="toggle toggle-primary"
+                                                :checked="isLocaleEnabled(locale.code)"
+                                                :disabled="localesForm.processing"
+                                                @change="toggleLocale(locale.code)"
+                                            />
+                                        </td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
 
-                    <div class="flex justify-end">
-                        <button type="submit" class="btn btn-primary" :disabled="localesForm.processing">
-                            <span v-if="localesForm.processing" class="loading loading-spinner loading-xs mr-2" />
-                            {{ __('frontend.app_settings_page.languages.save') }}
-                        </button>
+                            <div class="flex justify-between">
+                                <div class="flex justify-end gap-2">
+                                    <button
+                                        type="button"
+                                        class="btn btn-ghost btn-sm"
+                                        :disabled="localesForm.processing || isAllSelected"
+                                        @click="resetLocales"
+                                    >
+                                        {{ __('frontend.app_settings_page.languages.select_all') }}
+                                    </button>
+                                </div>
+                                <button type="submit" class="btn btn-primary" :disabled="localesForm.processing">
+                                    <span v-if="localesForm.processing" class="loading loading-spinner loading-xs mr-2" />
+                                    {{ __('frontend.app_settings_page.languages.save') }}
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </form>
