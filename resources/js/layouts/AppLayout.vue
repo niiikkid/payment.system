@@ -144,9 +144,6 @@ const pageIconPath = computed(() => {
                     <a href="/dashboard" class="block px-2 py-3 text-xl font-semibold tracking-wide text-center">
                         {{ appName }}
                     </a>
-                    <div class="px-2 pb-2">
-                        <LanguageSwitcher />
-                    </div>
                     <div>
                         <ul class="menu w-full font-semibold space-y-1">
                             <li>
@@ -232,6 +229,9 @@ const pageIconPath = computed(() => {
                     </div>
                 </div>
                 <div class="hidden lg:block mt-auto border-t border-base-200 p-2 mb-2">
+                    <div class="pb-2">
+                        <LanguageSwitcher />
+                    </div>
                     <Link href="/settings/profile" :class="{ 'menu-active': isProfileSettingsActive, active: isProfileSettingsActive }" class="btn btn-ghost btn-md w-full justify-start">
                         <span class="flex items-center gap-3 truncate text-base font-semibold">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6 opacity-30">

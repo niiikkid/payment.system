@@ -11,6 +11,7 @@ type LocaleOption = {
 
 const locales: LocaleOption[] = [
     { code: 'ru', label: 'Русский', flag: 'RU' },
+    { code: 'kk', label: 'Қазақша', flag: 'KZ' },
     { code: 'uk', label: 'Українська', flag: 'UA' },
     { code: 'en', label: 'English', flag: 'US' },
     { code: 'zh', label: '中文', flag: 'CN' },
@@ -28,7 +29,7 @@ function switchLocale(code: string) {
 </script>
 
 <template>
-    <div class="dropdown dropdown-end w-full">
+    <div class="dropdown dropdown-top w-full">
         <div tabindex="0" role="button" class="btn btn-ghost w-full justify-start">
             <FlagIcon :code="current.flag" size="M" class="mr-2" />
             <span class="font-semibold">{{ current.label }}</span>
