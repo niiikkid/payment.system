@@ -211,7 +211,7 @@ return [
     ],
     'markets' => [
         'title' => 'Markets',
-        'subtitle' => 'Configure Binance P2P parsing for USDT/fiat pairs.',
+        'subtitle' => 'Pick a market and manage parsing for USDT/fiat pairs.',
         'actions' => [
             'add_fiat' => 'Add fiat',
             'save' => 'Save',
@@ -219,6 +219,7 @@ return [
             'settings' => 'Settings',
         ],
         'fields' => [
+            'market' => 'Market',
             'code' => 'Fiat code',
             'pair' => 'Pair',
             'rows' => 'Ads to average',
@@ -230,6 +231,10 @@ return [
             'sell_price' => 'Sell price',
             'updated_at' => 'Updated at',
         ],
+        'market_names' => [
+            'binance' => 'Binance P2P',
+            'rapira' => 'Rapira',
+        ],
         'table' => [
             'empty' => 'No fiats yet. Add one to start parsing.',
         ],
@@ -237,6 +242,11 @@ return [
             'rows' => 'How many ads to average from the top of the list.',
             'pay_types' => 'Leave empty to include all payment methods.',
         ],
+        'notes' => [
+            'binance' => 'Binance: averaging P2P ads by count and pay types.',
+            'rapira' => 'Rapira: order book for USDT/RUB, average of top 5 asks/bids.',
+        ],
+        'no_settings' => 'No configurable fields for this market.',
     ],
     'settings' => [
         'title' => 'Account settings',

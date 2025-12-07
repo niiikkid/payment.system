@@ -12,10 +12,17 @@ use Illuminate\Support\Collection;
 interface MarketServiceContract
 {
     /** Получить список всех фиатных валют с последними ценами */
-    public function listFiatsWithPrices(): Collection; // of MarketFiat
+    public function listFiatsWithPrices(MarketEnum $market): Collection; // of MarketFiat
 
     /** Создать новую фиатную валюту для парсинга */
-    public function createFiat(string $code, int $rows, array $payTypes, int $pollingInterval, bool $isEnabled): MarketFiat;
+    public function createFiat(
+        MarketEnum $market,
+        string $code,
+        int $rows,
+        array $payTypes,
+        int $pollingInterval,
+        bool $isEnabled
+    ): MarketFiat;
 
     /** Обновить настройки фиатной валюты */
     public function updateFiat(MarketFiat $fiat, int $rows, array $payTypes, int $pollingInterval, bool $isEnabled): MarketFiat;

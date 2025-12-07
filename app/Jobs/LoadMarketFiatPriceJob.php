@@ -47,6 +47,10 @@ class LoadMarketFiatPriceJob implements ShouldQueue
             return;
         }
 
+        if ($fiat->market !== $this->market->value) {
+            return;
+        }
+
         // Проверяем интервал, даже если job попала в очередь раньше.
         $now = now();
         if ($fiat->last_polled_at && $fiat->last_polled_at->addSeconds($fiat->polling_interval_seconds) > $now) {

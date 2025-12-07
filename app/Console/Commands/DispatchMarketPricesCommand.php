@@ -25,7 +25,10 @@ class DispatchMarketPricesCommand extends Command
         }
 
         $now = now();
-        $fiats = MarketFiat::query()->where('is_enabled', true)->get();
+        $fiats = MarketFiat::query()
+            ->where('is_enabled', true)
+            ->where('market', $market->value)
+            ->get();
         $dispatched = 0;
 
         foreach ($fiats as $fiat) {

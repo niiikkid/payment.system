@@ -15,6 +15,8 @@ class MarketFiatResource extends JsonResource
 
         return [
             'id' => $this->id,
+            'market' => $this->market,
+            'asset' => 'USDT',
             'code' => $this->code,
             'rows' => (int) $this->rows,
             'pay_types' => $this->pay_types ?? [],

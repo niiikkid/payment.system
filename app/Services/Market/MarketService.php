@@ -8,29 +8,35 @@ use App\Contracts\Market\MarketServiceContract;
 use App\Enums\MarketEnum;
 use App\Models\MarketFiat;
 use App\Models\MarketPrice;
+use App\Contracts\Market\MarketParserContract;
 use App\Services\Market\Parsers\BinanceParser;
+use App\Services\Market\Parsers\RapiraParser;
 use Brick\Math\BigDecimal;
 use Brick\Math\RoundingMode;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Log;
 
 final class MarketService implements MarketServiceContract
 {
     public function __construct(
         private readonly BinanceParser $binanceParser,
+        private readonly RapiraParser $rapiraParser,
     ) {
     }
 
-    public function listFiatsWithPrices(): Collection
+    public function listFiatsWithPrices(MarketEnum $market): Collection
     {
         return MarketFiat::query()
+            ->where('market', $market->value)
             ->with('latestPrice')
             ->orderBy('code')
             ->get();
     }
 
-    public function createFiat(string $code, int $rows, array $payTypes, int $pollingInterval, bool $isEnabled): MarketFiat
+    public function createFiat(MarketEnum $market, string $code, int $rows, array $payTypes, int $pollingInterval, bool $isEnabled): MarketFiat
     {
         return MarketFiat::query()->create([
+            'market' => $market->value,
             'code' => strtoupper($code),
             'rows' => $rows,
             'pay_types' => array_values($payTypes),
@@ -58,6 +64,7 @@ final class MarketService implements MarketServiceContract
         $now = now();
         $fiats = MarketFiat::query()
             ->where('is_enabled', true)
+            ->where('market', $market->value)
             ->get();
 
         $processed = 0;
@@ -76,6 +83,15 @@ final class MarketService implements MarketServiceContract
 
     public function loadPricesFor(MarketFiat $fiat, MarketEnum $market): ?MarketPrice
     {
+        if ($fiat->market !== $market->value) {
+            Log::warning('Попытка загрузить курс для неподходящего маркета', [
+                'fiat_id' => $fiat->id,
+                'fiat_market' => $fiat->market,
+                'requested_market' => $market->value,
+            ]);
+            return null;
+        }
+
         $parser = $this->parserFor($market);
         $prices = $parser->getPrices($fiat);
 
@@ -101,10 +117,12 @@ final class MarketService implements MarketServiceContract
         );
     }
 
-    private function parserFor(MarketEnum $market): BinanceParser
+    private function parserFor(MarketEnum $market): MarketParserContract
     {
-        // Пока доступен только Binance, но оставляем метод для расширения.
-        return $this->binanceParser;
+        return match ($market) {
+            MarketEnum::BINANCE => $this->binanceParser,
+            MarketEnum::RAPIRA => $this->rapiraParser,
+        };
     }
 
     private function normalizePrice(float $price): string

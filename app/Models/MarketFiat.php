@@ -14,6 +14,7 @@ class MarketFiat extends Model
     use HasFactory;
 
     protected $fillable = [
+        'market',
         'code',
         'pay_types',
         'rows',
@@ -23,6 +24,7 @@ class MarketFiat extends Model
     ];
 
     protected $casts = [
+        'market' => 'string',
         'pay_types' => 'array',
         'is_enabled' => 'boolean',
         'rows' => 'integer',
@@ -37,7 +39,8 @@ class MarketFiat extends Model
 
     public function latestPrice(): HasOne
     {
-        return $this->hasOne(MarketPrice::class)->latestOfMany('fetched_at');
+        return $this->hasOne(MarketPrice::class)
+            ->latestOfMany('fetched_at');
     }
 }
 

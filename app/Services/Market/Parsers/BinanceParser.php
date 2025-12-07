@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Services\Market\Parsers;
 
+use App\Contracts\Market\MarketParserContract;
+use App\Enums\MarketEnum;
 use App\Models\MarketFiat;
 use App\Services\Market\Data\MarketPrices;
 use App\Services\Market\Exceptions\BinanceParserException;
@@ -11,9 +13,14 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Throwable;
 
-final class BinanceParser
+final class BinanceParser implements MarketParserContract
 {
     private const ENDPOINT = 'https://p2p.binance.com/bapi/c2c/v2/friendly/c2c/adv/search';
+
+    public function market(): MarketEnum
+    {
+        return MarketEnum::BINANCE;
+    }
 
     public function getPrices(MarketFiat $fiat): ?MarketPrices
     {

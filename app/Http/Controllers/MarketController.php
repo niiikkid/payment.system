@@ -11,6 +11,7 @@ use App\Http\Requests\Market\UpdateMarketFiatRequest;
 use App\Http\Resources\MarketFiatResource;
 use App\Models\MarketFiat;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Inertia\Response;
 
 class MarketController extends Controller
@@ -20,13 +21,21 @@ class MarketController extends Controller
         $this->middleware(['auth', 'verified', 'role:admin']);
     }
 
-    public function index(MarketServiceContract $service): Response
+    public function index(Request $request, MarketServiceContract $service): Response
     {
-        $fiats = $service->listFiatsWithPrices();
+        $marketValue = strtoupper($request->string('market', MarketEnum::BINANCE->value)->toString());
+        $market = MarketEnum::tryFrom($marketValue) ?? MarketEnum::BINANCE;
+
+        $fiats = $service->listFiatsWithPrices($market);
 
         return $this->inertia('markets/Index', [
             'fiats' => MarketFiatResource::collection($fiats)->resolve(),
-            'market' => MarketEnum::BINANCE->value,
+            'market' => $market->value,
+            'markets' => collect(MarketEnum::cases())
+                ->map(fn (MarketEnum $item) => [
+                    'code' => $item->value,
+                    'title' => $item->label(),
+                ])->values(),
         ]);
     }
 
@@ -34,6 +43,7 @@ class MarketController extends Controller
     {
         $payload = $request->payload();
         $service->createFiat(
+            MarketEnum::from($payload['market']),
             $payload['code'],
             $payload['rows'],
             $payload['pay_types'],
@@ -60,7 +70,7 @@ class MarketController extends Controller
 
     public function refresh(MarketFiat $marketFiat, MarketServiceContract $service): RedirectResponse
     {
-        $service->loadPricesFor($marketFiat, MarketEnum::BINANCE);
+        $service->loadPricesFor($marketFiat, MarketEnum::from($marketFiat->market));
 
         return back()->with('success', __('messages.markets.refreshed'));
     }

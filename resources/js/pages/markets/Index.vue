@@ -1,11 +1,8 @@
 <script setup lang="ts">
 import AppLayout from '@/layouts/AppLayout.vue';
-import FormControl from '@/components/form/FormControl.vue';
-import Label from '@/components/form/Label.vue';
-import Input from '@/components/form/Input.vue';
 import MarketFiatModal from '@/components/modals/markets/MarketFiatModal.vue';
 import RelativeTime from '@/components/ui/RelativeTime.vue';
-import { computed, reactive, ref } from 'vue';
+import { computed, reactive, ref, watch } from 'vue';
 import { useForm, router } from '@inertiajs/vue3';
 import type { BreadcrumbItem } from '@/types';
 import { vueLang } from '@erag/lang-sync-inertia';
@@ -18,6 +15,8 @@ interface MarketPrice {
 
 interface MarketFiat {
     id: number;
+    market: string;
+    asset?: string;
     code: string;
     rows: number;
     pay_types: string[];
@@ -30,28 +29,101 @@ interface MarketFiat {
 interface PageProps {
     fiats: MarketFiat[];
     market: string;
+    markets: { code: string; title: string }[];
 }
 
 const props = defineProps<PageProps>();
 const { __ } = vueLang();
+
+interface MarketConfig {
+    code: string;
+    note: string;
+    visibleFields: {
+        rows: boolean;
+        pay_types: boolean;
+        polling_interval_seconds: boolean;
+        is_enabled: boolean;
+    };
+}
+
+const defaultConfig: MarketConfig = {
+    code: 'BINANCE',
+    note: '',
+    visibleFields: {
+        rows: true,
+        pay_types: true,
+        polling_interval_seconds: true,
+        is_enabled: true,
+    },
+};
+
+const marketConfigs: Record<string, MarketConfig> = {
+    BINANCE: {
+        code: 'BINANCE',
+        note: __('frontend.markets.notes.binance'),
+        visibleFields: {
+            rows: true,
+            pay_types: true,
+            polling_interval_seconds: true,
+            is_enabled: true,
+        },
+    },
+    RAPIRA: {
+        code: 'RAPIRA',
+        note: __('frontend.markets.notes.rapira'),
+        visibleFields: {
+            rows: false,
+            pay_types: false,
+            polling_interval_seconds: true,
+            is_enabled: true,
+        },
+    },
+};
 
 const breadcrumbs = computed<BreadcrumbItem[]>(() => [
     { title: __('frontend.app_settings_page.breadcrumb.home'), href: '/dashboard' },
     { title: __('frontend.layout.page_titles.markets') },
 ]);
 
+const marketOptions = computed(() => props.markets ?? []);
+const currentMarketConfig = computed<MarketConfig>(() => marketConfigs[props.market] ?? { ...defaultConfig, code: props.market });
+
 const editForms = reactive<Record<number, any>>({});
 const openedFiatId = ref<number | null>(null);
 const modalVisible = ref(false);
 
-props.fiats.forEach((fiat) => {
-    editForms[fiat.id] = useForm({
-        rows: fiat.rows,
-        pay_types: fiat.pay_types.join(', '),
-        polling_interval_seconds: fiat.polling_interval_seconds,
-        is_enabled: fiat.is_enabled,
+const buildForms = (fiats: MarketFiat[]) => {
+    Object.keys(editForms).forEach((key) => delete editForms[Number(key)]);
+
+    fiats.forEach((fiat) => {
+        editForms[fiat.id] = useForm({
+            rows: fiat.rows,
+            pay_types: fiat.pay_types.join(', '),
+            polling_interval_seconds: fiat.polling_interval_seconds,
+            is_enabled: fiat.is_enabled,
+        });
     });
-});
+};
+
+buildForms(props.fiats);
+
+watch(
+    () => props.fiats,
+    (fiats) => {
+        buildForms(fiats);
+        openedFiatId.value = null;
+        modalVisible.value = false;
+    },
+    { deep: true }
+);
+
+const switchMarket = (marketCode: string) => {
+    if (marketCode === props.market) {
+        return;
+    }
+
+    router.get('/markets', { market: marketCode }, { preserveScroll: true, preserveState: false, replace: true });
+};
 
 const normalizePayTypes = (value: string): string[] => {
     return value
@@ -79,18 +151,24 @@ const refreshFiat = (fiatId: number) => {
     router.post(`/markets/${fiatId}/refresh`, {}, { preserveScroll: true });
 };
 
-const formatPrice = (price?: number | null) => {
+const formatPrice = (price?: number | string | null) => {
     if (price === null || price === undefined) {
         return '—';
     }
-    return price.toFixed(4);
+    const numeric = Number(price);
+    if (Number.isNaN(numeric)) {
+        return '—';
+    }
+    return numeric.toFixed(4);
 };
-
-const formatList = (items: string[]) => (items.length ? items.join(', ') : '—');
 
 const openedFiat = computed(() => props.fiats.find((f) => f.id === openedFiatId.value) ?? null);
 // Упрощаем типизацию, чтобы избежать глубокой инстанциации useForm
 const openedForm = computed<any>(() => (openedFiatId.value ? editForms[openedFiatId.value] : null));
+const openedMarketConfig = computed<MarketConfig>(() => {
+    const marketKey = openedFiat.value?.market ?? '';
+    return marketConfigs[marketKey] ?? { ...defaultConfig, code: marketKey || props.market };
+});
 
 const openSettings = (fiatId: number) => {
     openedFiatId.value = fiatId;
@@ -108,12 +186,29 @@ const closeSettings = () => {
         <div class="space-y-6">
             <div class="lg:card lg:bg-base-100 lg:shadow">
                 <div class="lg:card-body">
-                    <div class="flex items-center justify-between mb-4">
+                    <div class="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between mb-4">
                         <div>
                             <h2 class="card-title">{{ __('frontend.markets.title') }}</h2>
                             <p class="text-sm opacity-70">{{ __('frontend.markets.subtitle') }}</p>
+                            <p v-if="currentMarketConfig.note" class="text-xs opacity-70 mt-1">
+                                {{ currentMarketConfig.note }}
+                            </p>
                         </div>
-                        <span class="badge badge-outline uppercase">{{ props.market }}</span>
+                        <div class="flex items-center gap-2 flex-wrap">
+                            <span class="text-sm opacity-70">{{ __('frontend.markets.fields.market') }}</span>
+                            <div class="join join-sm">
+                                <button
+                                    v-for="option in marketOptions"
+                                    :key="option.code"
+                                    class="btn btn-sm join-item"
+                                    :class="option.code === props.market ? 'btn-primary' : 'btn-ghost'"
+                                    type="button"
+                                    @click="switchMarket(option.code)"
+                                >
+                                    {{ option.title }}
+                                </button>
+                            </div>
+                        </div>
                     </div>
 
                     <!-- Desktop table -->
@@ -131,7 +226,7 @@ const closeSettings = () => {
                             <tbody>
                                 <tr v-for="fiat in props.fiats" :key="fiat.id">
                                     <td class="uppercase flex items-center gap-2">
-                                        USDT/{{ fiat.code }}
+                                        {{ (fiat.asset ?? 'USDT') }}/{{ fiat.code }}
                                         <span
                                             class="badge badge-xs"
                                             :class="fiat.is_enabled ? 'badge-success' : 'badge-error'"
@@ -194,7 +289,7 @@ const closeSettings = () => {
                             <div class="card-body p-4 space-y-3">
                                 <div class="flex items-center justify-between">
                                     <div class="flex items-center gap-2">
-                                        <span class="font-semibold uppercase">USDT/{{ fiat.code }}</span>
+                                        <span class="font-semibold uppercase">{{ (fiat.asset ?? 'USDT') }}/{{ fiat.code }}</span>
                                         <span
                                             class="badge badge-xs"
                                             :class="fiat.is_enabled ? 'badge-success' : 'badge-error'"
@@ -261,10 +356,14 @@ const closeSettings = () => {
         <MarketFiatModal
             v-if="openedFiat && openedForm"
             v-model="modalVisible"
+            :market="openedFiat.market"
             :fiat-code="openedFiat.code"
+            :asset="openedFiat.asset ?? 'USDT'"
             :last-polled-at="openedFiat.last_polled_at ?? null"
             v-model:form="openedForm"
             :loading="openedForm.processing"
+            :visible-fields="openedMarketConfig.visibleFields"
+            :note="openedMarketConfig.note"
             @close="closeSettings"
             @submit="openedFiatId !== null && submitUpdate(openedFiatId)"
         />
