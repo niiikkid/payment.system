@@ -110,15 +110,27 @@ function buildFilterPayload(extra: Record<string, unknown> = {}) {
         ...extra,
     };
 
-    return Object.fromEntries(
-        Object.entries(payload).filter(([key, value]) => {
-            if (key === 'page') return true;
-            if (typeof value === 'boolean') {
-                return value ? ((payload[key] = 1), true) : false;
+    const cleaned: Record<string, unknown> = {};
+
+    Object.entries(payload).forEach(([key, value]) => {
+        if (key === 'page') {
+            cleaned[key] = value;
+            return;
+        }
+
+        if (typeof value === 'boolean') {
+            if (value) {
+                cleaned[key] = 1;
             }
-            return value !== undefined && value !== null && String(value).length > 0;
-        }),
-    );
+            return;
+        }
+
+        if (value !== undefined && value !== null && String(value).length > 0) {
+            cleaned[key] = value;
+        }
+    });
+
+    return cleaned;
 }
 
 function applyFilters() {
