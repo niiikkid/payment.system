@@ -3,6 +3,7 @@
 namespace App\Http\Middleware;
 
 use App\Contracts\Lang\LanguageSettingsServiceContract;
+use App\Enums\NotificationChannel;
 use App\Models\Notification;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Http\Request;
@@ -64,7 +65,13 @@ class HandleInertiaRequests extends Middleware
                 'error' => fn () => $request->session()->get('error'),
             ],
             'notifications' => [
-                'unread_count' => fn () => $user ? Notification::query()->where('user_id', $user->id)->whereNull('read_at')->count() : 0,
+                'unread_count' => fn () => $user
+                    ? Notification::query()
+                        ->where('user_id', $user->id)
+                        ->where('channel', NotificationChannel::IN_APP)
+                        ->whereNull('read_at')
+                        ->count()
+                    : 0,
             ],
             'locale' => app()->getLocale(),
             self::LOCALE_SHARE_KEY => [

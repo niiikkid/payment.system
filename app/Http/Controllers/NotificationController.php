@@ -32,8 +32,8 @@ class NotificationController extends Controller
 
         $notifications = Notification::query()
             ->where('user_id', $userId)
+            ->where('channel', NotificationChannel::IN_APP)
             ->when($filters['event'], fn ($query, string $event) => $query->where('event', $event))
-            ->when($filters['channel'], fn ($query, string $channel) => $query->where('channel', $channel))
             ->when($filters['delivery_status'], fn ($query, string $status) => $query->where('status', $status))
             ->when($filters['only_unread'], fn ($query) => $query->whereNull('read_at'))
             ->latest('id')
@@ -97,6 +97,7 @@ class NotificationController extends Controller
         $userId = Auth::id();
         Notification::query()
             ->where('user_id', $userId)
+            ->where('channel', NotificationChannel::IN_APP)
             ->whereNull('read_at')
             ->update(['read_at' => now()]);
 

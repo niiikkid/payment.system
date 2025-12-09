@@ -32,9 +32,7 @@ final class NotificationTemplateResolver
             ? $this->money->format($amount)
             : '0';
 
-        $title = __('messages.notifications.templates.invoice_created.title', [
-            'channel' => $channel->label(),
-        ]);
+        $title = __('messages.notifications.templates.invoice_created.title');
 
         $body = __('messages.notifications.templates.invoice_created.body', [
             'amount' => $formattedAmount,
@@ -52,9 +50,7 @@ final class NotificationTemplateResolver
             ? $this->money->format($amount)
             : '0';
 
-        $title = __('messages.notifications.templates.invoice_status_changed.title', [
-            'channel' => $channel->label(),
-        ]);
+        $title = __('messages.notifications.templates.invoice_status_changed.title');
 
         $body = __('messages.notifications.templates.invoice_status_changed.body', [
             'status' => $event->status() ?? '',

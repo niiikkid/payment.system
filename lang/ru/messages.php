@@ -129,11 +129,11 @@ return [
         ],
         'templates' => [
             'invoice_created' => [
-                'title' => 'Создан инвойс (:channel)',
+                'title' => 'Создан инвойс',
                 'body' => 'Создан новый инвойс на сумму :amount :currency.',
             ],
             'invoice_status_changed' => [
-                'title' => 'Статус инвойса изменён (:channel)',
+                'title' => 'Статус инвойса изменён',
                 'body' => 'Статус изменён с :previous на :status для суммы :amount :currency.',
             ],
         ],

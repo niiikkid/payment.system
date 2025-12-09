@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Observers;
 
+use App\Enums\InvoiceStatus;
 use App\Contracts\Invoice\InvoiceCallbackServiceContract;
 use App\Contracts\Notification\NotificationServiceContract;
 use App\Models\Invoice;
@@ -30,7 +31,10 @@ class InvoiceObserver
             return;
         }
 
-        $previousStatus = $invoice->getOriginal('status');
+        $previousStatusRaw = $invoice->getOriginal('status');
+        $previousStatus = $previousStatusRaw instanceof InvoiceStatus
+            ? $previousStatusRaw->value
+            : $previousStatusRaw;
 
         app(InvoiceCallbackServiceContract::class)->send($invoice, 'status_changed');
         app(NotificationServiceContract::class)->dispatch(new InvoiceStatusChangedNotificationEvent($invoice, $previousStatus));

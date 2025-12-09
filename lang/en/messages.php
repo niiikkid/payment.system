@@ -129,11 +129,11 @@ return [
         ],
         'templates' => [
             'invoice_created' => [
-                'title' => 'Invoice created (:channel)',
+                'title' => 'Invoice created',
                 'body' => 'A new invoice for :amount :currency has been created.',
             ],
             'invoice_status_changed' => [
-                'title' => 'Invoice status changed (:channel)',
+                'title' => 'Invoice status changed',
                 'body' => 'Status changed from :previous to :status for :amount :currency.',
             ],
         ],

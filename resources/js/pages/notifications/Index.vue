@@ -349,8 +349,6 @@ const eventRequiresStatus = computed(() => ruleForm.event === 'invoice.status_ch
                   <tr>
                     <th>{{ __('frontend.notifications.list.title_col') }}</th>
                     <th>{{ __('frontend.notifications.list.event') }}</th>
-                    <th>{{ __('frontend.notifications.list.channel') }}</th>
-                    <th>{{ __('frontend.notifications.list.status') }}</th>
                     <th>{{ __('frontend.notifications.list.created_at') }}</th>
                     <th></th>
                   </tr>
@@ -364,40 +362,29 @@ const eventRequiresStatus = computed(() => ruleForm.event === 'invoice.status_ch
                       </div>
                       <div class="text-sm opacity-70 whitespace-pre-wrap">{{ notification.body }}</div>
                     </td>
-                    <td>
-                      <span class="badge badge-ghost">{{ eventLabel(notification.event) }}</span>
-                    </td>
-                    <td>
-                      <span class="badge badge-outline">{{ channelLabel(notification.channel) }}</span>
-                    </td>
-                    <td>
-                      <span
-                        class="badge badge-sm"
-                        :class="{
-                          'badge-success': notification.status === 'delivered',
-                          'badge-error': notification.status === 'failed',
-                          'badge-ghost': notification.status === 'pending',
-                        }"
-                      >
-                        {{ statusLabel(notification.status) }}
-                      </span>
+                    <td class="whitespace-nowrap">
+                      <span class="badge badge-ghost whitespace-nowrap">{{ eventLabel(notification.event) }}</span>
                     </td>
                     <td>
                       <DateTimeFormat :value="notification.created_at" />
                     </td>
                     <td class="text-right">
                       <div class="flex items-center justify-end gap-2">
-                        <button v-if="notification.read_at === null" class="btn btn-primary btn-xs" @click="markRead(notification)">
-                          {{ __('frontend.notifications.actions.mark_read') }}
-                        </button>
-                        <button v-else class="btn btn-ghost btn-xs" @click="markUnread(notification)">
-                          {{ __('frontend.notifications.actions.mark_unread') }}
+                        <button
+                          v-if="notification.read_at === null"
+                          class="btn btn-primary btn-xs"
+                          aria-label="Mark as read"
+                          @click="markRead(notification)"
+                        >
+                          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+                          </svg>
                         </button>
                       </div>
                     </td>
                   </tr>
                   <tr v-if="notifications.data.length === 0">
-                    <td colspan="6" class="text-center text-sm opacity-70 py-6">
+                    <td colspan="4" class="text-center text-sm opacity-70 py-6">
                       {{ __('frontend.notifications.list.empty') }}
                     </td>
                   </tr>
@@ -421,25 +408,18 @@ const eventRequiresStatus = computed(() => ruleForm.event === 'invoice.status_ch
                     </div>
                   </div>
                   <div class="flex flex-wrap gap-2">
-                    <span class="badge badge-ghost">{{ eventLabel(notification.event) }}</span>
-                    <span class="badge badge-outline">{{ channelLabel(notification.channel) }}</span>
-                    <span
-                      class="badge badge-sm"
-                      :class="{
-                        'badge-success': notification.status === 'delivered',
-                        'badge-error': notification.status === 'failed',
-                        'badge-ghost': notification.status === 'pending',
-                      }"
-                    >
-                      {{ statusLabel(notification.status) }}
-                    </span>
+                    <span class="badge badge-ghost whitespace-nowrap">{{ eventLabel(notification.event) }}</span>
                   </div>
                   <div class="flex justify-end gap-2">
-                    <button v-if="notification.read_at === null" class="btn btn-primary btn-xs" @click="markRead(notification)">
-                      {{ __('frontend.notifications.actions.mark_read') }}
-                    </button>
-                    <button v-else class="btn btn-ghost btn-xs" @click="markUnread(notification)">
-                      {{ __('frontend.notifications.actions.mark_unread') }}
+                    <button
+                      v-if="notification.read_at === null"
+                      class="btn btn-primary btn-xs"
+                      aria-label="Mark as read"
+                      @click="markRead(notification)"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+                      </svg>
                     </button>
                   </div>
                 </div>
