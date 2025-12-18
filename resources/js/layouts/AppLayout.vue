@@ -229,7 +229,8 @@ const pageIconStrokeWidth = computed(() => (isNotificationsActive.value ? 1.5 : 
                                     </span>
                                 </Link>
                             </li>
-                            <li v-if="(page.props as any)?.auth?.is_admin">
+                            <!-- Временно скрыто: функционал маркетов -->
+                            <!-- <li v-if="(page.props as any)?.auth?.is_admin">
                                 <Link href="/markets" :class="{ 'menu-active': isMarketsActive, active: isMarketsActive }">
                                     <span class="flex items-center gap-2">
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5 opacity-30">
@@ -238,7 +239,7 @@ const pageIconStrokeWidth = computed(() => (isNotificationsActive.value ? 1.5 : 
                                         {{ __('frontend.nav.markets') }}
                                     </span>
                                 </Link>
-                            </li>
+                            </li> -->
                             <li v-if="(page.props as any)?.auth?.is_admin">
                                 <Link href="/admin/users" :class="{ 'menu-active': isAdminUsersActive, active: isAdminUsersActive }" aria-current="page">
                                     <span class="flex items-center gap-2">
