@@ -93,6 +93,7 @@ return [
             'create' => 'Create client',
             'add' => 'Add',
             'save' => 'Save',
+            'view_invoices' => 'Client invoices',
         ],
         'fields' => [
             'external_id' => 'Client ID',

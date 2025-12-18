@@ -93,6 +93,7 @@ return [
             'create' => 'Создать клиента',
             'add' => 'Добавить',
             'save' => 'Сохранить',
+            'view_invoices' => 'Инвойсы клиента',
         ],
         'fields' => [
             'external_id' => 'Client ID',

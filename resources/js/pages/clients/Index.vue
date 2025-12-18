@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import { useForm } from '@inertiajs/vue3'
+import { Link, useForm } from '@inertiajs/vue3'
 import AppLayout from '@/layouts/AppLayout.vue'
 import FilterPanel from '@/components/filters/FilterPanel.vue'
 import Pagination from '@/components/ui/Pagination.vue'
@@ -166,6 +166,10 @@ function closeModal() {
     form.clearErrors()
 }
 
+function invoicesLink(client: ClientItem): string {
+    return `/invoices?${new URLSearchParams({ client_id: client.id }).toString()}`
+}
+
 function updateFormPayload(payload: ClientForm) {
     form.external_id = payload.external_id
     form.name = payload.name
@@ -270,6 +274,9 @@ function toIso(input: string | null | undefined): string {
                                         <span v-else class="opacity-60">—</span>
                                     </td>
                                     <td class="flex items-center gap-2">
+                                        <Link class="btn btn-ghost btn-xs" :href="invoicesLink(client)">
+                                            {{ __('frontend.clients.actions.view_invoices') }}
+                                        </Link>
                                         <button class="btn btn-xs" @click="openEdit(client)">
                                             {{ __('frontend.common.edit') }}
                                         </button>
@@ -317,6 +324,9 @@ function toIso(input: string | null | undefined): string {
                                     </div>
 
                                     <div class="flex flex-col items-end gap-2">
+                                        <Link class="btn btn-ghost btn-xs" :href="invoicesLink(client)">
+                                            {{ __('frontend.clients.actions.view_invoices') }}
+                                        </Link>
                                         <button class="btn btn-xs" @click="openEdit(client)">
                                             {{ __('frontend.common.edit') }}
                                         </button>
@@ -370,9 +380,14 @@ function toIso(input: string | null | undefined): string {
                                         </span>
                                         <span v-else class="ml-1 opacity-60">—</span>
                                     </div>
-                                    <button class="btn btn-ghost btn-xs" @click="openEdit(client)">
-                                        {{ __('frontend.common.edit') }}
-                                    </button>
+                                    <div class="flex items-center gap-2">
+                                        <Link class="btn btn-ghost btn-xs" :href="invoicesLink(client)">
+                                            {{ __('frontend.clients.actions.view_invoices') }}
+                                        </Link>
+                                        <button class="btn btn-ghost btn-xs" @click="openEdit(client)">
+                                            {{ __('frontend.common.edit') }}
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
