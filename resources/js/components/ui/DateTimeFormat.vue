@@ -9,12 +9,12 @@ interface Props {
   value: string
   /**
    * Поддерживаемые токены: YYYY (или YY при shortYear), MM, DD, HH, mm, ss
-   * По умолчанию: 'YYYY-MM-DD HH:mm:ss'
+   * По умолчанию: 'YYYY.MM.DD HH:mm:ss' (при shortYear будет отображаться как YY.MM.DD HH:mm:ss)
    */
   pattern?: string
   /**
    * Отображать год в сокращенном формате (2025 → 25)
-   * По умолчанию: false
+   * По умолчанию: true
    */
   shortYear?: boolean
   /**
@@ -71,8 +71,8 @@ const dateObject = computed<Date | null>(() => {
 
 const formatted = computed<string>(() => {
   if (!dateObject.value) return ''
-  let pattern = props.pattern ?? 'YYYY-MM-DD HH:mm:ss'
-  const shortYear = props.shortYear ?? false
+  let pattern = props.pattern ?? 'YYYY.MM.DD HH:mm:ss'
+  const shortYear = props.shortYear ?? true
   const hideSeconds = props.hideSeconds ?? false
   
   if (hideSeconds) {
@@ -84,7 +84,7 @@ const formatted = computed<string>(() => {
 
 const fullFormatted = computed<string>(() => {
   if (!dateObject.value) return ''
-  const pattern = props.pattern ?? 'YYYY-MM-DD HH:mm:ss'
+  const pattern = props.pattern ?? 'YYYY.MM.DD HH:mm:ss'
   return formatWithPattern(dateObject.value, pattern, false)
 })
 

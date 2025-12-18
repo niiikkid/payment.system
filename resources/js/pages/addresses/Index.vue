@@ -41,6 +41,16 @@ interface AddressFilters {
     is_active: boolean;
 }
 
+type FilterType = 'text' | 'select' | 'checkpoint';
+
+interface FilterField {
+    key: string;
+    type: FilterType;
+    label: string;
+    placeholder?: string;
+    options?: { value: string; label: string }[];
+}
+
 interface Props {
     addresses: PaginatedAddresses;
     currencyOptions: { value: string; label: string }[];
@@ -78,7 +88,7 @@ const filtersModel = computed({
         filters.is_active = Boolean(value.is_active);
     },
 });
-const filterFields = computed(() => [
+const filterFields = computed<FilterField[]>(() => [
     {
         key: 'search',
         type: 'text',
@@ -245,7 +255,13 @@ function toIso(input: string | null | undefined): string {
                                     </td>
                                     <td>{{ addr.balance }}</td>
                                     <td>
-                                        <CurrencyNetworkBadge :currency-label="addr.currency_label" :network-label="addr.network_label" />
+                                        <CurrencyNetworkBadge
+                                            :currency="addr.currency"
+                                            :network="addr.network"
+                                            :icon-size="22"
+                                            :currency-label="addr.currency_label"
+                                            :network-label="addr.network_label"
+                                        />
                                     </td>
                                     <td>
                                         <div class="flex items-center gap-2">
@@ -287,7 +303,7 @@ function toIso(input: string | null | undefined): string {
                                     </div>
 
                                     <div class="flex justify-center min-w-0">
-                                        <CurrencyNetworkBadge :currency-label="addr.currency_label" :network-label="addr.network_label" />
+                                        <CurrencyNetworkBadge :icon-size="22" :currency-label="addr.currency_label" :network-label="addr.network_label" />
                                     </div>
 
                                     <div class="flex items-center gap-2 whitespace-nowrap">
@@ -342,7 +358,7 @@ function toIso(input: string | null | undefined): string {
                                 <!-- Footer -->
                                 <div class="flex items-center justify-between mt-3">
                                     <div>
-                                        <CurrencyNetworkBadge :currency-label="addr.currency_label" :network-label="addr.network_label" />
+                                        <CurrencyNetworkBadge :icon-size="22" :currency-label="addr.currency_label" :network-label="addr.network_label" />
                                     </div>
                                     <div class="inline-flex items-center gap-2">
                                         <span class="text-xs opacity-70">{{ __('frontend.common.balance') }}:</span>

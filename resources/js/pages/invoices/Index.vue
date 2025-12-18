@@ -404,7 +404,7 @@ watch(invoices, (collection: any) => {
                   </td>
                   <td>{{ inv.amount }}</td>
                   <td>
-                    <CurrencyNetworkBadge :currency-label="inv.currency_label || inv.currency" :network-label="inv.network_label || inv.network" />
+                    <CurrencyNetworkBadge :icon-size="22" :currency-label="inv.currency_label || inv.currency" :network-label="inv.network_label || inv.network" />
                   </td>
                   <td>
                     <span class="badge badge-sm" :class="{
@@ -414,7 +414,7 @@ watch(invoices, (collection: any) => {
                     }">{{ inv.status }}</span>
                   </td>
                   <td class="text-xs font-mono">
-                    <DateTimeFormat :value="toIso(inv.created_at)" />
+                    <DateTimeFormat short-year :value="toIso(inv.created_at)" />
                   </td>
                   <td class="flex items-center gap-2">
                     <button class="btn btn-xs" @click="openDetails(inv)">
