@@ -16,6 +16,7 @@ use Illuminate\Validation\Rule;
  * @property-read string|null $currency
  * @property-read string|null $network
  * @property-read int|null $merchant_id
+ * @property-read string|null $client_id
  * @property-read bool|null $has_callback
  */
 class InvoiceFilterRequest extends FormRequest
@@ -33,6 +34,7 @@ class InvoiceFilterRequest extends FormRequest
             'currency' => ['nullable', 'string', Rule::in(array_map(static fn (Currency $currency) => $currency->value, Currency::cases()))],
             'network' => ['nullable', 'string', Rule::in(array_map(static fn (Network $network) => $network->value, Network::cases()))],
             'merchant_id' => ['nullable', 'integer', 'min:1'],
+            'client_id' => ['nullable', 'string', 'max:26'],
             'has_callback' => ['sometimes', 'boolean'],
         ];
     }
@@ -45,6 +47,7 @@ class InvoiceFilterRequest extends FormRequest
             'currency' => (string) $this->input('currency', ''),
             'network' => (string) $this->input('network', ''),
             'merchant_id' => $this->filled('merchant_id') ? (string) $this->integer('merchant_id') : '',
+            'client_id' => (string) $this->input('client_id', ''),
             'has_callback' => $this->boolean('has_callback'),
         ];
     }

@@ -28,6 +28,12 @@ type Invoice = {
     callback_url: string | null
     tag: string | null
     metadata: Record<string, any> | null
+    client?: {
+        id: string
+        external_id: string
+        name: string | null
+    } | null
+    client_external_id?: string | null
     created_at: string | null
 }
 
@@ -127,6 +133,15 @@ function toIso(input: string | null | undefined): string {
                             <div>
                                 <AddressCopy v-if="invoice.address" :address="invoice.address" />
                                 <span v-else class="text-base-content/60">#{{ invoice.address_id }}</span>
+                            </div>
+                        </div>
+                        <div class="flex-1 min-w-[200px]">
+                            <div class="text-xs text-base-content/60 mb-1">{{ __('frontend.invoices_details.main.client') }}</div>
+                            <div class="flex flex-col">
+                                <span class="font-medium">{{ invoice.client?.name || invoice.client_external_id || '—' }}</span>
+                                <span v-if="invoice.client?.external_id && invoice.client?.name" class="text-xs text-base-content/60 truncate">
+                                    {{ invoice.client?.external_id }}
+                                </span>
                             </div>
                         </div>
                     </div>

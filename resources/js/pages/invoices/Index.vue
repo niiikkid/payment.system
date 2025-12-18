@@ -11,6 +11,7 @@ import Pagination from '@/components/ui/Pagination.vue';
 import InvoiceDetailsModal from '@/components/modals/invoices/InvoiceDetailsModal.vue';
 import InvoiceEditModal, { type InvoiceEditForm } from '@/components/modals/invoices/InvoiceEditModal.vue';
 import InvoiceCreateModal, { type InvoiceCreateForm } from '@/components/modals/invoices/InvoiceCreateModal.vue';
+import ClientModal, { type ClientForm } from '@/components/modals/clients/ClientModal.vue';
 import FilterPanel from '@/components/filters/FilterPanel.vue';
 import { vueLang } from '@erag/lang-sync-inertia';
 
@@ -30,6 +31,15 @@ type Invoice = {
   callback_url: string | null
   tag: string | null
   metadata: Record<string, any> | null
+  client_id?: string | null
+  client_external_id?: string | null
+  client?: {
+    id: string
+    external_id: string
+    name: string | null
+    telegram: string | null
+    contact: string | null
+  } | null
   created_at: string | null
   updated_at: string | null
 }
@@ -42,6 +52,13 @@ interface MerchantOption {
   logo_url?: string | null;
   description?: string | null;
 }
+interface ClientOption {
+  id: string;
+  value: string;
+  label: string;
+  contact?: string | null;
+  external_id?: string;
+}
 
 interface InvoiceFilters {
   search: string;
@@ -49,6 +66,7 @@ interface InvoiceFilters {
   currency: string;
   network: string;
   merchant_id: string;
+  client_id: string;
   has_callback: boolean;
 }
 
@@ -67,6 +85,13 @@ const statuses = computed(() => page.props.statuses as { active: string[]; final
 const currencyOptions = computed(() => page.props.currencyOptions as Option[]);
 const networkOptions = computed(() => page.props.networkOptions as Option[]);
 const merchantOptions = computed(() => page.props.merchantOptions as MerchantOption[]);
+const clientOptions = ref<ClientOption[]>(((page.props.clientOptions as any) ?? []) as ClientOption[]);
+const clientFilterOptions = computed(() =>
+  clientOptions.value.map((client) => ({
+    value: client.id,
+    label: client.label || client.value,
+  })),
+);
 const pageFilters = computed(() => (page.props.filters as Partial<InvoiceFilters> | undefined) ?? {});
 const { __ } = vueLang();
 
@@ -77,6 +102,15 @@ const showEdit = ref(false);
 const sendLoading = ref(false);
 const sendError = ref<string | null>(null);
 const sendSuccess = ref(false);
+const showClientModal = ref(false);
+const clientModalLoading = ref(false);
+const clientModalErrors = ref<Partial<Record<keyof ClientForm, string>>>({});
+const clientModalForm = ref<ClientForm>({
+  external_id: '',
+  name: '',
+  telegram: '',
+  contact: '',
+});
 
 const editForm = useForm<InvoiceEditForm>({ status: '', txid: null });
 const filterDefaults: InvoiceFilters = {
@@ -85,6 +119,7 @@ const filterDefaults: InvoiceFilters = {
   currency: '',
   network: '',
   merchant_id: '',
+  client_id: '',
   has_callback: false,
 };
 const filters = useForm<InvoiceFilters>({
@@ -102,6 +137,7 @@ const filtersModel = computed({
     filters.currency = value.currency ?? '';
     filters.network = value.network ?? '';
     filters.merchant_id = value.merchant_id ?? '';
+    filters.client_id = value.client_id ?? '';
     filters.has_callback = Boolean(value.has_callback);
   },
 });
@@ -135,6 +171,12 @@ const filterFields = computed<FilterField[]>(() => [
     type: 'select',
     label: __('frontend.invoices_page.filters.merchant'),
     options: merchantOptions.value,
+  },
+  {
+    key: 'client_id',
+    type: 'select',
+    label: __('frontend.invoices_page.filters.client'),
+    options: clientFilterOptions.value,
   },
   {
     key: 'has_callback',
@@ -203,6 +245,7 @@ function resetFilters() {
   filters.currency = filterDefaults.currency;
   filters.network = filterDefaults.network;
   filters.merchant_id = filterDefaults.merchant_id;
+  filters.client_id = filterDefaults.client_id;
   filters.has_callback = filterDefaults.has_callback;
 
   applyFilters();
@@ -264,6 +307,10 @@ const createForm = useForm<InvoiceCreateForm>({
   network: '',
   amount: '',
   merchant_id: '',
+  client_id: '',
+  client_name: '',
+  client_telegram: '',
+  client_contact: '',
   product_name: '',
   product_description: '',
   external_invoice_id: '',
@@ -282,6 +329,10 @@ function updateCreatePayload(payload: InvoiceCreateForm) {
   createForm.network = payload.network;
   createForm.amount = payload.amount;
   createForm.merchant_id = payload.merchant_id;
+  createForm.client_id = payload.client_id;
+  createForm.client_name = payload.client_name;
+  createForm.client_telegram = payload.client_telegram;
+  createForm.client_contact = payload.client_contact;
   createForm.product_name = payload.product_name;
   createForm.product_description = payload.product_description;
   createForm.external_invoice_id = payload.external_invoice_id;
@@ -310,6 +361,10 @@ function submitCreate() {
     .transform((data) => ({
       ...data,
       merchant_id: data.merchant_id || null,
+      client_id: data.client_id || null,
+      client_name: data.client_name || null,
+      client_telegram: data.client_telegram || null,
+      client_contact: data.client_contact || null,
       product_name: data.product_name || null,
       product_description: data.product_description || null,
       external_invoice_id: data.external_invoice_id || null,
@@ -332,6 +387,74 @@ function submitCreate() {
     });
 }
 
+function mapClientToOption(client: any): ClientOption {
+  return {
+    id: String(client.id ?? ''),
+    value: String(client.external_id ?? ''),
+    label: client.name || client.external_id || '',
+    contact: client.contact ?? client.telegram ?? null,
+    external_id: client.external_id ?? '',
+  };
+}
+
+function resetClientModalForm() {
+  clientModalForm.value = {
+    external_id: '',
+    name: '',
+    telegram: '',
+    contact: '',
+  };
+  clientModalErrors.value = {};
+}
+
+function updateClientModalForm(payload: ClientForm) {
+  clientModalForm.value = { ...payload };
+}
+
+function openClientModal() {
+  resetClientModalForm();
+  showClientModal.value = true;
+}
+
+function closeClientModal() {
+  showClientModal.value = false;
+  clientModalErrors.value = {};
+}
+
+async function submitClientModal() {
+  clientModalLoading.value = true;
+  clientModalErrors.value = {};
+  try {
+    const payload = { ...clientModalForm.value };
+    const response = await axios.post('/clients', payload, {
+      headers: { Accept: 'application/json' },
+    });
+    const newClient = response.data?.client;
+    if (newClient) {
+      const option = mapClientToOption(newClient);
+      clientOptions.value = [option, ...clientOptions.value.filter((opt) => opt.id !== option.id)];
+      createForm.client_id = option.value;
+    }
+    showClientModal.value = false;
+    resetClientModalForm();
+  } catch (error: any) {
+    const errors = error?.response?.data?.errors;
+    const message = error?.response?.data?.message || error?.message;
+    if (errors) {
+      const parsed: Partial<Record<keyof ClientForm, string>> = {};
+      Object.entries(errors).forEach(([key, msgs]) => {
+        const first = Array.isArray(msgs) ? msgs[0] : String(msgs);
+        parsed[key as keyof ClientForm] = first;
+      });
+      clientModalErrors.value = parsed;
+    } else if (message) {
+      clientModalErrors.value = { external_id: message };
+    }
+  } finally {
+    clientModalLoading.value = false;
+  }
+}
+
 function toIso(input: string | null | undefined): string {
   if (!input) return '';
   if (typeof input !== 'string') return '';
@@ -347,6 +470,15 @@ watch(invoices, (collection: any) => {
     selected.value = fresh;
   }
 });
+
+watch(
+  () => page.props.clientOptions as any,
+  (value) => {
+    if (Array.isArray(value)) {
+      clientOptions.value = [...(value as ClientOption[])];
+    }
+  },
+);
 
 </script>
 
@@ -386,6 +518,7 @@ watch(invoices, (collection: any) => {
                 <tr>
                   <th>{{ __('frontend.invoices_page.table.id') }}</th>
                   <th>{{ __('frontend.invoices_page.table.address') }}</th>
+                  <th>{{ __('frontend.invoices_page.table.client') }}</th>
                   <th>{{ __('frontend.invoices_page.table.amount') }}</th>
                   <th>{{ __('frontend.invoices_page.table.currency') }}</th>
                   <th>{{ __('frontend.invoices_page.table.status') }}</th>
@@ -401,6 +534,14 @@ watch(invoices, (collection: any) => {
                   <td class="font-mono text-xs">
                     <AddressCopy v-if="inv.address" :address="inv.address" />
                     <span v-else class="opacity-60">#{{ inv.address_id }}</span>
+                  </td>
+                  <td class="text-sm">
+                    <div class="flex flex-col">
+                      <span class="font-medium truncate">{{ inv.client?.name || inv.client_external_id || '—' }}</span>
+                      <span v-if="inv.client?.external_id && inv.client?.name" class="text-xs text-base-content/60 truncate">
+                        {{ inv.client?.external_id }}
+                      </span>
+                    </div>
                   </td>
                   <td>{{ inv.amount }}</td>
                   <td>
@@ -469,6 +610,9 @@ watch(invoices, (collection: any) => {
                     <div class="font-mono text-xs opacity-70 truncate text-center">
                       <AddressCopy v-if="inv.address" :address="inv.address" />
                       <span v-else class="opacity-60">#{{ inv.address_id }}</span>
+                    </div>
+                    <div class="text-xs text-base-content/70 truncate text-center">
+                      {{ inv.client?.name || inv.client_external_id || '—' }}
                     </div>
                   </div>
 
@@ -549,6 +693,9 @@ watch(invoices, (collection: any) => {
                                     <AddressCopy v-if="inv.address" :address="inv.address" />
                                     <span v-else class="opacity-60">#{{ inv.address_id }}</span>
                                 </div>
+                                <div class="text-xs text-base-content/70 truncate text-center ml-2">
+                                    {{ inv.client?.name || inv.client_external_id || '—' }}
+                                </div>
                             </div>
                             <div class="flex items-center gap-2">
                                 <button class="btn btn-xs" @click="openDetails(inv)">
@@ -604,11 +751,23 @@ watch(invoices, (collection: any) => {
       :currency-options="currencyOptions"
       :network-options="networkOptions"
       :merchant-options="merchantOptions"
+      :client-options="clientOptions"
       :errors="createForm.errors"
       :loading="createForm.processing"
       @update:form="updateCreatePayload"
       @submit="submitCreate"
       @close="closeCreate"
+      @create-client="openClientModal"
+    />
+
+    <ClientModal
+      v-model="showClientModal"
+      :form="clientModalForm"
+      :errors="clientModalErrors"
+      :loading="clientModalLoading"
+      @update:form="updateClientModalForm"
+      @submit="submitClientModal"
+      @close="closeClientModal"
     />
 
   </AppLayout>

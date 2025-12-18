@@ -12,6 +12,7 @@ use App\Http\Controllers\Dev\CallbackSandboxController;
 use App\Http\Controllers\Admin\UsersController;
 use App\Http\Controllers\ImpersonationController;
 use App\Http\Controllers\MerchantController;
+use App\Http\Controllers\ClientController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\NotificationRuleController;
 use App\Http\Controllers\TelegramSettingsController;
@@ -56,6 +57,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('addresses', [AddressController::class, 'index'])->name('addresses.index');
     Route::post('addresses', [AddressController::class, 'store'])->name('addresses.store');
     Route::patch('addresses/{address}', [AddressController::class, 'update'])->name('addresses.update');
+
+    // Clients
+    Route::get('clients', [ClientController::class, 'index'])->name('clients.index');
+    Route::post('clients', [ClientController::class, 'store'])->name('clients.store');
+    Route::patch('clients/{client}', [ClientController::class, 'update'])->name('clients.update');
 
     // Merchants
     Route::get('merchants', [MerchantController::class, 'index'])->name('merchants.index');

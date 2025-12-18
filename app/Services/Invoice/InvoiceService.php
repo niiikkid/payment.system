@@ -16,6 +16,7 @@ use App\Jobs\ConfirmInvoicePaymentJob;
 use App\Enums\Currency;
 use App\Enums\InvoiceStatus;
 use App\Enums\Network;
+use App\Models\Client;
 use App\Models\Invoice;
 use App\Models\Merchant;
 use App\Models\User;
@@ -34,7 +35,7 @@ class InvoiceService implements InvoiceServiceContract
     ) {
     }
 
-    public function create(User $user, Currency $currency, Network $network, MoneyAmount $amount, ?string $externalInvoiceId = null, ?string $callbackUrl = null, ?string $tag = null, array $metadata = [], ?Merchant $merchant = null, ?string $productName = null, ?string $productDescription = null): Invoice
+    public function create(User $user, Currency $currency, Network $network, MoneyAmount $amount, ?string $externalInvoiceId = null, ?string $callbackUrl = null, ?string $tag = null, array $metadata = [], ?Merchant $merchant = null, ?Client $client = null, ?string $productName = null, ?string $productDescription = null): Invoice
     {
         // Проверка суммы по глобальным App Settings
         $settings = $this->appSettings->get($currency);
@@ -59,6 +60,9 @@ class InvoiceService implements InvoiceServiceContract
         if ($merchant !== null && $merchant->user_id !== $user->id) {
             throw new \RuntimeException(__('messages.merchants.errors.not_owner'));
         }
+        if ($client !== null && $client->user_id !== $user->id) {
+            throw new \RuntimeException(__('messages.clients.errors.not_owner'));
+        }
         $amountMinor = $this->money->toMinor($amount);
 
         $expiresInMinutes = $merchant?->invoice_expires_in_minutes ?? self::DEFAULT_EXPIRES_IN_MINUTES;
@@ -68,6 +72,7 @@ class InvoiceService implements InvoiceServiceContract
         $invoice = Invoice::query()->create([
             'user_id' => $user->id,
             'merchant_id' => $merchant?->id,
+            'client_id' => $client?->id,
             'external_invoice_id' => $externalInvoiceId,
             'address_id' => $address->id,
             'amount' => $amountMinor,

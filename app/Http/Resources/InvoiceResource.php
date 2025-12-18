@@ -8,6 +8,7 @@ use App\Contracts\Blockchain\ExplorerServiceContract;
 use App\Contracts\Money\MoneyServiceContract;
 use App\Models\Invoice;
 use App\Http\Resources\MerchantResource;
+use App\Http\Resources\ClientResource;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -40,6 +41,9 @@ class InvoiceResource extends JsonResource
             'metadata' => $this->metadata,
             'merchant_id' => $this->merchant_id,
             'merchant' => $this->whenLoaded('merchant', fn () => (new MerchantResource($this->merchant))->resolve()),
+            'client_id' => $this->client_id,
+            'client_external_id' => $this->client?->external_id,
+            'client' => $this->whenLoaded('client', fn () => (new ClientResource($this->client))->resolve()),
             'product_name' => $this->product_name,
             'product_description' => $this->product_description,
             'created_at' => $this->created_at?->toISOString(),

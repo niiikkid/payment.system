@@ -7,6 +7,7 @@ namespace App\Contracts\Invoice;
 use App\Enums\Currency;
 use App\Enums\Network;
 use App\Enums\InvoiceStatus;
+use App\Models\Client;
 use App\Models\Invoice;
 use App\Models\Merchant;
 use App\Models\User;
@@ -18,7 +19,7 @@ interface InvoiceServiceContract
      * Создать инвойс, выбирая адрес через AddressService::pickForPayment.
      * Возвращает созданный инвойс или бросает исключение при отсутствии доступного адреса.
      */
-    public function create(User $user, Currency $currency, Network $network, MoneyAmount $amount, ?string $externalInvoiceId = null, ?string $callbackUrl = null, ?string $tag = null, array $metadata = [], ?Merchant $merchant = null, ?string $productName = null, ?string $productDescription = null): Invoice;
+    public function create(User $user, Currency $currency, Network $network, MoneyAmount $amount, ?string $externalInvoiceId = null, ?string $callbackUrl = null, ?string $tag = null, array $metadata = [], ?Merchant $merchant = null, ?Client $client = null, ?string $productName = null, ?string $productDescription = null): Invoice;
 
     /**
      * Пометить инвойс как просроченный, если он ещё активен.

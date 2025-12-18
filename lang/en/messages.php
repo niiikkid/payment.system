@@ -67,6 +67,17 @@ return [
             'not_owner' => 'Merchant does not belong to the current user.',
         ],
     ],
+    'clients' => [
+        'created' => 'Client created',
+        'updated' => 'Client updated',
+        'create_failed' => 'Failed to create client.',
+        'update_failed' => 'Failed to update client.',
+        'errors' => [
+            'duplicate_external_id' => 'Client with this Client ID already exists.',
+            'empty_external_id' => 'Client ID is required.',
+            'not_owner' => 'Client does not belong to the current user.',
+        ],
+    ],
     'markets' => [
         'created' => 'Fiat added',
         'updated' => 'Settings saved',

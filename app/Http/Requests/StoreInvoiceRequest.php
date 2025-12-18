@@ -23,6 +23,10 @@ use Illuminate\Validation\Rule;
  * @property-read string|null $callback_url URL для callback
  * @property-read string|null $tag Произвольная метка
  * @property-read array|null $metadata Доп. данные
+ * @property-read string|null $client_id Внешний идентификатор клиента
+ * @property-read string|null $client_name Имя клиента
+ * @property-read string|null $client_telegram Контакт Telegram
+ * @property-read string|null $client_contact Дополнительный контакт
  */
 class StoreInvoiceRequest extends FormRequest
 {
@@ -48,6 +52,10 @@ class StoreInvoiceRequest extends FormRequest
             'callback_url' => ['nullable', 'url', 'max:255'],
             'tag' => ['nullable', 'string', 'max:255'],
             'metadata' => ['nullable', 'array'],
+            'client_id' => ['nullable', 'string', 'max:128'],
+            'client_name' => ['nullable', 'string', 'max:255'],
+            'client_telegram' => ['nullable', 'string', 'max:255'],
+            'client_contact' => ['nullable', 'string', 'max:255'],
         ];
     }
 
@@ -64,6 +72,32 @@ class StoreInvoiceRequest extends FormRequest
     public function toMoneyAmount(MoneyServiceContract $money): MoneyAmount
     {
         return $money->create($this->input('amount'), $this->toCurrencyEnum());
+    }
+
+    public function clientExternalId(): ?string
+    {
+        $value = $this->input('client_id');
+        if ($value === null) {
+            return null;
+        }
+
+        $trimmed = trim((string) $value);
+        return $trimmed === '' ? null : $trimmed;
+    }
+
+    public function clientName(): ?string
+    {
+        return $this->nullableString('client_name');
+    }
+
+    public function clientTelegram(): ?string
+    {
+        return $this->nullableString('client_telegram');
+    }
+
+    public function clientContact(): ?string
+    {
+        return $this->nullableString('client_contact');
     }
 
     public function merchant(): ?Merchant
@@ -99,6 +133,17 @@ class StoreInvoiceRequest extends FormRequest
 
         $trimmed = trim((string) $value);
         return $trimmed !== '' ? $trimmed : null;
+    }
+
+    private function nullableString(string $key): ?string
+    {
+        $value = $this->input($key);
+        if ($value === null) {
+            return null;
+        }
+
+        $trimmed = trim((string) $value);
+        return $trimmed === '' ? null : $trimmed;
     }
 }
 

@@ -26,6 +26,7 @@ class Invoice extends Model
         'id',
         'user_id',
         'merchant_id',
+        'client_id',
         'external_invoice_id',
         'address_id',
         'amount',
@@ -68,6 +69,11 @@ class Invoice extends Model
     public function merchant(): BelongsTo
     {
         return $this->belongsTo(Merchant::class);
+    }
+
+    public function client(): BelongsTo
+    {
+        return $this->belongsTo(Client::class);
     }
 
     public function user(): BelongsTo

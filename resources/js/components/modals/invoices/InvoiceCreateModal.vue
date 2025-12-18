@@ -7,6 +7,7 @@ import Input from '@/components/form/Input.vue'
 import Select from '@/components/form/Select.vue'
 import Textarea from '@/components/form/Textarea.vue'
 import MerchantSelect from '@/components/merchants/MerchantSelect.vue'
+import ClientSelect from '@/components/clients/ClientSelect.vue'
 import { vueLang } from '@erag/lang-sync-inertia'
 
 interface Option { value: string; label: string }
@@ -19,12 +20,23 @@ interface MerchantOption {
     description?: string | null
     disabled?: boolean
 }
+interface ClientOption {
+    id: string
+    value: string
+    label: string
+    contact?: string | null
+    external_id?: string
+}
 
 export interface InvoiceCreateForm {
     currency: string
     network: string
     amount: string
     merchant_id: string | number | null
+    client_id: string | null
+    client_name: string
+    client_telegram: string
+    client_contact: string
     product_name: string
     product_description: string
     external_invoice_id: string
@@ -41,6 +53,7 @@ interface Props {
     currencyOptions: Option[]
     networkOptions: Option[]
     merchantOptions: MerchantOption[]
+    clientOptions: ClientOption[]
     errors: InvoiceCreateErrors | null
     loading: boolean
 }
@@ -53,6 +66,10 @@ const props = withDefaults(defineProps<Props>(), {
         network: '',
         amount: '',
         merchant_id: null,
+        client_id: null,
+        client_name: '',
+        client_telegram: '',
+        client_contact: '',
         product_name: '',
         product_description: '',
         external_invoice_id: '',
@@ -63,6 +80,7 @@ const props = withDefaults(defineProps<Props>(), {
     currencyOptions: () => [],
     networkOptions: () => [],
     merchantOptions: () => [],
+    clientOptions: () => [],
     errors: () => ({} as InvoiceCreateErrors),
 })
 
@@ -71,6 +89,7 @@ const emit = defineEmits<{
     (e: 'update:form', value: InvoiceCreateForm): void
     (e: 'submit'): void
     (e: 'close'): void
+    (e: 'create-client'): void
 }>()
 
 const form = computed({
@@ -91,6 +110,7 @@ function submit() {
     const trimmedForm = {
         ...form.value,
         amount: form.value.amount.trim(),
+        client_id: form.value.client_id ? form.value.client_id.trim() : null,
         external_invoice_id: form.value.external_invoice_id.trim(),
         callback_url: form.value.callback_url.trim(),
         tag: form.value.tag.trim(),
@@ -119,6 +139,21 @@ function submit() {
                     :options="merchantOptions"
                     :placeholder="__('frontend.invoices.fields.merchant_placeholder')"
                     :empty-label="__('frontend.invoices.fields.merchant_empty')"
+                />
+            </FormControl>
+            <FormControl :hint="__('frontend.invoices.fields.client_hint')" :error="fieldErrors.client_id">
+                <div class="flex items-center justify-between">
+                    <Label for="client_id">{{ __('frontend.invoices.fields.client') }}</Label>
+                    <button type="button" class="btn btn-ghost btn-xs" @click="emit('create-client')">
+                        {{ __('frontend.invoices.fields.client_create') }}
+                    </button>
+                </div>
+                <ClientSelect
+                    id="client_id"
+                    v-model="form.client_id"
+                    :options="clientOptions"
+                    :placeholder="__('frontend.invoices.fields.client_placeholder')"
+                    :empty-label="__('frontend.invoices.fields.client_empty')"
                 />
             </FormControl>
             <FormControl :hint="__('frontend.invoices.fields.currency_hint')" :error="fieldErrors.currency">

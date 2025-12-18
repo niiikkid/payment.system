@@ -8,6 +8,7 @@ return [
             'dashboard' => 'Главная',
             'addresses' => 'Адреса',
             'merchants' => 'Мерчанты',
+            'clients' => 'Клиенты',
             'invoices' => 'Инвойсы',
             'notifications' => 'Уведомления',
             'callback_logs' => 'Callback логи',
@@ -63,6 +64,56 @@ return [
             'address_placeholder' => 'Например: T...',
         ],
     ],
+    'clients' => [
+        'list' => [
+            'title' => 'Клиенты',
+        ],
+        'filters' => [
+            'title' => 'Фильтры',
+            'search' => 'Поиск',
+            'search_placeholder' => 'Client ID или имя',
+            'has_contact' => 'Есть контакты',
+            'apply' => 'Применить',
+            'reset' => 'Сбросить',
+            'show' => 'Показать фильтры',
+            'hide' => 'Скрыть фильтры',
+            'any' => 'Любое значение',
+        ],
+        'modals' => [
+            'create' => [
+                'title' => 'Создать клиента',
+                'description' => 'Укажите Client ID и контакты',
+            ],
+            'edit' => [
+                'title' => 'Редактировать клиента',
+                'description' => 'Обновите контакты или имя клиента',
+            ],
+        ],
+        'actions' => [
+            'create' => 'Создать клиента',
+            'add' => 'Добавить',
+            'save' => 'Сохранить',
+        ],
+        'fields' => [
+            'external_id' => 'Client ID',
+            'external_id_placeholder' => 'Уникальный идентификатор клиента',
+            'name' => 'Имя или название',
+            'name_placeholder' => 'Например: Client A',
+            'telegram' => 'Telegram',
+            'telegram_placeholder' => '@username',
+            'contact' => 'Контакт',
+            'contact_placeholder' => 'Любой контакт: email, чат и т.п.',
+        ],
+        'table' => [
+            'external_id' => 'Client ID',
+            'name' => 'Имя',
+            'contacts' => 'Контакты',
+            'empty' => 'Клиентов пока нет',
+        ],
+        'errors' => [
+            'create_failed' => 'Не удалось создать клиента.',
+        ],
+    ],
     'invoices' => [
         'modals' => [
             'create' => [
@@ -88,6 +139,11 @@ return [
             'merchant_placeholder' => 'Выберите мерчанта',
             'merchant_hint' => 'К какому мерчанту относится инвойс',
             'merchant_empty' => 'Мерчантов пока нет',
+            'client' => 'Клиент',
+            'client_placeholder' => 'Введите или выберите Client ID',
+            'client_hint' => 'Client ID обязательное поле для API. Можно создать нового клиента.',
+            'client_create' => 'Создать клиента',
+            'client_empty' => 'Клиенты пока не добавлены',
             'product_name' => 'Название товара',
             'product_name_placeholder' => 'Например: Подписка Pro',
             'product_description' => 'Описание товара',
@@ -108,6 +164,7 @@ return [
         'dashboard' => 'Главная',
         'addresses' => 'Адреса',
         'merchants' => 'Мерчанты',
+        'clients' => 'Клиенты',
         'invoices' => 'Инвойсы',
         'notifications' => 'Уведомления',
         'callback_logs' => 'Callback логи',
@@ -400,6 +457,7 @@ return [
             'currency' => 'Валюта',
             'network' => 'Сеть',
             'merchant' => 'Мерчант',
+            'client' => 'Клиент',
             'has_callback' => 'С callback URL',
             'apply' => 'Применить',
             'reset' => 'Сбросить',
@@ -410,6 +468,7 @@ return [
         'table' => [
             'id' => 'ID',
             'address' => 'Адрес',
+            'client' => 'Клиент',
             'amount' => 'Сумма',
             'currency' => 'Валюта',
             'status' => 'Статус',
@@ -478,6 +537,7 @@ return [
             'status' => 'Статус',
             'amount' => 'Сумма',
             'address' => 'Адрес',
+            'client' => 'Клиент',
         ],
         'payment' => [
             'title' => 'Детали платежа',

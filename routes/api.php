@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\InvoiceController;
 use App\Http\Controllers\Api\MerchantController;
+use App\Http\Controllers\Api\ClientController;
 
 Route::prefix('v1')
     ->middleware(['api.key'])
@@ -20,6 +21,10 @@ Route::prefix('v1')
 
         // Мерчанты текущего пользователя
         Route::get('merchants', [MerchantController::class, 'index']);
+
+        // Клиенты текущего пользователя
+        Route::get('clients', [ClientController::class, 'index']);
+        Route::post('clients', [ClientController::class, 'store']);
     });
 
 

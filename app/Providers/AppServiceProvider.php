@@ -31,6 +31,8 @@ use App\Contracts\Merchant\MerchantServiceContract;
 use App\Services\Merchant\MerchantService;
 use App\Contracts\Store\StoreServiceContract;
 use App\Services\Store\StoreService;
+use App\Contracts\Client\ClientServiceContract;
+use App\Services\Client\ClientService;
 use App\Contracts\Notification\NotificationServiceContract;
 use App\Services\Notification\NotificationService;
 use App\Contracts\Telegram\TelegramServiceContract;
@@ -58,6 +60,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->singleton(LanguageSettingsServiceContract::class, LanguageSettingsService::class);
         $this->app->singleton(LoginHistoryServiceContract::class, LoginHistoryService::class);
         $this->app->singleton(MerchantServiceContract::class, MerchantService::class);
+        $this->app->singleton(ClientServiceContract::class, ClientService::class);
         $this->app->singleton(StoreServiceContract::class, StoreService::class);
         $this->app->singleton(MarketServiceContract::class, MarketService::class);
         $this->app->singleton(VendorLangService::class, LangService::class);

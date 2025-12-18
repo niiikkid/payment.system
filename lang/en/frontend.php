@@ -8,6 +8,7 @@ return [
             'dashboard' => 'Dashboard',
             'addresses' => 'Addresses',
             'merchants' => 'Merchants',
+            'clients' => 'Clients',
             'invoices' => 'Invoices',
             'notifications' => 'Notifications',
             'callback_logs' => 'Callback logs',
@@ -63,6 +64,56 @@ return [
             'address_placeholder' => 'For example: T...',
         ],
     ],
+    'clients' => [
+        'list' => [
+            'title' => 'Clients',
+        ],
+        'filters' => [
+            'title' => 'Filters',
+            'search' => 'Search',
+            'search_placeholder' => 'Client ID or name',
+            'has_contact' => 'Has contacts',
+            'apply' => 'Apply',
+            'reset' => 'Reset',
+            'show' => 'Show filters',
+            'hide' => 'Hide filters',
+            'any' => 'Any value',
+        ],
+        'modals' => [
+            'create' => [
+                'title' => 'Create client',
+                'description' => 'Provide Client ID and contacts',
+            ],
+            'edit' => [
+                'title' => 'Edit client',
+                'description' => 'Update client name or contacts',
+            ],
+        ],
+        'actions' => [
+            'create' => 'Create client',
+            'add' => 'Add',
+            'save' => 'Save',
+        ],
+        'fields' => [
+            'external_id' => 'Client ID',
+            'external_id_placeholder' => 'Unique client identifier',
+            'name' => 'Name',
+            'name_placeholder' => 'For example: Client A',
+            'telegram' => 'Telegram',
+            'telegram_placeholder' => '@username',
+            'contact' => 'Contact',
+            'contact_placeholder' => 'Any contact: email, chat, etc.',
+        ],
+        'table' => [
+            'external_id' => 'Client ID',
+            'name' => 'Name',
+            'contacts' => 'Contacts',
+            'empty' => 'No clients yet',
+        ],
+        'errors' => [
+            'create_failed' => 'Failed to create client.',
+        ],
+    ],
     'invoices' => [
         'modals' => [
             'create' => [
@@ -88,6 +139,11 @@ return [
             'merchant_placeholder' => 'Select merchant',
             'merchant_hint' => 'Who owns this invoice',
             'merchant_empty' => 'No merchants yet',
+            'client' => 'Client',
+            'client_placeholder' => 'Enter or pick Client ID',
+            'client_hint' => 'Client ID is required for API, you can create a new one.',
+            'client_create' => 'Create client',
+            'client_empty' => 'No clients yet',
             'product_name' => 'Product name',
             'product_name_placeholder' => 'e.g. Premium plan',
             'product_description' => 'Product description',
@@ -108,6 +164,7 @@ return [
         'dashboard' => 'Dashboard',
         'addresses' => 'Addresses',
         'merchants' => 'Merchants',
+        'clients' => 'Clients',
         'invoices' => 'Invoices',
         'notifications' => 'Notifications',
         'callback_logs' => 'Callback logs',
@@ -398,6 +455,7 @@ return [
             'currency' => 'Currency',
             'network' => 'Network',
             'merchant' => 'Merchant',
+            'client' => 'Client',
             'has_callback' => 'With callback URL',
             'apply' => 'Apply',
             'reset' => 'Reset',
@@ -408,6 +466,7 @@ return [
         'table' => [
             'id' => 'ID',
             'address' => 'Address',
+            'client' => 'Client',
             'amount' => 'Amount',
             'currency' => 'Currency',
             'status' => 'Status',
@@ -476,6 +535,7 @@ return [
             'status' => 'Status',
             'amount' => 'Amount',
             'address' => 'Address',
+            'client' => 'Client',
         ],
         'payment' => [
             'title' => 'Payment details',

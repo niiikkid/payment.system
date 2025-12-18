@@ -6,6 +6,8 @@ namespace App\Http\Controllers\Api;
 
 use App\Contracts\Invoice\InvoiceServiceContract;
 use App\Contracts\Money\MoneyServiceContract;
+use App\Contracts\Client\ClientServiceContract;
+use App\Exceptions\Client\ClientException;
 use App\Enums\InvoiceStatus;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreInvoiceRequest;
@@ -17,9 +19,21 @@ use Illuminate\Support\Facades\Auth;
 
 class InvoiceController extends Controller
 {
-    public function store(StoreInvoiceRequest $request, InvoiceServiceContract $service, MoneyServiceContract $money)
+    public function store(StoreInvoiceRequest $request, InvoiceServiceContract $service, MoneyServiceContract $money, ClientServiceContract $clients)
     {
         try {
+            $client = null;
+            $clientExternalId = $request->clientExternalId();
+            if ($clientExternalId !== null) {
+                $client = $clients->findOrCreate(
+                    $request->user(),
+                    $clientExternalId,
+                    $request->clientName(),
+                    $request->clientTelegram(),
+                    $request->clientContact()
+                );
+            }
+
             $invoice = $service->create(
                 $request->user(),
                 $request->toCurrencyEnum(),
@@ -30,11 +44,16 @@ class InvoiceController extends Controller
                 $request->input('tag'),
                 (array) $request->input('metadata', []),
                 $request->merchant(),
+                $client,
                 $request->productName(),
                 $request->productDescription()
             );
 
-            return response()->json((new InvoiceResource($invoice->load(['address', 'merchant'])))->resolve());
+            return response()->json((new InvoiceResource($invoice->load(['address', 'merchant', 'client'])))->resolve());
+        } catch (ClientException $exception) {
+            return response()->json([
+                'message' => $exception->getMessage() ?: __('messages.clients.create_failed'),
+            ], 422);
         } catch (\Throwable $e) {
             return response()->json([
                 'message' => $e->getMessage(),
@@ -46,14 +65,14 @@ class InvoiceController extends Controller
     {
         $this->authorizeInvoice($invoice);
 
-        return (new InvoiceResource($invoice->load(['address', 'merchant'])))->resolve();
+        return (new InvoiceResource($invoice->load(['address', 'merchant', 'client'])))->resolve();
     }
 
     public function status(Invoice $invoice): array
     {
         $this->authorizeInvoice($invoice);
 
-        $data = (new InvoiceResource($invoice))->resolve();
+        $data = (new InvoiceResource($invoice->loadMissing('client')))->resolve();
 
         return [
             'id' => $data['id'] ?? $invoice->id,
@@ -70,7 +89,7 @@ class InvoiceController extends Controller
     {
         $this->authorizeInvoice($invoice);
 
-        $invoice->load(['address', 'merchant']);
+        $invoice->load(['address', 'merchant', 'client']);
 
         return (new InvoiceResource($invoice))->resolve();
     }
