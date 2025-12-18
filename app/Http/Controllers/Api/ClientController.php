@@ -6,15 +6,17 @@ namespace App\Http\Controllers\Api;
 
 use App\Contracts\Client\ClientServiceContract;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\ClientIndexRequest;
 use App\Http\Requests\Client\ClientStoreRequest;
 use App\Http\Resources\ClientResource;
 use App\Models\Client;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Symfony\Component\HttpFoundation\Response;
 
 class ClientController extends Controller
 {
-    public function index(Request $request): array
+    public function index(ClientIndexRequest $request): AnonymousResourceCollection
     {
         $userId = $request->user()?->id;
 
@@ -22,12 +24,13 @@ class ClientController extends Controller
             abort(Response::HTTP_UNAUTHORIZED);
         }
 
-        $clients = Client::query()
+        $paginator = Client::query()
             ->where('user_id', $userId)
             ->latest('id')
-            ->get();
+            ->paginate($request->perPage())
+            ->withQueryString();
 
-        return ClientResource::collection($clients)->resolve();
+        return ClientResource::collection($paginator);
     }
 
     public function store(ClientStoreRequest $request, ClientServiceContract $service): array

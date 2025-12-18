@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\ClientController;
 Route::prefix('v1')
     ->middleware(['api.key'])
     ->group(function () {
+        Route::get('invoices', [InvoiceController::class, 'index']);
         Route::post('invoices', [InvoiceController::class, 'store']);
         Route::get('invoices/{invoice}', [InvoiceController::class, 'show']);
         Route::get('invoices/{invoice}/status', [InvoiceController::class, 'status']);

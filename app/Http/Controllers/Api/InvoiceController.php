@@ -8,17 +8,56 @@ use App\Contracts\Invoice\InvoiceServiceContract;
 use App\Contracts\Money\MoneyServiceContract;
 use App\Contracts\Client\ClientServiceContract;
 use App\Exceptions\Client\ClientException;
+use App\Enums\Currency;
 use App\Enums\InvoiceStatus;
+use App\Enums\Network;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\InvoiceIndexRequest;
 use App\Http\Requests\StoreInvoiceRequest;
 use App\Http\Resources\InvoiceResource;
 use App\Models\Invoice;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Endroid\QrCode\QrCode;
 use Endroid\QrCode\Writer\PngWriter;
 use Illuminate\Support\Facades\Auth;
 
 class InvoiceController extends Controller
 {
+    public function index(InvoiceIndexRequest $request): AnonymousResourceCollection
+    {
+        $filters = $request->filters();
+
+        $paginator = Invoice::query()
+            ->where('user_id', $request->user()?->id)
+            ->with(['merchant', 'client'])
+            ->when($filters['status'], fn (Builder $query, string $status) => $query->where('status', InvoiceStatus::from($status)))
+            ->when($filters['currency'], fn (Builder $query, string $currency) => $query->where('currency', Currency::from($currency)))
+            ->when($filters['network'], fn (Builder $query, string $network) => $query->where('network', Network::from($network)))
+            ->when($filters['merchant_id'], fn (Builder $query, int $merchantId) => $query->where('merchant_id', $merchantId))
+            ->when($filters['client_external_id'], fn (Builder $query, string $clientExternalId) => $query->whereHas('client', fn (Builder $client) => $client->where('external_id', $clientExternalId)))
+            ->when($filters['external_invoice_id'], fn (Builder $query, string $externalId) => $query->where('external_invoice_id', 'like', '%' . $externalId . '%'))
+            ->when($filters['tag'], fn (Builder $query, string $tag) => $query->where('tag', 'like', '%' . $tag . '%'))
+            ->when($filters['has_callback'], fn (Builder $query) => $query->whereNotNull('callback_url'))
+            ->when($filters['search'], function (Builder $query, string $search) {
+                $term = '%' . $search . '%';
+
+                $query->where(function (Builder $nested) use ($term) {
+                    $nested
+                        ->where('id', 'like', $term)
+                        ->orWhere('external_invoice_id', 'like', $term)
+                        ->orWhere('tag', 'like', $term)
+                        ->orWhereHas('client', fn (Builder $client) => $client->where('external_id', 'like', $term)->orWhere('name', 'like', $term))
+                        ->orWhereHas('address', fn (Builder $address) => $address->where('address', 'like', $term));
+                });
+            })
+            ->orderByDesc('id')
+            ->paginate($request->perPage())
+            ->withQueryString();
+
+        return InvoiceResource::collection($paginator);
+    }
+
     public function store(StoreInvoiceRequest $request, InvoiceServiceContract $service, MoneyServiceContract $money, ClientServiceContract $clients)
     {
         try {

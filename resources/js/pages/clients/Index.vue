@@ -5,6 +5,7 @@ import AppLayout from '@/layouts/AppLayout.vue'
 import FilterPanel from '@/components/filters/FilterPanel.vue'
 import Pagination from '@/components/ui/Pagination.vue'
 import DateTimeFormat from '@/components/ui/DateTimeFormat.vue'
+import UidCopy from '@/components/ui/UidCopy.vue'
 import ClientModal, { type ClientForm } from '@/components/modals/clients/ClientModal.vue'
 import { vueLang } from '@erag/lang-sync-inertia'
 
@@ -234,7 +235,8 @@ function toIso(input: string | null | undefined): string {
                     <h2 class="hidden lg:block card-title">{{ __('frontend.clients.list.title') }}</h2>
                     <h2 class="lg:hidden card-title mb-3">{{ __('frontend.clients.list.title') }}</h2>
 
-                    <div class="overflow-x-auto">
+                    <!-- Desktop Table View (lg and above) -->
+                    <div class="hidden lg:block overflow-x-auto">
                         <table class="table table-sm w-full">
                             <thead>
                                 <tr>
@@ -248,7 +250,9 @@ function toIso(input: string | null | undefined): string {
                             </thead>
                             <tbody>
                                 <tr v-for="client in clients.data" :key="client.id">
-                                    <td class="font-mono text-xs truncate">{{ client.id }}</td>
+                                    <td class="font-mono text-xs">
+                                        <UidCopy :uid="client.id" />
+                                    </td>
                                     <td class="font-mono text-xs truncate">{{ client.external_id }}</td>
                                     <td class="text-sm">
                                         <span v-if="client.name">{{ client.name }}</span>
@@ -278,6 +282,103 @@ function toIso(input: string | null | undefined): string {
                                 </tr>
                             </tbody>
                         </table>
+                    </div>
+
+                    <!-- Mobile Card View (sm to lg) -->
+                    <div class="hidden sm:block lg:hidden space-y-3">
+                        <div v-for="client in clients.data" :key="client.id" class="card bg-base-100 shadow-sm">
+                            <div class="card-body p-4 space-y-3">
+                                <!-- Header: UUID and Date -->
+                                <div class="flex items-center justify-between gap-2">
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-xs opacity-70">UUID:</span>
+                                        <UidCopy :uid="client.id" />
+                                    </div>
+                                    <div class="flex items-center gap-1.5 text-xs text-base-content/70" v-if="client.created_at">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-3.5 opacity-70">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5" />
+                                        </svg>
+                                        <DateTimeFormat :value="toIso(client.created_at)" short-year />
+                                    </div>
+                                </div>
+
+                                <!-- Main Content -->
+                                <div class="grid grid-cols-[1fr_auto] gap-3 items-start">
+                                    <div class="space-y-1 min-w-0">
+                                        <div class="font-semibold truncate">{{ client.name || '—' }}</div>
+                                        <div class="font-mono text-xs text-base-content/70 truncate">
+                                            {{ client.external_id || '—' }}
+                                        </div>
+                                        <div class="text-sm">
+                                            <div v-if="client.telegram" class="truncate">@{{ client.telegram.replace('@', '') }}</div>
+                                            <div v-if="client.contact" class="truncate text-xs text-base-content/70">{{ client.contact }}</div>
+                                            <div v-if="!client.telegram && !client.contact" class="opacity-60 text-xs">—</div>
+                                        </div>
+                                    </div>
+
+                                    <div class="flex flex-col items-end gap-2">
+                                        <button class="btn btn-xs" @click="openEdit(client)">
+                                            {{ __('frontend.common.edit') }}
+                                        </button>
+                                        <div class="text-xs text-base-content/70">
+                                            <span class="opacity-70">{{ __('frontend.common.created_at') }}:</span>
+                                            <span v-if="client.created_at" class="ml-1 font-mono">
+                                                <DateTimeFormat :value="toIso(client.created_at)" short-year />
+                                            </span>
+                                            <span v-else class="ml-1 opacity-60">—</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div v-if="!clients.data.length" class="text-center text-sm opacity-70 py-6">
+                            {{ __('frontend.clients.table.empty') }}
+                        </div>
+                    </div>
+
+                    <!-- Small Mobile Card View (below sm) -->
+                    <div class="sm:hidden space-y-3">
+                        <div v-for="client in clients.data" :key="client.id" class="card bg-base-100 shadow-sm">
+                            <div class="card-body p-4 space-y-3">
+                                <div class="flex items-center justify-between gap-2">
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-xs opacity-70">UUID:</span>
+                                        <UidCopy :uid="client.id" />
+                                    </div>
+                                    <div class="text-xs text-base-content/70">
+                                        <span class="opacity-70">{{ __('frontend.clients.table.external_id') }}:</span>
+                                        <span class="font-mono ml-1">{{ client.external_id || '—' }}</span>
+                                    </div>
+                                </div>
+
+                                <div class="space-y-1">
+                                    <div class="font-semibold text-sm truncate">{{ client.name || '—' }}</div>
+                                    <div class="text-xs text-base-content/70 truncate">
+                                        <span v-if="client.telegram">@{{ client.telegram.replace('@', '') }}</span>
+                                        <span v-else class="opacity-60">—</span>
+                                    </div>
+                                    <div class="text-xs text-base-content/70 truncate">
+                                        <span v-if="client.contact">{{ client.contact }}</span>
+                                    </div>
+                                </div>
+
+                                <div class="flex items-center justify-between">
+                                    <div class="text-xs text-base-content/70">
+                                        <span class="opacity-70">{{ __('frontend.common.created_at') }}:</span>
+                                        <span v-if="client.created_at" class="ml-1 font-mono">
+                                            <DateTimeFormat :value="toIso(client.created_at)" short-year hide-seconds />
+                                        </span>
+                                        <span v-else class="ml-1 opacity-60">—</span>
+                                    </div>
+                                    <button class="btn btn-ghost btn-xs" @click="openEdit(client)">
+                                        {{ __('frontend.common.edit') }}
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div v-if="!clients.data.length" class="text-center text-sm opacity-70 py-6">
+                            {{ __('frontend.clients.table.empty') }}
+                        </div>
                     </div>
 
                     <Pagination :links="clients.links" />
