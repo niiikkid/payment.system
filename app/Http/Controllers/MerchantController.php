@@ -24,6 +24,8 @@ use Throwable;
 
 class MerchantController extends Controller
 {
+    private const DEFAULT_INVOICE_EXPIRES_IN_MINUTES = 30;
+
     public function index(MerchantFilterRequest $request): InertiaResponse
     {
         $userId = Auth::id();
@@ -57,12 +59,15 @@ class MerchantController extends Controller
     public function store(MerchantStoreRequest $request, MerchantServiceContract $service): JsonResponse|RedirectResponse
     {
         try {
+            $invoiceExpiresInMinutes = (int) $request->input('invoice_expires_in_minutes', self::DEFAULT_INVOICE_EXPIRES_IN_MINUTES);
+
             $merchant = $service->create(
                 $request->user(),
                 $request->string('name')->toString(),
                 $request->filled('description') ? $request->string('description')->toString() : null,
                 $request->string('initials')->toString(),
                 $request->boolean('white_label_enabled', true),
+                $invoiceExpiresInMinutes,
                 $request->file('logo')
             );
 
@@ -80,12 +85,15 @@ class MerchantController extends Controller
         $this->authorizeMerchant($merchant);
 
         try {
+            $invoiceExpiresInMinutes = (int) $request->input('invoice_expires_in_minutes', (int) ($merchant->invoice_expires_in_minutes ?? self::DEFAULT_INVOICE_EXPIRES_IN_MINUTES));
+
             $service->update(
                 $merchant,
                 $request->string('name')->toString(),
                 $request->filled('description') ? $request->string('description')->toString() : null,
                 $request->string('initials')->toString(),
                 $request->boolean('white_label_enabled', true),
+                $invoiceExpiresInMinutes,
                 $request->file('logo')
             );
 

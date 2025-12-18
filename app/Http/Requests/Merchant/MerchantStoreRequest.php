@@ -21,6 +21,7 @@ class MerchantStoreRequest extends FormRequest
             'initials' => ['required', 'string', 'max:16'],
             'logo' => ['nullable', 'image', 'mimes:png,jpg,jpeg,webp', 'max:2048', 'dimensions:max_width=500,max_height=500'],
             'white_label_enabled' => ['sometimes', 'boolean'],
+            'invoice_expires_in_minutes' => ['sometimes', 'integer', 'min:1', 'max:10080'],
         ];
     }
 }

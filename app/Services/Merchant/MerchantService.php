@@ -25,6 +25,7 @@ final class MerchantService implements MerchantServiceContract
         ?string $description,
         string $initials,
         bool $whiteLabelEnabled,
+        int $invoiceExpiresInMinutes,
         ?UploadedFile $logo = null
     ): Merchant {
         $logoPath = $this->storeLogo($logo);
@@ -36,6 +37,7 @@ final class MerchantService implements MerchantServiceContract
             'initials' => $initials,
             'logo_path' => $logoPath,
             'white_label_enabled' => $whiteLabelEnabled,
+            'invoice_expires_in_minutes' => $invoiceExpiresInMinutes,
         ]);
     }
 
@@ -45,6 +47,7 @@ final class MerchantService implements MerchantServiceContract
         ?string $description,
         string $initials,
         bool $whiteLabelEnabled,
+        int $invoiceExpiresInMinutes,
         ?UploadedFile $logo = null
     ): Merchant {
         $logoPath = $logo ? $this->replaceLogo($merchant, $logo) : $merchant->logo_path;
@@ -55,6 +58,7 @@ final class MerchantService implements MerchantServiceContract
             'initials' => $initials,
             'logo_path' => $logoPath,
             'white_label_enabled' => $whiteLabelEnabled,
+            'invoice_expires_in_minutes' => $invoiceExpiresInMinutes,
         ]);
 
         $merchant->save();

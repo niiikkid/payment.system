@@ -198,6 +198,9 @@ return [
             'white_label_disabled_hint' => 'White label is hidden on the payment page',
             'white_label_enabled_on' => 'White label shown',
             'white_label_enabled_off' => 'White label hidden',
+            'invoice_expires_in_minutes' => 'Invoice lifetime (min)',
+            'invoice_expires_in_minutes_hint' => 'How many minutes before the invoice expires',
+            'invoice_expires_in_minutes_placeholder' => 'For example: 30',
         ],
         'modals' => [
             'create' => [

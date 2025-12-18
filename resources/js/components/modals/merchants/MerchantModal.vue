@@ -13,6 +13,7 @@ export interface MerchantForm {
     description: string;
     initials: string;
     white_label_enabled: boolean;
+    invoice_expires_in_minutes: number;
     logo: File | null;
 }
 
@@ -37,6 +38,7 @@ const props = withDefaults(defineProps<Props>(), {
         description: '',
         initials: '',
         white_label_enabled: true,
+        invoice_expires_in_minutes: 30,
         logo: null,
     }),
     errors: () => ({} as MerchantFormErrors),
@@ -148,6 +150,26 @@ function submit() {
                 <p class="text-xs text-base-content/70 mt-1">
                     {{ __('frontend.merchants.fields.white_label_enabled_description') }}
                 </p>
+            </FormControl>
+
+            <FormControl :error="fieldErrors.invoice_expires_in_minutes">
+                <div class="flex items-center justify-between">
+                    <Label for="merchant-invoice-expires" required>
+                        {{ __('frontend.merchants.fields.invoice_expires_in_minutes') }}
+                    </Label>
+                    <span class="text-xs text-base-content/70">
+                        {{ __('frontend.merchants.fields.invoice_expires_in_minutes_hint') }}
+                    </span>
+                </div>
+                <Input
+                    id="merchant-invoice-expires"
+                    v-model="form.invoice_expires_in_minutes"
+                    type="number"
+                    min="1"
+                    max="10080"
+                    :placeholder="__('frontend.merchants.fields.invoice_expires_in_minutes_placeholder')"
+                    required
+                />
             </FormControl>
 
             <FormControl :error="fieldErrors.logo">

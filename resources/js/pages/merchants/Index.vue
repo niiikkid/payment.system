@@ -28,6 +28,7 @@ interface Merchant {
     logo_path: string | null;
     logo_url: string | null;
     white_label_enabled: boolean;
+    invoice_expires_in_minutes: number;
     created_at: string | null;
 }
 
@@ -64,6 +65,7 @@ const merchantForm = useForm<MerchantForm>({
     description: '',
     initials: '',
     white_label_enabled: true,
+    invoice_expires_in_minutes: 30,
     logo: null,
 });
 const filterDefaults: MerchantFilters = {
@@ -164,6 +166,7 @@ function openEdit(item: Merchant) {
     merchantForm.description = item.description ?? '';
     merchantForm.initials = item.initials ?? '';
     merchantForm.white_label_enabled = item.white_label_enabled;
+    merchantForm.invoice_expires_in_minutes = Number(item.invoice_expires_in_minutes ?? 30);
     merchantForm.logo = null;
     merchantForm.clearErrors();
     currentLogoUrl.value = item.logo_url;
@@ -175,6 +178,7 @@ function updateFormPayload(payload: MerchantForm) {
     merchantForm.description = payload.description;
     merchantForm.initials = payload.initials;
     merchantForm.white_label_enabled = payload.white_label_enabled;
+    merchantForm.invoice_expires_in_minutes = payload.invoice_expires_in_minutes;
     merchantForm.logo = payload.logo;
 }
 
@@ -188,6 +192,9 @@ function submit() {
         description: (merchantForm.description ?? editing.value?.description ?? '').toString().trim(),
         initials: (merchantForm.initials ?? editing.value?.initials ?? '').toString().trim(),
         white_label_enabled: Boolean(merchantForm.white_label_enabled ?? editing.value?.white_label_enabled),
+        invoice_expires_in_minutes: Number(
+            merchantForm.invoice_expires_in_minutes ?? editing.value?.invoice_expires_in_minutes ?? 30
+        ),
         logo: merchantForm.logo ?? null,
     };
 

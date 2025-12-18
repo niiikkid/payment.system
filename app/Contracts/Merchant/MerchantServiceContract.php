@@ -16,6 +16,7 @@ interface MerchantServiceContract
         ?string $description,
         string $initials,
         bool $whiteLabelEnabled,
+        int $invoiceExpiresInMinutes,
         ?UploadedFile $logo = null
     ): Merchant;
 
@@ -25,6 +26,7 @@ interface MerchantServiceContract
         ?string $description,
         string $initials,
         bool $whiteLabelEnabled,
+        int $invoiceExpiresInMinutes,
         ?UploadedFile $logo = null
     ): Merchant;
 }

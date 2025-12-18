@@ -19,10 +19,12 @@ class Merchant extends Model
         'initials',
         'logo_path',
         'white_label_enabled',
+        'invoice_expires_in_minutes',
     ];
 
     protected $casts = [
         'white_label_enabled' => 'boolean',
+        'invoice_expires_in_minutes' => 'integer',
     ];
 
     public function user(): BelongsTo

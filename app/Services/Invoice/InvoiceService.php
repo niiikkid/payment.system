@@ -24,6 +24,8 @@ use Illuminate\Support\Carbon;
 
 class InvoiceService implements InvoiceServiceContract
 {
+    private const DEFAULT_EXPIRES_IN_MINUTES = 30;
+
     public function __construct(
         private readonly AddressServiceContract $addresses,
         private readonly MoneyServiceContract $money,
@@ -59,7 +61,9 @@ class InvoiceService implements InvoiceServiceContract
         }
         $amountMinor = $this->money->toMinor($amount);
 
-        $expiresAt = now()->addMinutes(30);
+        $expiresInMinutes = $merchant?->invoice_expires_in_minutes ?? self::DEFAULT_EXPIRES_IN_MINUTES;
+        $expiresInMinutes = max(1, (int) $expiresInMinutes);
+        $expiresAt = now()->addMinutes($expiresInMinutes);
 
         $invoice = Invoice::query()->create([
             'user_id' => $user->id,
@@ -78,7 +82,7 @@ class InvoiceService implements InvoiceServiceContract
             'product_description' => $productDescription,
         ]);
 
-        // Планируем асинхронную экспирацию ровно через 30 минут
+        // Планируем асинхронную экспирацию через N минут
         ExpireInvoiceJob::dispatch($invoice->id)->delay($expiresAt);
 
         // Запускаем периодический поиск точной входящей транзакции раз в минуту

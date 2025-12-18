@@ -198,6 +198,9 @@ return [
             'white_label_disabled_hint' => 'White label скрыт на платежной странице',
             'white_label_enabled_on' => 'White label отображается',
             'white_label_enabled_off' => 'White label скрыт',
+            'invoice_expires_in_minutes' => 'Время жизни инвойса (мин.)',
+            'invoice_expires_in_minutes_hint' => 'Через сколько минут инвойс станет просроченным',
+            'invoice_expires_in_minutes_placeholder' => 'Например: 30',
         ],
         'modals' => [
             'create' => [
