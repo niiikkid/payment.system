@@ -67,7 +67,7 @@ function handleBlur(event: FocusEvent) {
     <div class="dropdown w-full" :class="{ 'dropdown-open': isOpen }" @focusout="handleBlur">
         <button
             type="button"
-            class="btn btn-outline w-full justify-between"
+            class="btn btn-outline border border-base-300 w-full justify-between"
             :id="id"
             :class="{ 'opacity-60': disabled }"
             :disabled="disabled"

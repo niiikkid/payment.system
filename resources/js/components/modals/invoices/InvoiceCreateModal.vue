@@ -2,13 +2,14 @@
 import { computed, watch } from 'vue'
 import ModalDialog from '@/components/ui/modal/ModalDialog.vue'
 import FormControl from '@/components/form/FormControl.vue'
+import FormInput from '@/components/form/Input.vue'
 import Label from '@/components/form/Label.vue'
 import CurrencyNetworkSelect, { type CurrencyNetworkOption } from '@/components/ui/CurrencyNetworkSelect.vue'
 import Textarea from '@/components/form/Textarea.vue'
 import MerchantSelect from '@/components/merchants/MerchantSelect.vue'
 import ClientSelect from '@/components/clients/ClientSelect.vue'
 import { vueLang } from '@erag/lang-sync-inertia'
-import { usePage } from '@inertiajs/vue3'
+import { Form, usePage } from '@inertiajs/vue3';
 import type { CurrencyAmountRule } from '@/utils/currencyAmount'
 import { normalizeCurrencyAmountOnBlur, sanitizeCurrencyAmountInput } from '@/utils/currencyAmount'
 
@@ -313,7 +314,7 @@ function submit() {
             </FormControl>
             <FormControl :error="fieldErrors.external_invoice_id">
                 <Label for="external_invoice_id">{{ __('frontend.invoices.fields.external_id') }}</Label>
-                <Input
+                <FormInput
                     id="external_invoice_id"
                     v-model="form.external_invoice_id"
                     type="text"
@@ -321,7 +322,7 @@ function submit() {
             </FormControl>
             <FormControl :error="fieldErrors.callback_url">
                 <Label for="callback_url">{{ __('frontend.invoices.fields.callback_url') }}</Label>
-                <Input
+                <FormInput
                     id="callback_url"
                     v-model="form.callback_url"
                     type="url"
@@ -329,7 +330,7 @@ function submit() {
             </FormControl>
             <FormControl :error="fieldErrors.tag">
                 <Label for="tag">{{ __('frontend.invoices.fields.tag') }}</Label>
-                <Input
+                <FormInput
                     id="tag"
                     v-model="form.tag"
                     type="text"
@@ -337,7 +338,7 @@ function submit() {
             </FormControl>
             <FormControl :error="fieldErrors.product_name">
                 <Label for="product_name">{{ __('frontend.invoices.fields.product_name') }}</Label>
-                <Input
+                <FormInput
                     id="product_name"
                     v-model="form.product_name"
                     type="text"
