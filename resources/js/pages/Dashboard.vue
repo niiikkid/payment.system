@@ -28,9 +28,9 @@ const breadcrumbs: BreadcrumbItem[] = [
 <template>
     <AppLayout :breadcrumbs="breadcrumbs">
         <div
-            class="mt-6 flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl bg-base-200"
+            class="mt-6 flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl bg-base-200 shadow"
         >
-            <div class="stats stats-vertical md:stats-horizontal shadow bg-base-100">
+            <div class="stats stats-vertical md:stats-horizontal bg-base-100">
                 <div class="stat">
                     <div class="stat-title">{{ __('frontend.dashboard.stats.total') }}</div>
                     <div class="stat-value">{{ props.stats.totalInvoices }}</div>
