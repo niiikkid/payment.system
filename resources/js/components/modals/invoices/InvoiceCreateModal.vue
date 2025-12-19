@@ -200,7 +200,7 @@ function submit() {
         :model-value="modelValue"
         :title="__('frontend.invoices.modals.create.title')"
         :description="__('frontend.invoices.modals.create.description')"
-        size="3xl"
+        size="2xl"
         placement="bottom"
         @update:modelValue="emit('update:modelValue', $event)"
         @close="close"

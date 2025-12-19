@@ -2,12 +2,13 @@
 import { computed } from 'vue'
 
 type ModalSize = 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl'
+type ModalSizeInput = ModalSize | string
 
 interface Props {
     modelValue: boolean
     title?: string
     description?: string
-    size?: ModalSize
+    size?: ModalSizeInput
     placement?: 'center' | 'bottom'
     closable?: boolean
 }
@@ -35,12 +36,38 @@ const sizeClassMap: Record<ModalSize, string> = {
     '3xl': 'max-w-3xl',
 }
 
-const modalBoxClass = computed(() => {
-    if (props.placement === 'bottom') {
-        const sizeClass = sizeClassMap[props.size]
-        return `w-full max-w-full md:w-auto md:${sizeClass}`
+// Для `placement="bottom"` нельзя собирать `md:${size}` динамически:
+// Tailwind может не сгенерировать такие классы. Поэтому держим явную карту.
+const sizeClassMapMd: Record<ModalSize, string> = {
+    sm: 'md:max-w-sm',
+    md: 'md:max-w-md',
+    lg: 'md:max-w-lg',
+    xl: 'md:max-w-xl',
+    '2xl': 'md:max-w-2xl',
+    '3xl': 'md:max-w-3xl',
+}
+
+const normalizedSize = computed<ModalSize>(() => {
+    const raw = String(props.size ?? 'md')
+        .toLowerCase()
+        .replace(/[\s-_]/g, '')
+
+    // поддержка "3xL" / "2xL" (после toLowerCase станет 3xl/2xl)
+    if (raw === 'sm' || raw === 'md' || raw === 'lg' || raw === 'xl' || raw === '2xl' || raw === '3xl') {
+        return raw
     }
-    return `w-full ${sizeClassMap[props.size]}`
+
+    return 'md'
+})
+
+const modalBoxClass = computed(() => {
+    const size = normalizedSize.value
+    if (props.placement === 'bottom') {
+        // На мобильных: 100% ширины.
+        // На md+: раскрываемся до выбранного max-width (а не "по контенту").
+        return `w-full max-w-full md:w-full ${sizeClassMapMd[size]}`
+    }
+    return `w-full ${sizeClassMap[size]}`
 })
 const modalPlacementClass = computed(() => props.placement === 'bottom' ? 'modal modal-bottom md:modal-middle' : 'modal')
 
