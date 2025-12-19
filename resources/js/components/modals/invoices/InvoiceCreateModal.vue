@@ -3,7 +3,6 @@ import { computed, watch } from 'vue'
 import ModalDialog from '@/components/ui/modal/ModalDialog.vue'
 import FormControl from '@/components/form/FormControl.vue'
 import Label from '@/components/form/Label.vue'
-import Input from '@/components/form/Input.vue'
 import CurrencyNetworkSelect, { type CurrencyNetworkOption } from '@/components/ui/CurrencyNetworkSelect.vue'
 import Textarea from '@/components/form/Textarea.vue'
 import MerchantSelect from '@/components/merchants/MerchantSelect.vue'
@@ -106,7 +105,7 @@ const currencyAmountRules = computed<Record<string, CurrencyAmountRule>>(
 )
 
 const currentAmountRule = computed<CurrencyAmountRule>(() => {
-    const currency = (form.value.currency || '').toString().toUpperCase()
+    const currency = (form.value.currency || '').toString().trim().toUpperCase()
     return currencyAmountRules.value[currency] ?? { decimals: 6, example: '12.123456', decimal_separator: '.' }
 })
 
@@ -154,25 +153,79 @@ const currencyNetworkValue = computed<string | null>({
             return
         }
         const [currency, network] = raw.split('|')
-        form.value.currency = (currency || '').toString()
-        form.value.network = (network || '').toString()
+        form.value.currency = (currency || '').toString().trim()
+        form.value.network = (network || '').toString().trim()
     },
 })
 
+const isCurrencySelected = computed(() => Boolean(currencyNetworkValue.value))
+
 function onAmountInput(value: string | number) {
+    // Если валюта не выбрана — поле должно быть неактивным, но на всякий случай
+    // не даём сохранить/внести значение.
+    if (!isCurrencySelected.value) {
+        form.value.amount = ''
+        return
+    }
     const decimals = Number(currentAmountRule.value.decimals ?? 0)
     form.value.amount = sanitizeCurrencyAmountInput(String(value ?? ''), decimals)
+}
+
+function onAmountInputEvent(event: Event) {
+    const target = event.target as HTMLInputElement
+
+    if (!isCurrencySelected.value) {
+        target.value = ''
+        form.value.amount = ''
+        return
+    }
+
+    const decimals = Number(currentAmountRule.value.decimals ?? 0)
+    const sanitized = sanitizeCurrencyAmountInput(String(target.value ?? ''), decimals)
+
+    // Ключевой момент: переписываем значение прямо в поле ввода,
+    // чтобы пользователь физически не мог видеть/ввести "лишние" знаки.
+    if (target.value !== sanitized) {
+        target.value = sanitized
+    }
+
+    form.value.amount = sanitized
 }
 
 function onAmountBlur() {
     form.value.amount = normalizeCurrencyAmountOnBlur(form.value.amount)
 }
 
+function onAmountBlurEvent(event: FocusEvent) {
+    const target = event.target as HTMLInputElement
+    const normalized = normalizeCurrencyAmountOnBlur(String(target.value ?? ''))
+    if (target.value !== normalized) {
+        target.value = normalized
+    }
+    form.value.amount = normalized
+}
+
 watch(
     () => form.value.currency,
-    () => {
-        // При смене валюты сразу применяем новое ограничение (чтобы не осталось "лишних" знаков)
-        onAmountInput(form.value.amount)
+    (newCurrency, oldCurrency) => {
+        // При смене валюты сумма должна сбрасываться
+        if (String(newCurrency ?? '') !== String(oldCurrency ?? '')) {
+            form.value.amount = ''
+        }
+    },
+)
+
+watch(
+    () => form.value.amount,
+    (value) => {
+        // Дублирующая защита: если значение попало в модель не через инпут (вставка, автозаполнение и т.п.),
+        // всё равно ограничиваем дробную часть по текущей валюте.
+        if (!isCurrencySelected.value) return
+        const decimals = Number(currentAmountRule.value.decimals ?? 0)
+        const sanitized = sanitizeCurrencyAmountInput(String(value ?? ''), decimals)
+        if (sanitized !== value) {
+            form.value.amount = sanitized
+        }
     },
 )
 
@@ -245,15 +298,17 @@ function submit() {
             </FormControl>
             <FormControl :error="fieldErrors.amount">
                 <Label for="amount" required>{{ __('frontend.invoices.fields.amount') }}</Label>
-                <Input
+                <input
                     id="amount"
-                    :model-value="form.amount"
-                    @update:modelValue="onAmountInput"
-                    @blur="onAmountBlur"
+                    class="input input-bordered w-full input-md"
                     type="text"
                     inputmode="decimal"
+                    :value="form.amount"
                     :placeholder="amountPlaceholder"
+                    :disabled="loading || !isCurrencySelected"
                     required
+                    @input="onAmountInputEvent"
+                    @blur="onAmountBlurEvent"
                 />
             </FormControl>
             <FormControl :error="fieldErrors.external_invoice_id">
