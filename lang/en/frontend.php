@@ -654,7 +654,7 @@ return [
         ],
         'requests' => [
             'create_title' => 'POST /invoices — Create invoice',
-            'create_description' => 'Creates an invoice and returns the object. Required: currency, network, amount. Optional: external_invoice_id, callback_url, tag, metadata, merchant_id, client_id, product_name, product_description.',
+            'create_description' => 'Creates an invoice and returns the object. Required: currency, network, amount, merchant_id. Optional: external_invoice_id, callback_url, tag, metadata, client_id, product_name, product_description.',
             'fields' => [
                 'currency' => 'Currency',
                 'network' => 'Network',

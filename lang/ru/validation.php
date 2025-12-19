@@ -158,6 +158,8 @@ return [
     'app' => [
         'invoice' => [
             'txid_required_for_paid' => 'TXID обязателен для статуса paid.',
+            'amount_format' => 'Сумма для валюты :currency должна быть в формате 12 или 12.34 (не более :decimals знаков после точки).',
+            'amount_positive' => 'Сумма должна быть больше 0.',
         ],
         'settings' => [
             'min_integer' => 'Минимальная сумма должна быть целым числом.',

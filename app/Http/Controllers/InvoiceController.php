@@ -9,6 +9,7 @@ use App\Contracts\Money\MoneyServiceContract;
 use App\Enums\InvoiceStatus;
 use App\Enums\Currency;
 use App\Enums\Network;
+use App\Enums\NetworkCurrency;
 use App\Contracts\Client\ClientServiceContract;
 use App\Exceptions\Client\ClientException;
 use App\Http\Requests\UpdateInvoiceRequest;
@@ -65,6 +66,20 @@ class InvoiceController extends Controller
 
         $currencyOptions = array_map(fn (Currency $c) => ['value' => $c->value, 'label' => $c->value], Currency::cases());
         $networkOptions = array_map(fn (Network $n) => ['value' => $n->value, 'label' => strtoupper($n->value)], Network::cases());
+
+        // Список поддерживаемых пар валюта+сеть для UI создания инвойса
+        $currencyNetworkOptions = [];
+        foreach (Currency::cases() as $currency) {
+            foreach (NetworkCurrency::networksByCurrency($currency) as $network) {
+                $currencyNetworkOptions[] = [
+                    'value' => $currency->value . '|' . $network->value,
+                    'currency' => $currency->value,
+                    'currency_label' => $currency->value,
+                    'network' => $network->value,
+                    'network_label' => $network->value,
+                ];
+            }
+        }
         $merchantOptions = Merchant::query()
             ->where('user_id', Auth::id())
             ->latest('id')
@@ -96,6 +111,7 @@ class InvoiceController extends Controller
             'invoices' => $paginator,
             'currencyOptions' => $currencyOptions,
             'networkOptions' => $networkOptions,
+            'currencyNetworkOptions' => $currencyNetworkOptions,
             'merchantOptions' => $merchantOptions,
             'clientOptions' => $clientOptions,
             'statuses' => [

@@ -1,7 +1,10 @@
 <script setup lang="ts">
-import { onMounted, reactive, ref } from 'vue';
+import { computed, onMounted, reactive, ref, watch } from 'vue';
 import { vueLang } from '@erag/lang-sync-inertia';
 import MerchantSelect from '@/components/merchants/MerchantSelect.vue';
+import { usePage } from '@inertiajs/vue3'
+import type { CurrencyAmountRule } from '@/utils/currencyAmount'
+import { normalizeCurrencyAmountOnBlur, sanitizeCurrencyAmountInput } from '@/utils/currencyAmount'
 
 interface Props {
     apiKey: string;
@@ -10,6 +13,11 @@ interface Props {
 
 const props = defineProps<Props>();
 const { __ } = vueLang();
+const page = usePage()
+
+const currencyAmountRules = computed<Record<string, CurrencyAmountRule>>(
+    () => (page.props.currencyAmountRules as any) ?? {},
+)
 
 type MerchantOption = {
     value: string | number;
@@ -68,6 +76,33 @@ const createForm = reactive({
     product_description: '',
     metadata: '',
 });
+
+const createAmountRule = computed<CurrencyAmountRule>(() => {
+    const currency = (createForm.currency || '').toString().toUpperCase()
+    return currencyAmountRules.value[currency] ?? { decimals: 6, example: '12.123456', decimal_separator: '.' }
+})
+
+watch(
+    () => createForm.amount,
+    (value) => {
+        const decimals = Number(createAmountRule.value.decimals ?? 0)
+        const sanitized = sanitizeCurrencyAmountInput(String(value ?? ''), decimals)
+        if (sanitized !== value) {
+            createForm.amount = sanitized
+        }
+    },
+)
+
+watch(
+    () => createForm.currency,
+    () => {
+        const decimals = Number(createAmountRule.value.decimals ?? 0)
+        const sanitized = sanitizeCurrencyAmountInput(String(createForm.amount ?? ''), decimals)
+        if (sanitized !== createForm.amount) {
+            createForm.amount = sanitized
+        }
+    },
+)
 const createResult = ref<string>('');
 const merchants = ref<MerchantOption[]>([]);
 const merchantsLoading = ref(false);
@@ -292,7 +327,13 @@ async function cancelInvoice() {
                         </label>
                         <label class="floating-label">
                             <span>{{ __('frontend.api.requests.fields.amount') }}</span>
-                            <input class="input input-md w-full" v-model="createForm.amount" placeholder="12.50" />
+                            <input
+                                class="input input-md w-full"
+                                v-model="createForm.amount"
+                                inputmode="decimal"
+                                :placeholder="createAmountRule.example || '12.50'"
+                                @blur="createForm.amount = normalizeCurrencyAmountOnBlur(createForm.amount)"
+                            />
                         </label>
                         <label class="floating-label">
                             <span>{{ __('frontend.api.requests.fields.external_id') }}</span>

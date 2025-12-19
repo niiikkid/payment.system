@@ -5,6 +5,7 @@ namespace App\Http\Middleware;
 use App\Contracts\Lang\LanguageSettingsServiceContract;
 use App\Enums\NotificationChannel;
 use App\Models\Notification;
+use App\Services\Money\CurrencyAmountRulesService;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
@@ -48,6 +49,7 @@ class HandleInertiaRequests extends Middleware
 
         [$message, $author] = str(Inspiring::quotes()->random())->explode('-');
         $languageSettingsService = app(LanguageSettingsServiceContract::class);
+        $currencyAmountRules = app(CurrencyAmountRulesService::class);
 
         return [
             ...parent::share($request),
@@ -74,6 +76,8 @@ class HandleInertiaRequests extends Middleware
                     : 0,
             ],
             'locale' => app()->getLocale(),
+            // Единые правила формата суммы по валютам (используется фронтом для ввода и подсказок)
+            'currencyAmountRules' => fn () => $currencyAmountRules->frontendRules(),
             self::LOCALE_SHARE_KEY => [
                 'available' => $languageSettingsService->availableLocales(),
                 'enabled' => $languageSettingsService->enabledLocaleCodes(),

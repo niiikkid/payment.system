@@ -6,8 +6,10 @@ namespace App\Http\Requests;
 
 use App\Enums\Currency;
 use App\Enums\Network;
+use App\Enums\NetworkCurrency;
 use App\Contracts\Money\MoneyServiceContract;
 use App\Services\Money\MoneyAmount;
+use App\Services\Money\CurrencyAmountRulesService;
 use App\Models\Merchant;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -15,9 +17,9 @@ use Illuminate\Validation\Rule;
 /**
  * @property-read string $currency ISO код валюты (например, USDT)
  * @property-read string $network Сеть (например, tron)
- * @property-read string|int|float $amount Сумма в десятичном виде
+ * @property-read string $amount Сумма в десятичном виде
  * @property-read string|null $external_invoice_id Внешний ID
- * @property-read int|null $merchant_id Идентификатор мерчанта
+ * @property-read int $merchant_id Идентификатор мерчанта
  * @property-read string|null $product_name Название товара
  * @property-read string|null $product_description Описание товара
  * @property-read string|null $callback_url URL для callback
@@ -35,16 +37,40 @@ class StoreInvoiceRequest extends FormRequest
         return $this->user() !== null;
     }
 
+    protected function prepareForValidation(): void
+    {
+        // Нормализуем значения, чтобы валидация была предсказуемой и case-insensitive для currency/network.
+        $currency = $this->input('currency');
+        if ($currency !== null) {
+            $this->merge(['currency' => strtoupper(trim((string) $currency))]);
+        }
+
+        $network = $this->input('network');
+        if ($network !== null) {
+            $this->merge(['network' => strtolower(trim((string) $network))]);
+        }
+
+        $amount = $this->input('amount');
+        if ($amount !== null) {
+            $this->merge(['amount' => trim((string) $amount)]);
+        }
+    }
+
     public function rules(): array
     {
+        $currencyValues = array_map(fn (Currency $c) => $c->value, Currency::cases());
+        $networkValues = array_map(fn (Network $n) => $n->value, Network::cases());
+
         return [
-            'currency' => ['required', 'string'],
-            'network' => ['required', 'string'],
-            'amount' => ['required', 'numeric', 'min:1'],
+            'currency' => ['required', 'string', Rule::in($currencyValues)],
+            'network' => ['required', 'string', Rule::in($networkValues)],
+            // Валидация формата по валюте — в withValidator(), т.к. зависит от currency
+            'amount' => ['required', 'string', 'max:64'],
             'external_invoice_id' => ['nullable', 'string', 'max:64'],
             'merchant_id' => [
-                'nullable',
+                'required',
                 'integer',
+                'min:1',
                 Rule::exists('merchants', 'id')->where(fn ($query) => $query->where('user_id', $this->user()?->id)),
             ],
             'product_name' => ['nullable', 'string', 'max:255'],
@@ -57,6 +83,74 @@ class StoreInvoiceRequest extends FormRequest
             'client_telegram' => ['nullable', 'string', 'max:255'],
             'client_contact' => ['nullable', 'string', 'max:255'],
         ];
+    }
+
+    public function attributes(): array
+    {
+        return [
+            'merchant_id' => __('frontend.invoices.fields.merchant'),
+        ];
+    }
+
+    public function withValidator($validator): void
+    {
+        $validator->after(function ($validator) {
+            // Если базовые правила уже упали — не продолжаем, чтобы не шуметь.
+            if ($validator->errors()->has('currency') || $validator->errors()->has('amount')) {
+                return;
+            }
+
+            $amount = trim((string) $this->input('amount', ''));
+            if ($amount === '') {
+                return; // required обработает
+            }
+
+            try {
+                $currency = $this->toCurrencyEnum();
+            } catch (\Throwable) {
+                return; // currency обработается базовой валидацией
+            }
+
+            // Совместимость currency+network (поддерживаемые пары)
+            try {
+                $network = $this->toNetworkEnum();
+                if (!NetworkCurrency::isSupported($currency, $network)) {
+                    $validator->errors()->add('network', __('messages.addresses.errors.currency_mismatch_value', [
+                        'currency' => $currency->value,
+                        'network' => $network->value,
+                    ]));
+                    return;
+                }
+            } catch (\Throwable) {
+                // network обработается базовыми правилами
+            }
+
+            $rules = app(CurrencyAmountRulesService::class);
+            $regex = $rules->invoiceInputRegex($currency);
+            $decimals = $rules->invoiceInputDecimals($currency);
+
+            if (!preg_match($regex, $amount)) {
+                $validator->errors()->add('amount', __('validation.app.invoice.amount_format', [
+                    'currency' => $currency->value,
+                    'decimals' => $decimals,
+                ]));
+                return;
+            }
+
+            // Дополнительно гарантируем, что сумма > 0 (диапазон min/max проверит InvoiceService).
+            try {
+                $money = app(MoneyServiceContract::class);
+                $moneyAmount = $money->create($amount, $currency);
+                $zero = $money->create('0', $currency);
+
+                if ($money->compare($moneyAmount, $zero) <= 0) {
+                    $validator->errors()->add('amount', __('validation.app.invoice.amount_positive'));
+                }
+            } catch (\Throwable) {
+                // На всякий случай (неожиданное значение BigDecimal и т.п.)
+                $validator->errors()->add('amount', __('validation.numeric'));
+            }
+        });
     }
 
     public function toCurrencyEnum(): Currency

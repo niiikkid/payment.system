@@ -84,6 +84,7 @@ const invoices = computed(() => page.props.invoices as any);
 const statuses = computed(() => page.props.statuses as { active: string[]; final: string[] });
 const currencyOptions = computed(() => page.props.currencyOptions as Option[]);
 const networkOptions = computed(() => page.props.networkOptions as Option[]);
+const currencyNetworkOptions = computed(() => (page.props.currencyNetworkOptions as any) ?? []);
 const merchantOptions = computed(() => page.props.merchantOptions as MerchantOption[]);
 const clientOptions = ref<ClientOption[]>(((page.props.clientOptions as any) ?? []) as ClientOption[]);
 const clientFilterOptions = computed(() =>
@@ -347,6 +348,11 @@ function resetCreatePayload() {
 }
 
 function submitCreate() {
+  if (!createForm.merchant_id) {
+    createForm.setError('merchant_id', __('frontend.invoices.fields.merchant_placeholder'));
+    return;
+  }
+
   let metadataParsed: Record<string, unknown> | undefined;
   if (createForm.metadata) {
     try {
@@ -360,7 +366,7 @@ function submitCreate() {
   createForm
     .transform((data) => ({
       ...data,
-      merchant_id: data.merchant_id || null,
+      merchant_id: data.merchant_id ? Number(data.merchant_id) : null,
       client_id: data.client_id || null,
       client_name: data.client_name || null,
       client_telegram: data.client_telegram || null,
@@ -386,6 +392,15 @@ function submitCreate() {
       },
     });
 }
+
+watch(
+  () => createForm.merchant_id,
+  (value) => {
+    if (value) {
+      createForm.clearErrors('merchant_id');
+    }
+  },
+);
 
 function mapClientToOption(client: any): ClientOption {
   return {
@@ -748,8 +763,7 @@ watch(
     <InvoiceCreateModal
       v-model="showCreate"
       :form="createForm"
-      :currency-options="currencyOptions"
-      :network-options="networkOptions"
+      :currency-network-options="currencyNetworkOptions"
       :merchant-options="merchantOptions"
       :client-options="clientOptions"
       :errors="createForm.errors"

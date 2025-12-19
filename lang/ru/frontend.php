@@ -127,6 +127,9 @@ return [
             ],
         ],
         'fields' => [
+            'currency_network' => 'Валюта / сеть',
+            'currency_network_hint' => 'Выберите валюту и сеть',
+            'currency_network_placeholder' => 'Выберите валюту и сеть',
             'currency' => 'Валюта',
             'currency_hint' => 'Напр.: BTC, ETH, USDT',
             'currency_placeholder' => 'Выберите валюту',
@@ -656,7 +659,7 @@ return [
         ],
         'requests' => [
             'create_title' => 'POST /invoices — Создать инвойс',
-            'create_description' => 'Создаёт инвойс и возвращает объект. Требует: currency, network, amount. Опционально: external_invoice_id, callback_url, tag, metadata, merchant_id, client_id, product_name, product_description.',
+            'create_description' => 'Создаёт инвойс и возвращает объект. Требует: currency, network, amount, merchant_id. Опционально: external_invoice_id, callback_url, tag, metadata, client_id, product_name, product_description.',
             'fields' => [
                 'currency' => 'Валюта',
                 'network' => 'Сеть',
