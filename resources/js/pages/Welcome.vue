@@ -13,11 +13,6 @@ const { __ } = vueLang();
     <Head :title="__('frontend.welcome.title')" />
     <div class="relative min-h-screen overflow-hidden bg-base-200 text-base-content">
 
-        <div class="mt-3 mx-auto grid w-full max-w-6xl gap-10 lg:grid-cols-[1.1fr,0.9fr]">
-            <div class="w-fit">
-                <LanguageSwitcher direction="down" align="end" class="w-fit" />
-            </div>
-        </div>
         <div class="relative z-10 flex min-h-screen items-center px-5 py-12 pt-0 md:px-12 lg:px-16">
             <div class="mx-auto grid w-full max-w-6xl gap-10 lg:grid-cols-[1.1fr,0.9fr]">
                 <!-- Left text + CTA -->
@@ -59,6 +54,12 @@ const { __ } = vueLang();
                         </div>
                         <div class="flex items-center gap-2">
                             <span class="h-2 w-2 rounded-full bg-accent"></span> Fiat → Crypto Routing
+                        </div>
+                    </div>
+
+                    <div class="mt-3">
+                        <div class="w-fit">
+                            <LanguageSwitcher direction="up" align="start" class="w-fit" />
                         </div>
                     </div>
                 </div>
