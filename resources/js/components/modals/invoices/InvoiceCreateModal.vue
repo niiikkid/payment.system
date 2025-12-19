@@ -200,12 +200,12 @@ function submit() {
         :model-value="modelValue"
         :title="__('frontend.invoices.modals.create.title')"
         :description="__('frontend.invoices.modals.create.description')"
-        size="2xl"
+        size="3xl"
         placement="bottom"
         @update:modelValue="emit('update:modelValue', $event)"
         @close="close"
     >
-        <form class="mt-4 grid gap-4" @submit.prevent="submit">
+        <form class="mt-4 grid grid-cols-1 xl:grid-cols-2 gap-4" @submit.prevent="submit">
             <FormControl :error="fieldErrors.merchant_id">
                 <Label for="merchant_id" required>{{ __('frontend.invoices.fields.merchant') }}</Label>
                 <MerchantSelect
