@@ -31,10 +31,10 @@ const currencyAmountRules = computed<Record<string, CurrencyAmountRule>>(
 const tabs = reactive({ view: 'form' as 'form' | 'example' })
 
 const createForm = reactive({
-    currency: 'USDT',
+    currency: 'usdt',
     network: 'tron',
-    amount: '12.50',
-    external_invoice_id: 'ORDER-123',
+    amount: '',
+    external_invoice_id: '',
     callback_url: '',
     tag: '',
     merchant_id: '',
@@ -141,8 +141,8 @@ async function createInvoice() {
         <div class="collapse-title text-md font-medium">{{ __('frontend.api.requests.create_title') }}</div>
         <div class="collapse-content space-y-4">
             <div class="tabs tabs-boxed w-full">
-                <button class="tab" :class="tabs.view === 'form' ? 'tab-active' : ''" @click="tabs.view = 'form'">Форма</button>
-                <button class="tab" :class="tabs.view === 'example' ? 'tab-active' : ''" @click="tabs.view = 'example'">Пример запроса</button>
+                <button class="tab" :class="tabs.view === 'form' ? 'tab-active' : ''" @click="tabs.view = 'form'">{{ __('frontend.api.requests.tabs.form') }}</button>
+                <button class="tab" :class="tabs.view === 'example' ? 'tab-active' : ''" @click="tabs.view = 'example'">{{ __('frontend.api.requests.tabs.example') }}</button>
             </div>
             <p class="text-sm text-base-content/70">{{ __('frontend.api.requests.create_description') }}</p>
 
@@ -150,7 +150,7 @@ async function createInvoice() {
                 <div class="card-body gap-4 p-0 pt-3 w-full">
                     <label class="floating-label">
                         <span>{{ __('frontend.api.requests.fields.currency') }}</span>
-                        <input class="input input-md w-full" v-model="createForm.currency" placeholder="USDT" />
+                        <input class="input input-md w-full" v-model="createForm.currency" placeholder="usdt" />
                     </label>
                     <label class="floating-label">
                         <span>{{ __('frontend.api.requests.fields.network') }}</span>
@@ -168,7 +168,7 @@ async function createInvoice() {
                     </label>
                     <label class="floating-label">
                         <span>{{ __('frontend.api.requests.fields.external_id') }}</span>
-                        <input class="input input-md w-full" v-model="createForm.external_invoice_id" placeholder="ORDER-123" />
+                        <input class="input input-md w-full" v-model="createForm.external_invoice_id" placeholder="order-123" />
                     </label>
                     <label class="floating-label">
                         <span>{{ __('frontend.api.requests.fields.callback_url') }}</span>
@@ -226,39 +226,33 @@ async function createInvoice() {
 
             <div v-else class="space-y-3 text-sm">
                 <div class="bg-base-200 rounded-box p-3">
-                    <p class="font-semibold">Headers</p>
+                    <p class="font-semibold">{{ __('frontend.api.requests.example.headers') }}</p>
                     <ul class="list-disc list-inside">
-                        <li>Accept: application/json</li>
-                        <li>Content-Type: application/json</li>
-                        <li>X-Api-Key: &lt;PUBLIC_API_KEY&gt;</li>
+                        <li>{{ __('frontend.api.requests.example.accept_header') }}</li>
+                        <li>{{ __('frontend.api.requests.example.content_type_header') }}</li>
+                        <li>{{ __('frontend.api.requests.example.api_key_header') }}</li>
                     </ul>
                 </div>
                 <div class="bg-base-200 rounded-box p-3">
-                    <p class="font-semibold">Параметры (body)</p>
+                    <p class="font-semibold">{{ __('frontend.api.requests.example.body_params') }}</p>
                     <ul class="list-disc list-inside">
-                        <li>currency (string, required)</li>
-                        <li>network (string, required)</li>
-                        <li>amount (string, required)</li>
-                        <li>client_id, merchant_id</li>
-                        <li>external_invoice_id, tag</li>
-                        <li>callback_url</li>
-                        <li>product_name, product_description</li>
-                        <li>metadata (JSON объект)</li>
+                        <li>{{ __('frontend.api.requests.example.params_descriptions.currency') }}</li>
+                        <li>{{ __('frontend.api.requests.example.params_descriptions.network') }}</li>
+                        <li>{{ __('frontend.api.requests.example.params_descriptions.amount') }}</li>
+                        <li>{{ __('frontend.api.requests.example.params_descriptions.client_id') }}, {{ __('frontend.api.requests.example.params_descriptions.merchant_id') }}</li>
+                        <li>{{ __('frontend.api.requests.example.params_descriptions.external_invoice_id') }}</li>
+                        <li>{{ __('frontend.api.requests.example.params_descriptions.callback_url') }}</li>
+                        <li>{{ __('frontend.api.requests.example.params_descriptions.product_name') }}</li>
+                        <li>{{ __('frontend.api.requests.example.params_descriptions.metadata') }}</li>
                     </ul>
                 </div>
                 <div>
-                    <p class="font-semibold mb-1">Пример запроса (curl)</p>
+                    <p class="font-semibold mb-1">{{ __('frontend.api.requests.example.curl_example') }}</p>
                     <pre class="mockup-code whitespace-pre overflow-x-auto max-w-full w-full pl-4"><code class="block">{{ `curl -X POST '${props.apiBase}/invoices' \
   -H 'Accept: application/json' \
   -H 'Content-Type: application/json' \
   -H 'X-Api-Key: <PUBLIC_API_KEY>' \
-  -d '{
-    "currency": "USDT",
-    "network": "tron",
-    "amount": "12.34",
-    "client_id": "customer-123",
-    "external_invoice_id": "order-1"
-  }'` }}</code></pre>
+  -d '${__('frontend.api.requests.example.curl_payload')}'` }}</code></pre>
                 </div>
             </div>
         </div>

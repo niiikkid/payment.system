@@ -34,8 +34,8 @@ async function loadClientsList() {
         <div class="collapse-content space-y-4">
             <p class="text-sm text-base-content/70">{{ __('frontend.api.requests.clients_description') }}</p>
             <div class="tabs tabs-boxed w-full">
-                <button class="tab" :class="tabs.view === 'form' ? 'tab-active' : ''" @click="tabs.view = 'form'">Форма</button>
-                <button class="tab" :class="tabs.view === 'example' ? 'tab-active' : ''" @click="tabs.view = 'example'">Пример запроса</button>
+                <button class="tab" :class="tabs.view === 'form' ? 'tab-active' : ''" @click="tabs.view = 'form'">{{ __('frontend.api.requests.tabs.form') }}</button>
+                <button class="tab" :class="tabs.view === 'example' ? 'tab-active' : ''" @click="tabs.view = 'example'">{{ __('frontend.api.requests.tabs.example') }}</button>
             </div>
 
             <div v-if="tabs.view === 'form'" class="grid md:grid-cols-3 gap-4">
@@ -62,14 +62,14 @@ async function loadClientsList() {
 
             <div v-else class="space-y-3 text-sm">
                 <div class="bg-base-200 rounded-box p-3">
-                    <p class="font-semibold">Headers</p>
+                    <p class="font-semibold">{{ __('frontend.api.requests.example.headers') }}</p>
                     <ul class="list-disc list-inside">
-                        <li>Accept: application/json</li>
-                        <li>X-Api-Key: &lt;PUBLIC_API_KEY&gt;</li>
+                        <li>{{ __('frontend.api.requests.example.accept_header') }}</li>
+                        <li>{{ __('frontend.api.requests.example.api_key_header') }}</li>
                     </ul>
                 </div>
                 <div class="bg-base-200 rounded-box p-3">
-                    <p class="font-semibold">Параметры (query)</p>
+                    <p class="font-semibold">{{ __('frontend.api.requests.example.query_params') }}</p>
                     <ul class="list-disc list-inside">
                         <li>page (number, ≥1)</li>
                         <li>per_page (number, 1..100)</li>

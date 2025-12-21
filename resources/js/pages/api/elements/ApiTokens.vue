@@ -30,15 +30,15 @@ const truncatedBase = computed(() => {
 const tooltipTextKey = ref(__('frontend.api.token.copy'));
 const showTooltipKey = ref(false);
 let resetTimerKey: number | undefined;
-let tooltipElementKey = ref<HTMLElement | null>(null);
-let triggerElementKey = ref<HTMLElement | null>(null);
+const tooltipElementKey = ref<HTMLElement | null>(null);
+const triggerElementKey = ref<HTMLElement | null>(null);
 
 // Tooltip state for API Base
 const tooltipTextBase = ref(__('frontend.api.token.copy'));
 const showTooltipBase = ref(false);
 let resetTimerBase: number | undefined;
-let tooltipElementBase = ref<HTMLElement | null>(null);
-let triggerElementBase = ref<HTMLElement | null>(null);
+const tooltipElementBase = ref<HTMLElement | null>(null);
+const triggerElementBase = ref<HTMLElement | null>(null);
 
 function updateTooltipPosition(element: HTMLElement | null, trigger: HTMLElement | null) {
     if (!element || !trigger || (!showTooltipKey.value && !showTooltipBase.value)) return;

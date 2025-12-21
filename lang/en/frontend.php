@@ -704,6 +704,58 @@ return [
             'clients_description' => 'Returns clients of the current user.',
             'client_create_title' => 'POST /clients — Create client',
             'client_create_description' => 'Creates client by external_id (Client ID).',
+            'tabs' => [
+                'form' => 'Form',
+                'example' => 'Request example',
+            ],
+            'example' => [
+                'headers' => 'Headers',
+                'body_params' => 'Parameters (body)',
+                'query_params' => 'Parameters (query)',
+                'curl_example' => 'Curl request example',
+                'accept_header' => 'Accept: application/json',
+                'content_type_header' => 'Content-Type: application/json',
+                'api_key_header' => 'X-Api-Key: &lt;PUBLIC_API_KEY&gt;',
+                'list_params_descriptions' => [
+                    'filters' => 'status, currency, network',
+                    'ids' => 'merchant_id, client_id',
+                    'identifiers' => 'external_invoice_id, tag, search',
+                    'pagination' => 'has_callback (1), page (≥1), per_page (1..100)',
+                ],
+                'path_params' => 'Parameters (path)',
+                'path_param_id' => 'id (string, required)',
+                'curl_list_payload' => '?status=pending&client_id=customer-123&per_page=20',
+                'params_descriptions' => [
+                    'currency' => 'currency (string, required)',
+                    'network' => 'network (string, required)',
+                    'amount' => 'amount (string, required)',
+                    'client_id' => 'client_id',
+                    'merchant_id' => 'merchant_id',
+                    'external_invoice_id' => 'external_invoice_id, tag',
+                    'callback_url' => 'callback_url',
+                    'product_name' => 'product_name, product_description',
+                    'metadata' => 'metadata (JSON object)',
+                ],
+                'curl_payload' => '{
+    "currency": "USDT",
+    "network": "tron",
+    "amount": "12.34",
+    "client_id": "customer-123",
+    "external_invoice_id": "order-1"
+  }',
+                'client_params_descriptions' => [
+                    'external_id' => 'external_id (string, required)',
+                    'name' => 'name (string, optional)',
+                    'telegram' => 'telegram (string, optional)',
+                    'contact' => 'contact (string, optional)',
+                ],
+                'curl_client_payload' => '{
+    "external_id": "customer-123",
+    "name": "John Doe",
+    "telegram": "@johndoe",
+    "contact": "john@example.com"
+  }',
+            ],
         ],
     ],
     'appearance' => [

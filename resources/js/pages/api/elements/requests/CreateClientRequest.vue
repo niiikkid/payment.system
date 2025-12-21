@@ -44,8 +44,8 @@ async function createClientRequest() {
         <div class="collapse-content space-y-4">
             <p class="text-sm text-base-content/70">{{ __('frontend.api.requests.client_create_description') }}</p>
             <div class="tabs tabs-boxed w-full">
-                <button class="tab" :class="tabs.view === 'form' ? 'tab-active' : ''" @click="tabs.view = 'form'">Форма</button>
-                <button class="tab" :class="tabs.view === 'example' ? 'tab-active' : ''" @click="tabs.view = 'example'">Пример запроса</button>
+                <button class="tab" :class="tabs.view === 'form' ? 'tab-active' : ''" @click="tabs.view = 'form'">{{ __('frontend.api.requests.tabs.form') }}</button>
+                <button class="tab" :class="tabs.view === 'example' ? 'tab-active' : ''" @click="tabs.view = 'example'">{{ __('frontend.api.requests.tabs.example') }}</button>
             </div>
 
             <div v-if="tabs.view === 'form'" class="grid md:grid-cols-3 gap-4">
@@ -78,32 +78,27 @@ async function createClientRequest() {
 
             <div v-else class="space-y-3 text-sm">
                 <div class="bg-base-200 rounded-box p-3">
-                    <p class="font-semibold">Headers</p>
+                    <p class="font-semibold">{{ __('frontend.api.requests.example.headers') }}</p>
                     <ul class="list-disc list-inside">
-                        <li>Accept: application/json</li>
-                        <li>Content-Type: application/json</li>
-                        <li>X-Api-Key: &lt;PUBLIC_API_KEY&gt;</li>
+                        <li>{{ __('frontend.api.requests.example.accept_header') }}</li>
+                        <li>{{ __('frontend.api.requests.example.content_type_header') }}</li>
+                        <li>{{ __('frontend.api.requests.example.api_key_header') }}</li>
                     </ul>
                 </div>
                 <div class="bg-base-200 rounded-box p-3">
-                    <p class="font-semibold">Параметры (body)</p>
+                    <p class="font-semibold">{{ __('frontend.api.requests.example.body_params') }}</p>
                     <ul class="list-disc list-inside">
-                        <li>external_id</li>
-                        <li>name</li>
-                        <li>telegram</li>
-                        <li>contact</li>
+                        <li>{{ __('frontend.api.requests.example.client_params_descriptions.external_id') }}</li>
+                        <li>{{ __('frontend.api.requests.example.client_params_descriptions.name') }}</li>
+                        <li>{{ __('frontend.api.requests.example.client_params_descriptions.telegram') }}</li>
+                        <li>{{ __('frontend.api.requests.example.client_params_descriptions.contact') }}</li>
                     </ul>
                 </div>
                 <pre class="mockup-code whitespace-pre overflow-x-auto max-w-full w-full pl-4"><code class="block">{{ `curl -X POST '${props.apiBase}/clients' \
   -H 'Accept: application/json' \
   -H 'Content-Type: application/json' \
   -H 'X-Api-Key: <PUBLIC_API_KEY>' \
-  -d '{
-    "external_id": "customer-123",
-    "name": "VIP Client",
-    "telegram": "@vip",
-    "contact": "vip@example.com"
-  }'` }}</code></pre>
+  -d '${__('frontend.api.requests.example.curl_client_payload')}'` }}</code></pre>
             </div>
         </div>
     </div>

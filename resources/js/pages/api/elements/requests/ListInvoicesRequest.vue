@@ -43,8 +43,8 @@ async function listInvoices() {
         <div class="collapse-content space-y-4">
             <p class="text-sm text-base-content/70">{{ __('frontend.api.requests.list_description') }}</p>
             <div class="tabs tabs-boxed w-full">
-                <button class="tab" :class="tabs.view === 'form' ? 'tab-active' : ''" @click="tabs.view = 'form'">Форма</button>
-                <button class="tab" :class="tabs.view === 'example' ? 'tab-active' : ''" @click="tabs.view = 'example'">Пример запроса</button>
+                <button class="tab" :class="tabs.view === 'form' ? 'tab-active' : ''" @click="tabs.view = 'form'">{{ __('frontend.api.requests.tabs.form') }}</button>
+                <button class="tab" :class="tabs.view === 'example' ? 'tab-active' : ''" @click="tabs.view = 'example'">{{ __('frontend.api.requests.tabs.example') }}</button>
             </div>
 
             <div v-if="tabs.view === 'form'" class="grid md:grid-cols-3 gap-4">
@@ -107,24 +107,24 @@ async function listInvoices() {
 
             <div v-else class="space-y-3 text-sm">
                 <div class="bg-base-200 rounded-box p-3">
-                    <p class="font-semibold">Headers</p>
+                    <p class="font-semibold">{{ __('frontend.api.requests.example.headers') }}</p>
                     <ul class="list-disc list-inside">
-                        <li>Accept: application/json</li>
-                        <li>X-Api-Key: &lt;PUBLIC_API_KEY&gt;</li>
+                        <li>{{ __('frontend.api.requests.example.accept_header') }}</li>
+                        <li>{{ __('frontend.api.requests.example.api_key_header') }}</li>
                     </ul>
                 </div>
                 <div class="bg-base-200 rounded-box p-3">
-                    <p class="font-semibold">Параметры (query)</p>
+                    <p class="font-semibold">{{ __('frontend.api.requests.example.query_params') }}</p>
                     <ul class="list-disc list-inside">
-                        <li>status, currency, network</li>
-                        <li>merchant_id, client_id</li>
-                        <li>external_invoice_id, tag, search</li>
-                        <li>has_callback (1), page (≥1), per_page (1..100)</li>
+                        <li>{{ __('frontend.api.requests.example.list_params_descriptions.filters') }}</li>
+                        <li>{{ __('frontend.api.requests.example.list_params_descriptions.ids') }}</li>
+                        <li>{{ __('frontend.api.requests.example.list_params_descriptions.identifiers') }}</li>
+                        <li>{{ __('frontend.api.requests.example.list_params_descriptions.pagination') }}</li>
                     </ul>
                 </div>
                 <div>
-                    <p class="font-semibold mb-1">Пример запроса (curl)</p>
-                    <pre class="mockup-code whitespace-pre overflow-x-auto max-w-full w-full pl-4"><code class="block">{{ `curl -X GET '${props.apiBase}/invoices?status=pending&client_id=customer-123&per_page=20' \
+                    <p class="font-semibold mb-1">{{ __('frontend.api.requests.example.curl_example') }}</p>
+                    <pre class="mockup-code whitespace-pre overflow-x-auto max-w-full w-full pl-4"><code class="block">{{ `curl -X GET '${props.apiBase}/invoices${__('frontend.api.requests.example.curl_list_payload')}' \
   -H 'Accept: application/json' \
   -H 'X-Api-Key: <PUBLIC_API_KEY>'` }}</code></pre>
                 </div>
