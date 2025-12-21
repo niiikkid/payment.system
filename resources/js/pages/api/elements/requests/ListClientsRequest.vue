@@ -33,9 +33,11 @@ async function loadClientsList() {
         <div class="collapse-title text-md font-medium">{{ __('frontend.api.requests.clients_title') }}</div>
         <div class="collapse-content space-y-4">
             <p class="text-sm text-base-content/70">{{ __('frontend.api.requests.clients_description') }}</p>
-            <div class="tabs tabs-boxed w-full">
-                <button class="tab" :class="tabs.view === 'form' ? 'tab-active' : ''" @click="tabs.view = 'form'">{{ __('frontend.api.requests.tabs.form') }}</button>
-                <button class="tab" :class="tabs.view === 'example' ? 'tab-active' : ''" @click="tabs.view = 'example'">{{ __('frontend.api.requests.tabs.example') }}</button>
+            <div class="w-fit">
+                <div role="tablist" class="tabs tabs-box">
+                    <a role="tab" :class="tabs.view === 'form' ? 'tab tab-active' : 'tab'" @click="tabs.view = 'form'">{{ __('frontend.api.requests.tabs.form') }}</a>
+                    <a role="tab" :class="tabs.view === 'example' ? 'tab tab-active' : 'tab'" @click="tabs.view = 'example'">{{ __('frontend.api.requests.tabs.example') }}</a>
+                </div>
             </div>
 
             <div v-if="tabs.view === 'form'" class="grid md:grid-cols-3 gap-4">
