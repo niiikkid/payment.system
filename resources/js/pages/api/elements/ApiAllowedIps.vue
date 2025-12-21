@@ -84,7 +84,7 @@ async function removeIp(id: number) {
 
 <template>
     <div class="card bg-base-100 shadow">
-        <div class="card-body space-y-4">
+        <div class="card-body space-y-3">
             <div class="space-y-1">
                 <h3 class="card-title">{{ __('frontend.api.whitelist.title') }}</h3>
                 <p class="text-sm text-base-content/70">
@@ -111,13 +111,7 @@ async function removeIp(id: number) {
                 <p v-if="error" class="text-error text-sm mt-2">{{ error }}</p>
             </div>
 
-            <div class="divider my-0"></div>
-
             <div class="space-y-3">
-                <p class="text-sm text-base-content/70">
-                    {{ __('frontend.api.whitelist.hint') }}
-                </p>
-
                 <div v-if="items.length" class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                     <div v-for="item in items" :key="item.id" class="border rounded-xl p-4 flex items-center justify-between gap-3">
                         <div class="space-y-1 min-w-0">
