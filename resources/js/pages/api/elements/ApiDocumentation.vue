@@ -29,7 +29,7 @@ defineProps<Props>();
                 <li>{{ __('frontend.api.documentation.endpoints.clients_get') }}</li>
                 <li>{{ __('frontend.api.documentation.endpoints.clients_post') }}</li>
             </ul>
-            <p class="text-sm text-warning">
+            <p class="text-sm text-info">
                 {{ __('frontend.api.documentation.accept_hint') }}
             </p>
         </div>
