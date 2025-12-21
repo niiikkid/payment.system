@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import { Link, useForm } from '@inertiajs/vue3'
+import { useForm } from '@inertiajs/vue3'
 import AppLayout from '@/layouts/AppLayout.vue'
 import FilterPanel from '@/components/filters/FilterPanel.vue'
 import Pagination from '@/components/ui/Pagination.vue'
@@ -8,6 +8,8 @@ import DateTimeFormat from '@/components/ui/DateTimeFormat.vue'
 import UidCopy from '@/components/ui/UidCopy.vue'
 import ClientModal, { type ClientForm } from '@/components/modals/clients/ClientModal.vue'
 import { vueLang } from '@erag/lang-sync-inertia'
+import EditButton from '@/components/ui/table-actions/EditButton.vue'
+import NavigationLinkButton from '@/components/ui/table-actions/NavigationLinkButton.vue'
 
 interface ClientItem {
     id: string
@@ -274,12 +276,12 @@ function toIso(input: string | null | undefined): string {
                                         <span v-else class="opacity-60">—</span>
                                     </td>
                                     <td class="flex items-center gap-2">
-                                        <Link class="btn btn-ghost btn-xs" :href="invoicesLink(client)">
-                                            {{ __('frontend.clients.actions.view_invoices') }}
-                                        </Link>
-                                        <button class="btn btn-xs" @click="openEdit(client)">
-                                            {{ __('frontend.common.edit') }}
-                                        </button>
+                                        <NavigationLinkButton :href="invoicesLink(client)" :title="__('frontend.clients.actions.view_invoices')">
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m3.75 9v7.5m2.25-6.466a9.016 9.016 0 0 0-3.461-.203c-.536.072-.974.478-1.021 1.017a4.559 4.559 0 0 0-.018.402c0 .464.336.844.775.994l2.95 1.012c.44.15.775.53.775.994 0 .136-.006.27-.018.402-.047.539-.485.945-1.021 1.017a9.077 9.077 0 0 1-3.461-.203M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
+                                            </svg>
+                                        </NavigationLinkButton>
+                                        <EditButton :title="__('frontend.common.edit')" @click="openEdit(client)" />
                                     </td>
                                 </tr>
                                 <tr v-if="!clients.data.length">
@@ -324,12 +326,12 @@ function toIso(input: string | null | undefined): string {
                                     </div>
 
                                     <div class="flex flex-col items-end gap-2">
-                                        <Link class="btn btn-ghost btn-xs" :href="invoicesLink(client)">
-                                            {{ __('frontend.clients.actions.view_invoices') }}
-                                        </Link>
-                                        <button class="btn btn-xs" @click="openEdit(client)">
-                                            {{ __('frontend.common.edit') }}
-                                        </button>
+                                        <NavigationLinkButton :href="invoicesLink(client)" :title="__('frontend.clients.actions.view_invoices')">
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m3.75 9v7.5m2.25-6.466a9.016 9.016 0 0 0-3.461-.203c-.536.072-.974.478-1.021 1.017a4.559 4.559 0 0 0-.018.402c0 .464.336.844.775.994l2.95 1.012c.44.15.775.53.775.994 0 .136-.006.27-.018.402-.047.539-.485.945-1.021 1.017a9.077 9.077 0 0 1-3.461-.203M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
+                                            </svg>
+                                        </NavigationLinkButton>
+                                        <EditButton :title="__('frontend.common.edit')" @click="openEdit(client)" />
                                         <div class="text-xs text-base-content/70">
                                             <span class="opacity-70">{{ __('frontend.common.created_at') }}:</span>
                                             <span v-if="client.created_at" class="ml-1 font-mono">
@@ -381,12 +383,12 @@ function toIso(input: string | null | undefined): string {
                                         <span v-else class="ml-1 opacity-60">—</span>
                                     </div>
                                     <div class="flex items-center gap-2">
-                                        <Link class="btn btn-ghost btn-xs" :href="invoicesLink(client)">
-                                            {{ __('frontend.clients.actions.view_invoices') }}
-                                        </Link>
-                                        <button class="btn btn-ghost btn-xs" @click="openEdit(client)">
-                                            {{ __('frontend.common.edit') }}
-                                        </button>
+                                        <NavigationLinkButton :href="invoicesLink(client)" :title="__('frontend.clients.actions.view_invoices')">
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m3.75 9v7.5m2.25-6.466a9.016 9.016 0 0 0-3.461-.203c-.536.072-.974.478-1.021 1.017a4.559 4.559 0 0 0-.018.402c0 .464.336.844.775.994l2.95 1.012c.44.15.775.53.775.994 0 .136-.006.27-.018.402-.047.539-.485.945-1.021 1.017a9.077 9.077 0 0 1-3.461-.203M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
+                                            </svg>
+                                        </NavigationLinkButton>
+                                        <EditButton :title="__('frontend.common.edit')" @click="openEdit(client)" />
                                     </div>
                                 </div>
                             </div>

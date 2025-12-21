@@ -33,21 +33,21 @@ class UpdateAppSettingsRequest extends FormRequest
         $validator->after(function ($validator) {
             $money = app(MoneyServiceContract::class);
             $maxUsdtValue = $this->getMaxUsdtValueInMinor($money);
-            
+
             foreach ($this->input('settings', []) as $index => $item) {
                 if (!isset($item['currency']) || !isset($item['min_invoice_amount']) || !isset($item['max_invoice_amount'])) {
                     continue;
                 }
-                
+
                 try {
-                    $currency = Currency::from(strtoupper((string) $item['currency']));
-                    
+                    $currency = Currency::from(strtolower((string) $item['currency']));
+
                     $min = $money->create($item['min_invoice_amount'], $currency);
                     $max = $money->create($item['max_invoice_amount'], $currency);
-                    
+
                     $minMinorStr = $money->toMinor($min);
                     $maxMinorStr = $money->toMinor($max);
-                    
+
                     if (!preg_match('/^-?\d+$/', $minMinorStr)) {
                         $validator->errors()->add(
                             "settings.{$index}.min_invoice_amount",
@@ -55,7 +55,7 @@ class UpdateAppSettingsRequest extends FormRequest
                         );
                         continue;
                     }
-                    
+
                     if (!preg_match('/^-?\d+$/', $maxMinorStr)) {
                         $validator->errors()->add(
                             "settings.{$index}.max_invoice_amount",
@@ -63,24 +63,24 @@ class UpdateAppSettingsRequest extends FormRequest
                         );
                         continue;
                     }
-                    
+
                     $minMinor = (int) $minMinorStr;
                     $maxMinor = (int) $maxMinorStr;
-                    
+
                     if ($minMinor < 0) {
                         $validator->errors()->add(
                             "settings.{$index}.min_invoice_amount",
                             __('validation.app.settings.min_non_negative')
                         );
                     }
-                    
+
                     if ($maxMinor < 0) {
                         $validator->errors()->add(
                             "settings.{$index}.max_invoice_amount",
                             __('validation.app.settings.max_non_negative')
                         );
                     }
-                    
+
                     if ($maxMinor > $maxUsdtValue) {
                         $maxUsdtFormatted = $money->format($money->fromMinor($maxUsdtValue, Currency::USDT));
                         $validator->errors()->add(
@@ -106,7 +106,7 @@ class UpdateAppSettingsRequest extends FormRequest
     {
         $result = [];
         foreach ((array) $this->input('settings', []) as $item) {
-            $currency = Currency::from(strtoupper((string) ($item['currency'] ?? '')));
+            $currency = Currency::from(strtolower((string) ($item['currency'] ?? '')));
             $min = $money->create($item['min_invoice_amount'], $currency);
             $max = $money->create($item['max_invoice_amount'], $currency);
             $result[] = [

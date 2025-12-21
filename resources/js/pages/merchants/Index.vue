@@ -9,6 +9,7 @@ import Pagination from '@/components/ui/Pagination.vue';
 import DateTimeFormat from '@/components/ui/DateTimeFormat.vue';
 import MerchantAvatar from '@/components/merchants/MerchantAvatar.vue';
 import FilterPanel from '@/components/filters/FilterPanel.vue';
+import EditButton from '@/components/ui/table-actions/EditButton.vue';
 
 type FilterType = 'text' | 'select' | 'checkpoint';
 
@@ -282,7 +283,7 @@ function submit() {
                                         <span v-else>—</span>
                                     </td>
                                     <td class="text-right">
-                                        <button class="btn btn-ghost btn-xs" @click="openEdit(merchant)">{{ __('frontend.common.edit') }}</button>
+                                        <EditButton :title="__('frontend.common.edit')" @click="openEdit(merchant)" />
                                     </td>
                                 </tr>
                                 <tr v-if="props.merchants.data.length === 0">
@@ -314,7 +315,7 @@ function submit() {
                                         <div class="text-xs text-base-content/70 truncate max-w-xs">{{ merchant.description || '—' }}</div>
                                     </div>
                                     <div class="ml-auto">
-                                        <button class="btn btn-ghost btn-xs" @click="openEdit(merchant)">{{ __('frontend.common.edit') }}</button>
+                                        <EditButton :title="__('frontend.common.edit')" @click="openEdit(merchant)" />
                                     </div>
                                 </div>
                                 <div class="flex items-center gap-2 text-xs text-base-content/70">

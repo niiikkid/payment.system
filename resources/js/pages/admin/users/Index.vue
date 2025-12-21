@@ -7,6 +7,7 @@ import ModalDialog from '@/components/ui/modal/ModalDialog.vue';
 import DateTimeFormat from '@/components/ui/DateTimeFormat.vue';
 import { vueLang } from '@erag/lang-sync-inertia';
 import FilterPanel from '@/components/filters/FilterPanel.vue';
+import EditButton from '@/components/ui/table-actions/EditButton.vue';
 
 type RoleOption = { value: string; label: string };
 type FilterType = 'text' | 'select' | 'checkpoint';
@@ -280,11 +281,7 @@ function impersonate(user: UserItem) {
                                     </td>
                                     <td>
                                         <div class="flex gap-2">
-                                            <button class="btn btn-xs" @click="openEdit(user)">
-                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25" />
-                                                </svg>
-                                            </button>
+                                            <EditButton :title="__('frontend.common.edit')" @click="openEdit(user)" />
                                             <button
                                                 v-if="user.can_be_impersonated"
                                                 class="btn btn-xs btn-warning"
@@ -310,11 +307,7 @@ function impersonate(user: UserItem) {
                             <div class="card-body p-4 space-y-3">
                                 <div class="flex items-center justify-between">
                                     <div class="font-semibold">{{ user.name }}</div>
-                                    <button class="btn btn-xs" @click="openEdit(user)">
-                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25" />
-                                        </svg>
-                                    </button>
+                                    <EditButton :title="__('frontend.common.edit')" @click="openEdit(user)" />
                                 </div>
                                     <div class="text-sm opacity-80">{{ user.email }}</div>
                                 <div class="flex flex-wrap gap-1">

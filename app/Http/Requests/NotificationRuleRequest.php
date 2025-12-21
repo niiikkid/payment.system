@@ -52,7 +52,7 @@ class NotificationRuleRequest extends FormRequest
 
     public function toCurrencyEnum(): Currency
     {
-        return Currency::from(strtoupper((string) $this->input('currency')));
+        return Currency::from(strtolower((string) $this->input('currency')));
     }
 
     public function toMoneyAmount(MoneyServiceContract $money): MoneyAmount

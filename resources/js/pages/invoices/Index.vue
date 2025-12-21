@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import AppLayout from '@/layouts/AppLayout.vue';
-import { Link, useForm, usePage } from '@inertiajs/vue3';
+import { useForm, usePage } from '@inertiajs/vue3';
 import { ref, computed, watch } from 'vue';
 import axios from 'axios';
 import CurrencyNetworkBadge from '@/components/ui/CurrencyNetworkBadge.vue';
@@ -8,6 +8,8 @@ import AddressCopy from '@/components/ui/AddressCopy.vue';
 import UidCopy from '@/components/ui/UidCopy.vue';
 import DateTimeFormat from '@/components/ui/DateTimeFormat.vue';
 import Pagination from '@/components/ui/Pagination.vue';
+import ViewButton from '@/components/ui/table-actions/ViewButton.vue';
+import ExternalLinkButton from '@/components/ui/table-actions/ExternalLinkButton.vue';
 import InvoiceDetailsModal from '@/components/modals/invoices/InvoiceDetailsModal.vue';
 import InvoiceEditModal, { type InvoiceEditForm } from '@/components/modals/invoices/InvoiceEditModal.vue';
 import InvoiceCreateModal, { type InvoiceCreateForm } from '@/components/modals/invoices/InvoiceCreateModal.vue';
@@ -575,16 +577,8 @@ watch(
                     <DateTimeFormat short-year :value="toIso(inv.created_at)" />
                   </td>
                   <td class="flex items-center gap-2">
-                    <button class="btn btn-xs" @click="openDetails(inv)">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25" />
-                        </svg>
-                    </button>
-                    <Link :href="`/pay/${inv.id}`" target="_blank" rel="noopener" class="btn btn-ghost btn-xs" :title="__('frontend.invoices_page.table.open_payment_page')">
-                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 0 0 3 8.25v10.5A2.25 2.25 0 0 0 5.25 21h10.5A2.25 2.25 0 0 0 18 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
-                      </svg>
-                    </Link>
+                    <ViewButton @click="openDetails(inv)" />
+                    <ExternalLinkButton :href="`/pay/${inv.id}`" :title="__('frontend.invoices_page.table.open_payment_page')" />
                   </td>
                 </tr>
                 <tr v-if="!invoices.data.length">
@@ -644,16 +638,8 @@ watch(
                         {{ inv.status }}
                       </span>
                     </div>
-                    <button class="btn btn-xs" @click="openDetails(inv)">
-                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25" />
-                      </svg>
-                    </button>
-                    <Link :href="`/pay/${inv.id}`" target="_blank" rel="noopener" class="btn btn-ghost btn-xs" :title="__('frontend.invoices_page.table.open_payment_page')">
-                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 0 0 3 8.25v10.5A2.25 2.25 0 0 0 5.25 21h10.5A2.25 2.25 0 0 0 18 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
-                      </svg>
-                    </Link>
+                    <ViewButton @click="openDetails(inv)" />
+                    <ExternalLinkButton :href="`/pay/${inv.id}`" :title="__('frontend.invoices_page.table.open_payment_page')" />
                   </div>
                 </div>
               </div>
@@ -715,16 +701,8 @@ watch(
                                 </div>
                             </div>
                             <div class="flex items-center gap-2">
-                                <button class="btn btn-xs" @click="openDetails(inv)">
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25" />
-                                    </svg>
-                                </button>
-                                <Link :href="`/pay/${inv.id}`" target="_blank" rel="noopener" class="btn btn-ghost btn-xs" :title="__('frontend.invoices_page.table.open_payment_page')">
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 0 0 3 8.25v10.5A2.25 2.25 0 0 0 5.25 21h10.5A2.25 2.25 0 0 0 18 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
-                                    </svg>
-                                </Link>
+                                <ViewButton @click="openDetails(inv)" />
+                                <ExternalLinkButton :href="`/pay/${inv.id}`" :title="__('frontend.invoices_page.table.open_payment_page')" />
                             </div>
                         </div>
                     </div>
