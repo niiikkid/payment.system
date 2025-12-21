@@ -5,9 +5,9 @@ namespace App\Http\Controllers;
 
 use App\Models\ApiToken;
 use App\Http\Resources\ApiTokenAllowedIpResource;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
-use Inertia\Inertia;
 use Inertia\Response;
 
 class ApiController extends Controller
@@ -39,6 +39,29 @@ class ApiController extends Controller
             'apiTokenId' => $token?->id,
             'allowedIps' => $allowedIps,
         ]);
+    }
+
+    public function regenerate(): RedirectResponse
+    {
+        $user = Auth::user();
+
+        if (!$user) {
+            abort(401);
+        }
+
+        $token = $user->apiTokens()->first();
+
+        if (!$token) {
+            abort(404, 'API token not found');
+        }
+
+        $token->update([
+            'token' => $this->generateUniqueToken(),
+        ]);
+
+        return redirect()
+            ->route('api.docs')
+            ->with('success', __('frontend.api.token.refreshed'));
     }
 
     private function generateUniqueToken(): string

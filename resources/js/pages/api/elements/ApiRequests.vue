@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import ApiDocumentation from '@/pages/api/elements/ApiDocumentation.vue'
 import CreateInvoiceRequest from '@/pages/api/elements/requests/CreateInvoiceRequest.vue'
 import ListInvoicesRequest from '@/pages/api/elements/requests/ListInvoicesRequest.vue'
 import GetInvoiceRequest from '@/pages/api/elements/requests/GetInvoiceRequest.vue'
@@ -20,6 +21,7 @@ const props = defineProps<Props>();
 
 <template>
     <div class="space-y-4">
+        <ApiDocumentation :api-base="props.apiBase" />
         <CreateInvoiceRequest :api-key="props.apiKey" :api-base="props.apiBase" />
         <ListInvoicesRequest :api-key="props.apiKey" :api-base="props.apiBase" />
         <GetInvoiceRequest :api-key="props.apiKey" :api-base="props.apiBase" />

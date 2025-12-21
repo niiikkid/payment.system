@@ -103,6 +103,7 @@ Route::middleware(['auth', 'verified', 'approved'])->group(function () {
 
     // API Docs & Playground (не в настройках)
     Route::get('api', ApiController::class)->name('api.docs');
+    Route::post('api/regenerate-token', [ApiController::class, 'regenerate'])->name('api.regenerate-token');
     Route::post('api/allowed-ips', [ApiTokenAllowedIpController::class, 'store'])->name('api.allowed-ips.store');
     Route::delete('api/allowed-ips/{allowedIp}', [ApiTokenAllowedIpController::class, 'destroy'])->name('api.allowed-ips.destroy');
 });

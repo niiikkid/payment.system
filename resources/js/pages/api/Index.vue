@@ -5,7 +5,6 @@ import type { BreadcrumbItem } from '@/types';
 import { computed } from 'vue';
 import ApiTokens from './elements/ApiTokens.vue';
 import ApiRequests from './elements/ApiRequests.vue';
-import ApiDocumentation from './elements/ApiDocumentation.vue';
 import { vueLang } from '@erag/lang-sync-inertia';
 import ApiAllowedIps from './elements/ApiAllowedIps.vue';
 
@@ -44,7 +43,6 @@ const allowedIps = computed(() => props.value.allowedIps || []);
             <ApiTokens :api-key="apiKey" :api-base="apiBase" />
             <ApiAllowedIps :api-token-id="apiTokenId" :allowed-ips="allowedIps" />
             <ApiRequests :api-key="apiKey" :api-base="apiBase" />
-            <ApiDocumentation :api-base="apiBase" />
         </div>
     </AppLayout>
 </template>

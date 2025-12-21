@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { computed, ref, onUnmounted, watch } from 'vue';
 import { vueLang } from '@erag/lang-sync-inertia';
+import { router } from '@inertiajs/vue3';
+import ConfirmDialog from '@/components/ui/modal/ConfirmDialog.vue';
 
 interface Props {
     apiKey: string;
@@ -39,6 +41,14 @@ const showTooltipBase = ref(false);
 let resetTimerBase: number | undefined;
 const tooltipElementBase = ref<HTMLElement | null>(null);
 const triggerElementBase = ref<HTMLElement | null>(null);
+
+// Hover state for blur effect
+const isHoveredKey = ref(false);
+const isHoveredBase = ref(false);
+
+// Regenerate token modal
+const showRegenerateModal = ref(false);
+const isRegenerating = ref(false);
 
 function updateTooltipPosition(element: HTMLElement | null, trigger: HTMLElement | null) {
     if (!element || !trigger || (!showTooltipKey.value && !showTooltipBase.value)) return;
@@ -107,6 +117,24 @@ function hideTooltipHandler(type: 'key' | 'base') {
     } else {
         showTooltipBase.value = false;
     }
+}
+
+function onMouseEnter(type: 'key' | 'base') {
+    if (type === 'key') {
+        isHoveredKey.value = true;
+    } else {
+        isHoveredBase.value = true;
+    }
+    showTooltipHandler(type);
+}
+
+function onMouseLeave(type: 'key' | 'base') {
+    if (type === 'key') {
+        isHoveredKey.value = false;
+    } else {
+        isHoveredBase.value = false;
+    }
+    hideTooltipHandler(type);
 }
 
 watch(showTooltipKey, (newValue) => {
@@ -178,6 +206,27 @@ function onKeydown(e: KeyboardEvent, type: 'key' | 'base') {
         copyToClipboard(text, type);
     }
 }
+
+function openRegenerateModal() {
+    showRegenerateModal.value = true;
+}
+
+function closeRegenerateModal() {
+    showRegenerateModal.value = false;
+}
+
+async function regenerateToken() {
+    isRegenerating.value = true;
+    router.post('/api/regenerate-token', {}, {
+        preserveScroll: true,
+        onSuccess: () => {
+            closeRegenerateModal();
+        },
+        onFinish: () => {
+            isRegenerating.value = false;
+        },
+    });
+}
 </script>
 
 <template>
@@ -195,15 +244,15 @@ function onKeydown(e: KeyboardEvent, type: 'key' | 'base') {
                         :title="apiKey"
                         @click="copyToClipboard(apiKey, 'key')"
                         @keydown="(e) => onKeydown(e, 'key')"
-                        @mouseenter="showTooltipHandler('key')"
-                        @mouseleave="hideTooltipHandler('key')"
+                        @mouseenter="onMouseEnter('key')"
+                        @mouseleave="onMouseLeave('key')"
                         @focus="showTooltipHandler('key')"
                         @blur="hideTooltipHandler('key')"
                         tabindex="0"
                         role="button"
                     >
-                        <span class="hidden sm:inline break-all">{{ apiKey }}</span>
-                        <span class="inline sm:hidden">{{ truncatedKey }}</span>
+                        <span :class="['hidden sm:inline break-all']" :style="{ filter: !isHoveredKey ? 'blur(3px)' : 'none' }">{{ apiKey }}</span>
+                        <span :class="['inline sm:hidden']" :style="{ filter: !isHoveredKey ? 'blur(3px)' : 'none' }">{{ truncatedKey }}</span>
                     </span>
                     <Teleport to="body">
                         <div
@@ -228,8 +277,8 @@ function onKeydown(e: KeyboardEvent, type: 'key' | 'base') {
                         :title="apiBase"
                         @click="copyToClipboard(apiBase, 'base')"
                         @keydown="(e) => onKeydown(e, 'base')"
-                        @mouseenter="showTooltipHandler('base')"
-                        @mouseleave="hideTooltipHandler('base')"
+                        @mouseenter="onMouseEnter('base')"
+                        @mouseleave="onMouseLeave('base')"
                         @focus="showTooltipHandler('base')"
                         @blur="hideTooltipHandler('base')"
                         tabindex="0"
@@ -250,7 +299,30 @@ function onKeydown(e: KeyboardEvent, type: 'key' | 'base') {
                     </Teleport>
                 </div>
             </div>
+            <div class="form-control mt-4">
+                <button
+                    type="button"
+                    class="btn btn-outline btn-error btn-sm"
+                    @click="openRegenerateModal"
+                >
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                    </svg>
+                    {{ __('frontend.api.token.regenerate') }}
+                </button>
+            </div>
         </div>
     </div>
+
+    <ConfirmDialog
+        v-model="showRegenerateModal"
+        :title="__('frontend.api.token.regenerate_confirm_title')"
+        :message="__('frontend.api.token.regenerate_confirm_message')"
+        :confirm-text="__('frontend.api.token.regenerate')"
+        :loading="isRegenerating"
+        danger
+        @confirm="regenerateToken"
+        @cancel="closeRegenerateModal"
+    />
 </template>
 
