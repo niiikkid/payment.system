@@ -74,9 +74,9 @@ class InvoiceController extends Controller
                 $currencyNetworkOptions[] = [
                     'value' => $currency->value . '|' . $network->value,
                     'currency' => $currency->value,
-                    'currency_label' => $currency->value,
+                    'currency_label' => strtoupper($currency->value),
                     'network' => $network->value,
-                    'network_label' => $network->value,
+                    'network_label' => strtoupper($network->value),
                 ];
             }
         }

@@ -35,8 +35,8 @@ class AddressService implements AddressServiceContract
 
     public function create(User $user, string $currency, string $network, string $address): Address
     {
-        $currencyEnum = Currency::tryFrom(strtoupper(trim($currency)));
-        $networkEnum = Network::tryFrom(strtolower(trim($network)));
+        $currencyEnum = Currency::tryFrom(trim($currency));
+        $networkEnum = Network::tryFrom(trim($network));
 
         if (!$currencyEnum) {
             throw new UnsupportedCurrencyException(__('messages.addresses.errors.unsupported_currency_value', [

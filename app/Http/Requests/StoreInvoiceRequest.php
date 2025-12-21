@@ -13,6 +13,7 @@ use App\Services\Money\CurrencyAmountRulesService;
 use App\Models\Merchant;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\Rules\Enum;
 
 /**
  * @property-read string $currency ISO код валюты (например, USDT)
@@ -42,7 +43,7 @@ class StoreInvoiceRequest extends FormRequest
         // Нормализуем значения, чтобы валидация была предсказуемой и case-insensitive для currency/network.
         $currency = $this->input('currency');
         if ($currency !== null) {
-            $this->merge(['currency' => strtoupper(trim((string) $currency))]);
+            $this->merge(['currency' => strtolower(trim((string) $currency))]);
         }
 
         $network = $this->input('network');
@@ -58,12 +59,9 @@ class StoreInvoiceRequest extends FormRequest
 
     public function rules(): array
     {
-        $currencyValues = array_map(fn (Currency $c) => $c->value, Currency::cases());
-        $networkValues = array_map(fn (Network $n) => $n->value, Network::cases());
-
         return [
-            'currency' => ['required', 'string', Rule::in($currencyValues)],
-            'network' => ['required', 'string', Rule::in($networkValues)],
+            'currency' => ['required', 'string', new Enum(Currency::class)],
+            'network' => ['required', 'string', new Enum(Network::class)],
             // Валидация формата по валюте — в withValidator(), т.к. зависит от currency
             'amount' => ['required', 'string', 'max:64'],
             'external_invoice_id' => ['nullable', 'string', 'max:64'],
@@ -155,7 +153,7 @@ class StoreInvoiceRequest extends FormRequest
 
     public function toCurrencyEnum(): Currency
     {
-        return Currency::from(strtoupper(trim((string) $this->input('currency'))));
+        return Currency::from(strtolower(trim((string) $this->input('currency'))));
     }
 
     public function toNetworkEnum(): Network

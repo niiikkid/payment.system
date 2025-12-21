@@ -552,13 +552,15 @@ watch(
                   </td>
                   <td class="text-sm">
                     <div class="flex flex-col">
-                      <span class="font-medium truncate">{{ inv.client?.name || inv.client_external_id || '—' }}</span>
+                      <span class="truncate">{{ inv.client?.name || inv.client_external_id || '—' }}</span>
                       <span v-if="inv.client?.external_id && inv.client?.name" class="text-xs text-base-content/60 truncate">
                         {{ inv.client?.external_id }}
                       </span>
                     </div>
                   </td>
-                  <td>{{ inv.amount }}</td>
+                  <td>
+                      <span class="text-sm">{{ inv.amount }}</span>
+                  </td>
                   <td>
                     <CurrencyNetworkBadge :icon-size="22" :currency-label="inv.currency_label || inv.currency" :network-label="inv.network_label || inv.network" />
                   </td>

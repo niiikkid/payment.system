@@ -124,7 +124,7 @@ const fallback_text = computed(() => {
         </span>
 
         <span class="space-x-1 inline-flex items-center">
-            <span :class="currencyClass">{{ props.currencyLabel }}</span>
+            <span class="text-sm text-base-content" :class="currencyClass">{{ props.currencyLabel }}</span>
             <span v-if="formattedNetworkLabel" :class="networkBadgeClass">{{ formattedNetworkLabel }}</span>
         </span>
     </span>
