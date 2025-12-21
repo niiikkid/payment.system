@@ -3,6 +3,7 @@
 use App\Http\Middleware\HandleAppearance;
 use App\Http\Middleware\HandleInertiaRequests;
 use App\Http\Middleware\ApiKeyAuth;
+use App\Http\Middleware\EnsureUserApproved;
 use App\Http\Middleware\SetLocale;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -36,6 +37,7 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $middleware->alias([
             'api.key' => ApiKeyAuth::class,
+            'approved' => EnsureUserApproved::class,
         ]);
     })
     ->withEvents()

@@ -27,6 +27,10 @@ return [
             'expired' => 'Истёкших',
             'addresses' => 'Адресов: {count}',
         ],
+        'pending_approval' => [
+            'title' => 'Ожидает модерации',
+            'description' => 'Доступ к панели будет открыт после одобрения администратором.',
+        ],
     ],
     'addresses' => [
         'list' => [
@@ -177,6 +181,7 @@ return [
         'app_settings' => 'Настройки',
         'markets' => 'Маркеты',
         'profile' => 'Профиль',
+        'admin' => 'Админ',
         'impersonation_title' => 'Режим пользователя',
         'impersonation_description' => 'Вы просматриваете интерфейс как другой пользователь.',
         'impersonation_return' => 'Вернуться в админку',
@@ -422,13 +427,17 @@ return [
             'cancel' => 'Отмена',
             'create' => 'Создать',
             'save' => 'Сохранить',
+            'approve' => 'Одобрить',
         ],
         'table' => [
             'id' => 'ID',
             'name' => 'Имя',
             'email' => 'Email',
             'roles' => 'Роли',
+            'approval' => 'Доступ',
             'created' => 'Создан',
+            'approved' => 'Одобрен',
+            'pending' => 'Ожидает',
             'empty' => 'Пользователи не найдены',
         ],
         'forms' => [

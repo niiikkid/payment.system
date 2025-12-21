@@ -188,14 +188,14 @@ function toIso(input: string | null | undefined): string {
                         <div class="flex flex-col sm:flex-row sm:items-center gap-2">
                             <div class="text-xs text-base-content/60 sm:w-32 flex-shrink-0">{{ __('frontend.invoices_details.payment.expires_at') }}</div>
                             <div class="flex-1">
-                                <DateTimeFormat v-if="invoice.expires_at" :value="toIso(invoice.expires_at)" />
+                                <DateTimeFormat short-year v-if="invoice.expires_at" :value="toIso(invoice.expires_at)" />
                                 <span v-else class="text-base-content/60">—</span>
                             </div>
                         </div>
                         <div class="flex flex-col sm:flex-row sm:items-center gap-2">
                             <div class="text-xs text-base-content/60 sm:w-32 flex-shrink-0">{{ __('frontend.invoices_details.payment.created_at') }}</div>
                             <div class="flex-1">
-                                <DateTimeFormat :value="toIso(invoice.created_at)" />
+                                <DateTimeFormat short-year :value="toIso(invoice.created_at)" />
                             </div>
                         </div>
                     </div>

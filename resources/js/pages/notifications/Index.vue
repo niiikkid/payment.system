@@ -366,7 +366,7 @@ const eventRequiresStatus = computed(() => ruleForm.event === 'invoice.status_ch
                       <span class="badge badge-ghost whitespace-nowrap">{{ eventLabel(notification.event) }}</span>
                     </td>
                     <td>
-                      <DateTimeFormat :value="notification.created_at" />
+                      <DateTimeFormat short-year :value="notification.created_at" />
                     </td>
                     <td class="text-right">
                       <div class="flex items-center justify-end gap-2">
@@ -404,7 +404,7 @@ const eventRequiresStatus = computed(() => ruleForm.event === 'invoice.status_ch
                       <div class="text-sm opacity-70 whitespace-pre-wrap">{{ notification.body }}</div>
                     </div>
                     <div class="text-xs opacity-70">
-                      <DateTimeFormat :value="notification.created_at" />
+                      <DateTimeFormat short-year :value="notification.created_at" />
                     </div>
                   </div>
                   <div class="flex flex-wrap gap-2">

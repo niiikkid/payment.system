@@ -5,6 +5,7 @@ declare(strict_types=1);
 return [
     'auth' => [
         'unauthorized' => 'Unauthorized.',
+        'pending_approval' => 'Pending administrator approval.',
     ],
     'impersonation' => [
         'forbidden' => 'You do not have permission to impersonate another user.',

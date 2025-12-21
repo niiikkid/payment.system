@@ -53,7 +53,7 @@ Route::get('dashboard', [DashboardController::class, 'index'])
     ->middleware(['auth', 'verified'])
     ->name('dashboard');
 
-Route::middleware(['auth', 'verified'])->group(function () {
+Route::middleware(['auth', 'verified', 'approved'])->group(function () {
     Route::get('addresses', [AddressController::class, 'index'])->name('addresses.index');
     Route::post('addresses', [AddressController::class, 'store'])->name('addresses.store');
     Route::patch('addresses/{address}', [AddressController::class, 'update'])->name('addresses.update');
@@ -114,6 +114,7 @@ Route::middleware(['auth', 'verified', 'role:admin'])
         Route::get('users', [UsersController::class, 'index'])->name('users.index');
         Route::post('users', [UsersController::class, 'store'])->name('users.store');
         Route::patch('users/{user}', [UsersController::class, 'update'])->name('users.update');
+        Route::patch('users/{user}/approval', [UsersController::class, 'updateApproval'])->name('users.approval.update');
         Route::post('impersonate/{user}', [ImpersonationController::class, 'start'])->name('impersonate.start');
     });
 

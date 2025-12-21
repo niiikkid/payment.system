@@ -6,6 +6,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\StoreUserRequest;
+use App\Http\Requests\Admin\UpdateUserApprovalRequest;
 use App\Http\Requests\Admin\UpdateUserRequest;
 use App\Http\Requests\Admin\UserFilterRequest;
 use App\Http\Resources\Admin\UserResource;
@@ -69,6 +70,9 @@ class UsersController extends Controller
             'password_confirmation',
         ]));
 
+        $user->approved_at = now();
+        $user->save();
+
         $roleName = $payload['role'] ?? 'user';
         $role = $this->resolveRole($roleName);
         if ($role) {
@@ -108,6 +112,32 @@ class UsersController extends Controller
                 $user->roles()->sync([$role->id]);
             }
         }
+
+        if ($request->expectsJson()) {
+            return response()->json([
+                'message' => __('messages.users.updated'),
+                'user' => (new UserResource($user->fresh('roles')))->resolve(),
+            ]);
+        }
+
+        return back()->with('success', __('messages.users.updated'));
+    }
+
+    public function updateApproval(UpdateUserApprovalRequest $request, User $user): JsonResponse|RedirectResponse
+    {
+        $approved = (bool) $request->validated('approved');
+
+        if ($user->hasRole('admin')) {
+            abort(HttpResponse::HTTP_FORBIDDEN);
+        }
+
+        if ($approved) {
+            $user->approved_at = $user->approved_at ?? now();
+        } else {
+            $user->approved_at = null;
+        }
+
+        $user->save();
 
         if ($request->expectsJson()) {
             return response()->json([

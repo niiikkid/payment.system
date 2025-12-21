@@ -278,7 +278,7 @@ function submit() {
                                     <td>{{ merchant.initials }}</td>
                                     <td class="max-w-xs truncate">{{ merchant.description }}</td>
                                     <td class="text-xs text-base-content/70 whitespace-nowrap">
-                                        <DateTimeFormat v-if="merchant.created_at" :value="merchant.created_at" />
+                                        <DateTimeFormat short-year v-if="merchant.created_at" :value="merchant.created_at" />
                                         <span v-else>—</span>
                                     </td>
                                     <td class="text-right">

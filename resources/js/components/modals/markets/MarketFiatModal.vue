@@ -130,7 +130,7 @@ function toIso(input: string | null | undefined): string {
         <div class="space-y-4">
             <div v-if="lastPolledAt" class="flex items-center gap-2 text-sm">
                 <span class="opacity-70">{{ __('frontend.markets.fields.last_polled_at') }}:</span>
-                <DateTimeFormat :value="toIso(lastPolledAt)" />
+                <DateTimeFormat short-year :value="toIso(lastPolledAt)" />
             </div>
 
             <p v-if="note" class="text-sm opacity-80 leading-relaxed">

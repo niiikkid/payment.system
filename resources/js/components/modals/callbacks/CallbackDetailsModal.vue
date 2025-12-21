@@ -108,7 +108,7 @@ function toIso(input: string | null | undefined): string {
                     <div class="grid gap-1">
                         <div class="text-xs opacity-60">{{ __('frontend.callbacks.details.created_at') }}</div>
                         <div>
-                            <DateTimeFormat :value="toIso(log.created_at)" />
+                            <DateTimeFormat short-year :value="toIso(log.created_at)" />
                         </div>
                     </div>
                 </div>

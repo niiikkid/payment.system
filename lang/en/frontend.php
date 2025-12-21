@@ -27,6 +27,10 @@ return [
             'expired' => 'Expired',
             'addresses' => 'Addresses: {count}',
         ],
+        'pending_approval' => [
+            'title' => 'Pending approval',
+            'description' => 'Access will be available after administrator approval.',
+        ],
     ],
     'addresses' => [
         'list' => [
@@ -174,6 +178,7 @@ return [
         'app_settings' => 'Settings',
         'markets' => 'Markets',
         'profile' => 'Profile',
+        'admin' => 'Admin',
         'impersonation_title' => 'Impersonation mode',
         'impersonation_description' => 'You are viewing the interface as another user.',
         'impersonation_return' => 'Return to admin',
@@ -417,13 +422,17 @@ return [
             'cancel' => 'Cancel',
             'create' => 'Create',
             'save' => 'Save',
+            'approve' => 'Approve',
         ],
         'table' => [
             'id' => 'ID',
             'name' => 'Name',
             'email' => 'Email',
             'roles' => 'Roles',
+            'approval' => 'Access',
             'created' => 'Created',
+            'approved' => 'Approved',
+            'pending' => 'Pending',
             'empty' => 'No users found',
         ],
         'forms' => [

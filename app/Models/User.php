@@ -50,6 +50,7 @@ class User extends Authenticatable implements LaratrustUser
     {
         return [
             'email_verified_at' => 'datetime',
+            'approved_at' => 'datetime',
             'password' => 'hashed',
             'two_factor_confirmed_at' => 'datetime',
         ];

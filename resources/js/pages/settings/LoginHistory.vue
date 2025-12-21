@@ -169,7 +169,7 @@ function statusBadge(login: LoginItem) {
                                     </div>
 
                                     <div class="text-xs opacity-70">
-                                        <DateTimeFormat v-if="login.created_at" :value="login.created_at" hide-seconds />
+                                        <DateTimeFormat short-year v-if="login.created_at" :value="login.created_at" hide-seconds />
                                         <span v-else>{{ __('frontend.login_history.table.ip') }}</span>
                                     </div>
                                 </div>

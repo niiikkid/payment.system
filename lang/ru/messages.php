@@ -5,6 +5,7 @@ declare(strict_types=1);
 return [
     'auth' => [
         'unauthorized' => 'Не авторизован.',
+        'pending_approval' => 'Ожидает одобрения администратором.',
     ],
     'impersonation' => [
         'forbidden' => 'Нет прав для входа под другим пользователем.',

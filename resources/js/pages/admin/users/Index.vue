@@ -17,6 +17,7 @@ type UserItem = {
     email: string;
     roles: string[];
     email_verified_at?: string | null;
+    approved_at?: string | null;
     created_at?: string | null;
     can_manage_role: boolean;
     can_be_impersonated: boolean;
@@ -51,6 +52,10 @@ const editForm = useForm({
     password: '',
     password_confirmation: '',
     role: 'user',
+});
+
+const approvalForm = useForm({
+    approved: false,
 });
 
 const impersonateForm = useForm({});
@@ -154,6 +159,8 @@ function openEdit(user: UserItem) {
     editForm.password_confirmation = '';
     editForm.role = user.roles[0] ?? 'user';
     editForm.clearErrors();
+    approvalForm.approved = Boolean(user.approved_at);
+    approvalForm.clearErrors();
     showEdit.value = true;
 }
 
@@ -183,9 +190,23 @@ function submitEdit() {
     });
 }
 
+function toggleApproval() {
+    if (!selectedUser.value) return;
+    if (approvalForm.processing) return;
+
+    approvalForm.patch(`/admin/users/${selectedUser.value.id}/approval`, {
+        preserveScroll: true,
+        preserveState: true,
+        onSuccess: () => {
+            if (!selectedUser.value) return;
+            selectedUser.value.approved_at = approvalForm.approved ? new Date().toISOString() : null;
+        },
+    });
+}
 function closeEdit() {
     showEdit.value = false;
     editForm.clearErrors();
+    approvalForm.clearErrors();
 }
 
 function closeCreate() {
@@ -235,6 +256,7 @@ function impersonate(user: UserItem) {
                                     <th>{{ __('frontend.admin_users.table.name') }}</th>
                                     <th>{{ __('frontend.admin_users.table.email') }}</th>
                                     <th>{{ __('frontend.admin_users.table.roles') }}</th>
+                                    <th>{{ __('frontend.admin_users.table.approval') }}</th>
                                     <th>{{ __('frontend.admin_users.table.created') }}</th>
                                     <th></th>
                                 </tr>
@@ -248,6 +270,10 @@ function impersonate(user: UserItem) {
                                         <div class="flex flex-wrap gap-1">
                                             <span v-for="role in user.roles" :key="role" class="badge badge-ghost badge-sm uppercase">{{ role }}</span>
                                         </div>
+                                    </td>
+                                    <td>
+                                        <span v-if="user.approved_at" class="badge badge-success badge-sm">{{ __('frontend.admin_users.table.approved') }}</span>
+                                        <span v-else class="badge badge-warning badge-sm">{{ __('frontend.admin_users.table.pending') }}</span>
                                     </td>
                                     <td class="text-xs font-mono">
                                         <DateTimeFormat :value="user.created_at || ''" />
@@ -293,6 +319,10 @@ function impersonate(user: UserItem) {
                                     <div class="text-sm opacity-80">{{ user.email }}</div>
                                 <div class="flex flex-wrap gap-1">
                                     <span v-for="role in user.roles" :key="role" class="badge badge-ghost badge-sm uppercase">{{ role }}</span>
+                                </div>
+                                <div>
+                                    <span v-if="user.approved_at" class="badge badge-success badge-sm">{{ __('frontend.admin_users.table.approved') }}</span>
+                                    <span v-else class="badge badge-warning badge-sm">{{ __('frontend.admin_users.table.pending') }}</span>
                                 </div>
                                 <div class="text-xs opacity-70">
                                     <DateTimeFormat :value="user.created_at || ''" />
@@ -399,6 +429,25 @@ function impersonate(user: UserItem) {
                     <p v-if="!selectedUser.can_manage_role" class="text-xs opacity-70">
                         {{ __('frontend.admin_users.forms.cannot_change_own_role') }}
                     </p>
+                </div>
+
+                <div v-if="!selectedUser.roles.includes('admin')" class="rounded-xl border border-base-200 bg-base-200/40 p-4">
+                    <div class="flex items-center justify-between gap-4">
+                        <div class="min-w-0">
+                            <div class="text-sm font-semibold">{{ __('frontend.admin_users.table.approval') }}</div>
+                            <div class="text-xs opacity-70">
+                                {{ approvalForm.approved ? __('frontend.admin_users.table.approved') : __('frontend.admin_users.table.pending') }}
+                            </div>
+                        </div>
+                        <input
+                            v-model="approvalForm.approved"
+                            type="checkbox"
+                            class="toggle toggle-success"
+                            :disabled="approvalForm.processing"
+                            @change="toggleApproval"
+                        />
+                    </div>
+                    <p v-if="approvalForm.errors.approved" class="text-error text-sm mt-2">{{ approvalForm.errors.approved }}</p>
                 </div>
 
                 <div class="modal-action">

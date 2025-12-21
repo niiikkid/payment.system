@@ -14,6 +14,7 @@ use Illuminate\Validation\Rules\Password;
  * @property-read string|null $password Новый пароль
  * @property-read string|null $password_confirmation Подтверждение пароля
  * @property-read string|null $role Роль пользователя (admin|user)
+ * @property-read bool|null $approved Одобрен ли пользователь
  */
 class UpdateUserRequest extends FormRequest
 {
@@ -38,6 +39,7 @@ class UpdateUserRequest extends FormRequest
             'password' => ['nullable', 'string', Password::default(), 'confirmed'],
             'password_confirmation' => ['nullable', 'string'],
             'role' => ['nullable', 'string', Rule::in(['admin', 'user'])],
+            'approved' => ['nullable', 'boolean'],
         ];
     }
 
