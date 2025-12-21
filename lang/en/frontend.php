@@ -700,6 +700,8 @@ return [
             'cancel' => 'Cancel',
             'invoice_id' => 'Invoice ID',
             'merchants_load_failed' => 'Failed to load merchants.',
+            'merchants_title' => 'GET /merchants — Merchants list',
+            'merchants_description' => 'Returns merchants of the current user.',
             'clients_title' => 'GET /clients — Clients list',
             'clients_description' => 'Returns clients of the current user.',
             'client_create_title' => 'POST /clients — Create client',

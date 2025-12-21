@@ -6,6 +6,7 @@ import GetInvoiceStatusRequest from '@/pages/api/elements/requests/GetInvoiceSta
 import GetInvoicePublicRequest from '@/pages/api/elements/requests/GetInvoicePublicRequest.vue'
 import GetInvoiceQrRequest from '@/pages/api/elements/requests/GetInvoiceQrRequest.vue'
 import CancelInvoiceRequest from '@/pages/api/elements/requests/CancelInvoiceRequest.vue'
+import ListMerchantsRequest from '@/pages/api/elements/requests/ListMerchantsRequest.vue'
 import ListClientsRequest from '@/pages/api/elements/requests/ListClientsRequest.vue'
 import CreateClientRequest from '@/pages/api/elements/requests/CreateClientRequest.vue'
 
@@ -26,6 +27,7 @@ const props = defineProps<Props>();
         <GetInvoicePublicRequest :api-key="props.apiKey" :api-base="props.apiBase" />
         <GetInvoiceQrRequest :api-key="props.apiKey" :api-base="props.apiBase" />
         <CancelInvoiceRequest :api-key="props.apiKey" :api-base="props.apiBase" />
+        <ListMerchantsRequest :api-key="props.apiKey" :api-base="props.apiBase" />
         <ListClientsRequest :api-key="props.apiKey" :api-base="props.apiBase" />
         <CreateClientRequest :api-key="props.apiKey" :api-base="props.apiBase" />
     </div>

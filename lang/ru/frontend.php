@@ -705,6 +705,8 @@ return [
             'cancel' => 'Отменить',
             'invoice_id' => 'ID инвойса',
             'merchants_load_failed' => 'Не удалось загрузить мерчантов.',
+            'merchants_title' => 'GET /merchants — Список мерчантов',
+            'merchants_description' => 'Возвращает список мерчантов текущего пользователя.',
             'clients_title' => 'GET /clients — Список клиентов',
             'clients_description' => 'Возвращает список клиентов текущего пользователя.',
             'client_create_title' => 'POST /clients — Создать клиента',

@@ -14,7 +14,7 @@ const { __ } = vueLang()
 const tabs = reactive({ view: 'form' as 'form' | 'example' })
 
 const createClientForm = reactive({
-    external_id: 'customer-123',
+    external_id: '',
     name: '',
     telegram: '',
     contact: '',

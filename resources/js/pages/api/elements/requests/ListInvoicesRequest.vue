@@ -29,6 +29,8 @@ const listForm = reactive({
 
 const listResult = ref<string>('')
 
+const curlQueryParams = '?status=pending&client_id=customer-123&per_page=20'
+
 async function listInvoices() {
     const { requestJson } = createApiClient(props.apiBase, props.apiKey)
     const res = await requestJson(`/invoices${buildQuery(listForm)}`)
@@ -124,7 +126,7 @@ async function listInvoices() {
                 </div>
                 <div>
                     <p class="font-semibold mb-1">{{ __('frontend.api.requests.example.curl_example') }}</p>
-                    <pre class="mockup-code whitespace-pre overflow-x-auto max-w-full w-full pl-4"><code class="block">{{ `curl -X GET '${props.apiBase}/invoices${__('frontend.api.requests.example.curl_list_payload')}' \
+                    <pre class="mockup-code whitespace-pre overflow-x-auto max-w-full w-full pl-4"><code class="block">{{ `curl -X GET '${props.apiBase}/invoices${curlQueryParams}' \
   -H 'Accept: application/json' \
   -H 'X-Api-Key: <PUBLIC_API_KEY>'` }}</code></pre>
                 </div>

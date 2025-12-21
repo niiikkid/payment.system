@@ -76,6 +76,14 @@ const merchants = ref<MerchantOption[]>([])
 const merchantsLoading = ref(false)
 const merchantsError = ref<string>('')
 
+const curlPayload = `{
+  "currency": "USDT",
+  "network": "tron",
+  "amount": "12.34",
+  "client_id": "customer-123",
+  "external_invoice_id": "order-1"
+}`
+
 async function loadMerchants() {
     const { requestJson } = createApiClient(props.apiBase, props.apiKey)
 
@@ -252,7 +260,7 @@ async function createInvoice() {
   -H 'Accept: application/json' \
   -H 'Content-Type: application/json' \
   -H 'X-Api-Key: <PUBLIC_API_KEY>' \
-  -d '${__('frontend.api.requests.example.curl_payload')}'` }}</code></pre>
+  -d '${curlPayload}'` }}</code></pre>
                 </div>
             </div>
         </div>
