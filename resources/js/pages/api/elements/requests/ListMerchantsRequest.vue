@@ -64,14 +64,14 @@ async function loadMerchantsList() {
 
             <div v-else class="space-y-3 text-sm">
                 <div class="bg-base-200 rounded-box p-3">
-                    <p class="font-semibold">{{ __('frontend.api.requests.example.headers') }}</p>
+                    <p class="font-semibold">Headers:</p>
                     <ul class="list-disc list-inside">
-                        <li>{{ __('frontend.api.requests.example.accept_header') }}</li>
-                        <li>{{ __('frontend.api.requests.example.api_key_header') }}</li>
+                        <li>Accept: application/json</li>
+                        <li>X-Api-Key: &lt;PUBLIC_API_KEY&gt;</li>
                     </ul>
                 </div>
                 <div class="bg-base-200 rounded-box p-3">
-                    <p class="font-semibold">{{ __('frontend.api.requests.example.query_params') }}</p>
+                    <p class="font-semibold">Query Parameters:</p>
                     <ul class="list-disc list-inside">
                         <li>page (number, ≥1)</li>
                         <li>per_page (number, 1..100)</li>

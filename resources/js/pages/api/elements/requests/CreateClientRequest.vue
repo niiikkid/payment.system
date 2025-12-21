@@ -80,27 +80,32 @@ async function createClientRequest() {
 
             <div v-else class="space-y-3 text-sm">
                 <div class="bg-base-200 rounded-box p-3">
-                    <p class="font-semibold">{{ __('frontend.api.requests.example.headers') }}</p>
+                    <p class="font-semibold">Headers:</p>
                     <ul class="list-disc list-inside">
-                        <li>{{ __('frontend.api.requests.example.accept_header') }}</li>
-                        <li>{{ __('frontend.api.requests.example.content_type_header') }}</li>
-                        <li>{{ __('frontend.api.requests.example.api_key_header') }}</li>
+                        <li>Accept: application/json</li>
+                        <li>Content-Type: application/json</li>
+                        <li>X-Api-Key: &lt;PUBLIC_API_KEY&gt;</li>
                     </ul>
                 </div>
                 <div class="bg-base-200 rounded-box p-3">
-                    <p class="font-semibold">{{ __('frontend.api.requests.example.body_params') }}</p>
+                    <p class="font-semibold">Parameters (body)</p>
                     <ul class="list-disc list-inside">
-                        <li>{{ __('frontend.api.requests.example.client_params_descriptions.external_id') }}</li>
-                        <li>{{ __('frontend.api.requests.example.client_params_descriptions.name') }}</li>
-                        <li>{{ __('frontend.api.requests.example.client_params_descriptions.telegram') }}</li>
-                        <li>{{ __('frontend.api.requests.example.client_params_descriptions.contact') }}</li>
+                        <li>external_id (string, required)</li>
+                        <li>name (string, optional)</li>
+                        <li>telegram (string, optional)</li>
+                        <li>contact (string, optional)</li>
                     </ul>
                 </div>
                 <pre class="mockup-code whitespace-pre overflow-x-auto max-w-full w-full pl-4"><code class="block">{{ `curl -X POST '${props.apiBase}/clients' \
   -H 'Accept: application/json' \
   -H 'Content-Type: application/json' \
   -H 'X-Api-Key: <PUBLIC_API_KEY>' \
-  -d '${__('frontend.api.requests.example.curl_client_payload')}'` }}</code></pre>
+  -d '{
+    "external_id": "customer-123",
+    "name": "John Doe",
+    "telegram": "@johndoe",
+    "contact": "john@example.com"
+  }'` }}</code></pre>
             </div>
         </div>
     </div>

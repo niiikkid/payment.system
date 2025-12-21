@@ -63,7 +63,7 @@ async function listInvoices() {
                     </label>
                     <label class="floating-label">
                         <span>{{ __('frontend.api.requests.fields.currency') }}</span>
-                        <input class="input input-md w-full" v-model="listForm.currency" placeholder="USDT" />
+                        <input class="input input-md w-full" v-model="listForm.currency" placeholder="usdt" />
                     </label>
                     <label class="floating-label">
                         <span>{{ __('frontend.api.requests.fields.network') }}</span>
@@ -79,7 +79,7 @@ async function listInvoices() {
                     </label>
                     <label class="floating-label">
                         <span>{{ __('frontend.api.requests.fields.external_id') }}</span>
-                        <input class="input input-md w-full" v-model="listForm.external_invoice_id" placeholder="ORDER-123" />
+                        <input class="input input-md w-full" v-model="listForm.external_invoice_id" placeholder="order-123" />
                     </label>
                     <label class="floating-label">
                         <span>{{ __('frontend.api.requests.fields.tag') }}</span>
@@ -111,23 +111,23 @@ async function listInvoices() {
 
             <div v-else class="space-y-3 text-sm">
                 <div class="bg-base-200 rounded-box p-3">
-                    <p class="font-semibold">{{ __('frontend.api.requests.example.headers') }}</p>
+                    <p class="font-semibold">Headers:</p>
                     <ul class="list-disc list-inside">
-                        <li>{{ __('frontend.api.requests.example.accept_header') }}</li>
-                        <li>{{ __('frontend.api.requests.example.api_key_header') }}</li>
+                        <li>Accept: application/json</li>
+                        <li>X-Api-Key: &lt;PUBLIC_API_KEY&gt;</li>
                     </ul>
                 </div>
                 <div class="bg-base-200 rounded-box p-3">
-                    <p class="font-semibold">{{ __('frontend.api.requests.example.query_params') }}</p>
+                    <p class="font-semibold">Query Parameters:</p>
                     <ul class="list-disc list-inside">
-                        <li>{{ __('frontend.api.requests.example.list_params_descriptions.filters') }}</li>
-                        <li>{{ __('frontend.api.requests.example.list_params_descriptions.ids') }}</li>
-                        <li>{{ __('frontend.api.requests.example.list_params_descriptions.identifiers') }}</li>
-                        <li>{{ __('frontend.api.requests.example.list_params_descriptions.pagination') }}</li>
+                        <li>status, currency, network</li>
+                        <li>merchant_id, client_id</li>
+                        <li>external_invoice_id, tag, search</li>
+                        <li>has_callback (1), page (≥1), per_page (1..100)</li>
                     </ul>
                 </div>
                 <div>
-                    <p class="font-semibold mb-1">{{ __('frontend.api.requests.example.curl_example') }}</p>
+                    <p class="font-semibold mb-1">Curl request example</p>
                     <pre class="mockup-code whitespace-pre overflow-x-auto max-w-full w-full pl-4"><code class="block">{{ `curl -X GET '${props.apiBase}/invoices${curlQueryParams}' \
   -H 'Accept: application/json' \
   -H 'X-Api-Key: <PUBLIC_API_KEY>'` }}</code></pre>
