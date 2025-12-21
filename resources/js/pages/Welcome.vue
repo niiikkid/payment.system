@@ -12,54 +12,105 @@ const { __ } = vueLang();
 <template>
     <Head :title="__('frontend.welcome.title')" />
     <div class="relative min-h-screen overflow-hidden bg-base-200 text-base-content">
+        <!-- Background -->
+        <div class="pointer-events-none absolute inset-0">
+            <div class="absolute -left-24 -top-24 h-72 w-72 rounded-full bg-primary/20 blur-3xl"></div>
+            <div class="absolute -right-24 top-16 h-80 w-80 rounded-full bg-secondary/20 blur-3xl"></div>
+            <div class="absolute bottom-0 left-1/2 h-96 w-96 -translate-x-1/2 rounded-full bg-accent/15 blur-3xl"></div>
+            <div class="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-base-300/70 to-transparent"></div>
+        </div>
 
-        <div class="relative z-10 flex min-h-screen items-center px-5 py-12 pt-0 md:px-12 lg:px-16">
-            <div class="mx-auto grid w-full max-w-6xl gap-10 lg:grid-cols-[1.1fr,0.9fr]">
-                <!-- Left text + CTA -->
+        <!-- Top: language -->
+        <div class="absolute inset-x-0 top-0 z-20">
+            <div class="mx-auto flex w-full max-w-6xl justify-end px-5 pt-4 md:px-12 lg:px-16">
+                <div class="rounded-xl border border-base-300/70 bg-base-100/70 p-2 shadow-sm backdrop-blur">
+                    <LanguageSwitcher direction="down" align="end" class="w-fit" />
+                </div>
+            </div>
+        </div>
+
+        <!-- Hero -->
+        <div class="relative z-10 mx-auto flex min-h-screen max-w-6xl items-center px-5 py-16 md:px-12 lg:px-16">
+            <div class="grid w-full items-center gap-10 lg:grid-cols-2 lg:gap-14">
+                <!-- Left -->
                 <div class="space-y-6">
-                    <div class="inline-flex items-center gap-2 rounded-full border border-base-300/60 bg-base-100/70 px-3 py-2 text-xs font-semibold uppercase tracking-[0.2em] backdrop-blur">
-                        <span class="h-2 w-2 rounded-full bg-primary animate-pulse" aria-hidden="true"></span>
-                        <span>Crypto. Billing. API.</span>
+                    <div class="flex flex-wrap items-center gap-2">
+                        <div class="badge badge-primary badge-outline gap-2 py-3">
+                            <span class="h-2 w-2 animate-pulse rounded-full bg-primary"></span>
+                            <span class="uppercase tracking-[0.2em]">{{ __('frontend.welcome.badge_crypto_billing_api') }}</span>
+                        </div>
                     </div>
 
                     <div class="space-y-4">
                         <h1 class="text-4xl font-bold leading-tight tracking-tight sm:text-5xl lg:text-6xl">
                             {{ __('frontend.welcome.title') }}
                         </h1>
-                        <p class="text-base text-base-content/70 sm:text-lg max-w-2xl">
+                        <p class="max-w-2xl text-base text-base-content/70 sm:text-lg">
                             {{ __('frontend.welcome.description') }}
                         </p>
                     </div>
 
-                    <div class="flex flex-wrap items-center gap-3">
-                        <Link v-if="$page.props.auth.user" :href="dashboard()" class="btn btn-primary btn-lg shadow-lg shadow-primary/25">
-                            {{ __('frontend.welcome.go_dashboard') }}
-                        </Link>
-                        <template v-else>
-                            <Link :href="login()" class="btn btn-lg btn-neutral bg-base-100/80 border-base-300/80 shadow-md">
-                                {{ __('frontend.welcome.login') }}
-                            </Link>
-                            <Link v-if="canRegister" :href="register()" class="btn btn-outline btn-lg">
-                                {{ __('frontend.welcome.register') }}
-                            </Link>
-                        </template>
-                    </div>
-
-                    <div class="flex flex-wrap gap-3 text-sm text-base-content/60">
-                        <div class="flex items-center gap-2">
-                            <span class="h-2 w-2 rounded-full bg-primary"></span> On-chain / Off-chain
+                    <div class="grid gap-3 sm:grid-cols-2">
+                        <div class="rounded-2xl border border-base-300/70 bg-base-100/60 p-4 backdrop-blur">
+                            <div class="text-sm font-semibold">{{ __('frontend.welcome.feature_dashboard_title') }}</div>
+                            <div class="mt-1 text-sm text-base-content/60">
+                                {{ __('frontend.welcome.feature_dashboard_description') }}
+                            </div>
                         </div>
-                        <div class="flex items-center gap-2">
-                            <span class="h-2 w-2 rounded-full bg-secondary"></span> Webhooks & Callbacks
-                        </div>
-                        <div class="flex items-center gap-2">
-                            <span class="h-2 w-2 rounded-full bg-accent"></span> Fiat → Crypto Routing
+                        <div class="rounded-2xl border border-base-300/70 bg-base-100/60 p-4 backdrop-blur">
+                            <div class="text-sm font-semibold">{{ __('frontend.welcome.feature_callbacks_title') }}</div>
+                            <div class="mt-1 text-sm text-base-content/60">
+                                {{ __('frontend.welcome.feature_callbacks_description') }}
+                            </div>
                         </div>
                     </div>
+                </div>
 
-                    <div class="mt-3">
-                        <div class="w-fit">
-                            <LanguageSwitcher direction="up" align="start" class="w-fit" />
+                <!-- Right: CTA card -->
+                <div class="lg:justify-self-end">
+                    <div class="card w-full max-w-md border border-base-300/70 bg-base-100/70 shadow-xl backdrop-blur">
+                        <div class="card-body gap-5">
+                            <div class="space-y-1">
+                                <div class="text-lg font-semibold">{{ __('frontend.welcome.cta_title') }}</div>
+                                <div class="text-sm text-base-content/60">
+                                    {{ __('frontend.welcome.cta_description') }}
+                                </div>
+                            </div>
+
+                            <div class="space-y-3">
+                                <Link
+                                    v-if="$page.props.auth.user"
+                                    :href="dashboard()"
+                                    class="btn btn-primary btn-lg w-full shadow-lg shadow-primary/25"
+                                >
+                                    {{ __('frontend.welcome.go_dashboard') }}
+                                </Link>
+                                <template v-else>
+                                    <Link :href="login()" class="btn btn-neutral btn-lg w-full">
+                                        {{ __('frontend.welcome.login') }}
+                                    </Link>
+                                    <Link v-if="canRegister" :href="register()" class="btn btn-outline btn-lg w-full">
+                                        {{ __('frontend.welcome.register') }}
+                                    </Link>
+                                </template>
+                            </div>
+
+                            <div class="divider my-0"></div>
+
+                            <ul class="space-y-2 text-sm text-base-content/70">
+                                <li class="flex items-start gap-2">
+                                    <span class="mt-1 inline-block h-2 w-2 rounded-full bg-success"></span>
+                                    <span>{{ __('frontend.welcome.bullet_api_tokens') }}</span>
+                                </li>
+                                <li class="flex items-start gap-2">
+                                    <span class="mt-1 inline-block h-2 w-2 rounded-full bg-success"></span>
+                                    <span>{{ __('frontend.welcome.bullet_invoices_notifications') }}</span>
+                                </li>
+                                <li class="flex items-start gap-2">
+                                    <span class="mt-1 inline-block h-2 w-2 rounded-full bg-success"></span>
+                                    <span>{{ __('frontend.welcome.bullet_highload_ready') }}</span>
+                                </li>
+                            </ul>
                         </div>
                     </div>
                 </div>

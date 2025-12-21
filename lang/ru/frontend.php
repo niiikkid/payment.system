@@ -975,6 +975,18 @@ return [
         'go_dashboard' => 'Перейти в панель',
         'login' => 'Войти',
         'register' => 'Регистрация',
+        'badge_crypto_billing_api' => 'Crypto. Billing. API.',
+        'badge_laravel_inertia' => 'Laravel + Inertia',
+        'badge_vue3' => 'Vue 3',
+        'feature_dashboard_title' => 'Панель управления',
+        'feature_dashboard_description' => 'API, счета, токены и настройки в одном месте.',
+        'feature_callbacks_title' => 'Callbacks',
+        'feature_callbacks_description' => 'Webhooks и события для статусов платежей.',
+        'cta_title' => 'Быстрый старт',
+        'cta_description' => 'Войдите или перейдите в панель управления.',
+        'bullet_api_tokens' => 'Стабильная интеграция через API и токены доступа',
+        'bullet_invoices_notifications' => 'Поддержка статусов инвойсов и уведомлений',
+        'bullet_highload_ready' => 'Готово для high-load: очереди, кэш, события',
     ],
 ];
 

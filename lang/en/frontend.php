@@ -968,6 +968,18 @@ return [
         'go_dashboard' => 'Go to dashboard',
         'login' => 'Sign in',
         'register' => 'Register',
+        'badge_crypto_billing_api' => 'Crypto. Billing. API.',
+        'badge_laravel_inertia' => 'Laravel + Inertia',
+        'badge_vue3' => 'Vue 3',
+        'feature_dashboard_title' => 'Dashboard',
+        'feature_dashboard_description' => 'API, invoices, tokens and settings in one place.',
+        'feature_callbacks_title' => 'Callbacks',
+        'feature_callbacks_description' => 'Webhooks and events for payment statuses.',
+        'cta_title' => 'Quick start',
+        'cta_description' => 'Sign in or go to the dashboard.',
+        'bullet_api_tokens' => 'Reliable integration via API and access tokens',
+        'bullet_invoices_notifications' => 'Invoice statuses and notifications support',
+        'bullet_highload_ready' => 'High-load ready: queues, cache, events',
     ],
 ];
 
