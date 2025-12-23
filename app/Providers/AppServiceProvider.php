@@ -37,6 +37,8 @@ use App\Contracts\Notification\NotificationServiceContract;
 use App\Services\Notification\NotificationService;
 use App\Contracts\Telegram\TelegramServiceContract;
 use App\Services\Telegram\TelegramService;
+use App\Contracts\WalletTransfer\WalletTransferServiceContract;
+use App\Services\WalletTransfer\WalletTransferService;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\ServiceProvider;
 use LaravelLangSyncInertia\Services\LangService as VendorLangService;
@@ -66,6 +68,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->singleton(VendorLangService::class, LangService::class);
         $this->app->singleton(NotificationServiceContract::class, NotificationService::class);
         $this->app->singleton(TelegramServiceContract::class, TelegramService::class);
+        $this->app->singleton(WalletTransferServiceContract::class, WalletTransferService::class);
     }
 
     /**
