@@ -30,7 +30,7 @@ const { __ } = vueLang();
         </div>
 
         <!-- Hero -->
-        <div class="relative z-10 mx-auto flex min-h-screen max-w-6xl items-center px-5 py-16 md:px-12 lg:px-16">
+        <div class="relative z-10 mx-auto flex min-h-screen max-w-6xl items-center px-5 py-16 sm:pt-16 pt-24 md:px-12 lg:px-16">
             <div class="grid w-full items-center gap-10 lg:grid-cols-2 lg:gap-14">
                 <!-- Left -->
                 <div class="space-y-6">
@@ -67,8 +67,8 @@ const { __ } = vueLang();
                 </div>
 
                 <!-- Right: CTA card -->
-                <div class="lg:justify-self-end">
-                    <div class="card w-full max-w-md border border-base-300/70 bg-base-100/70 shadow-xl backdrop-blur">
+                <div class="lg:justify-self-end grid md:grid-cols-2 lg:grid-cols-1">
+                    <div class="card w-full border border-base-300/70 bg-base-100/70 shadow-xl backdrop-blur">
                         <div class="card-body gap-5">
                             <div class="space-y-1">
                                 <div class="text-lg font-semibold">{{ __('frontend.welcome.cta_title') }}</div>
