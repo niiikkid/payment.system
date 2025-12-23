@@ -312,7 +312,7 @@ function submit() {
                                                 </svg>
                                             </div>
                                         </div>
-                                        <div class="text-xs text-base-content/70 truncate max-w-xs">{{ merchant.description || '—' }}</div>
+                                        <div class="text-xs text-base-content/70 truncate hidden sm:block max-w-xs">{{ merchant.description || '—' }}</div>
                                     </div>
                                     <div class="ml-auto">
                                         <EditButton :title="__('frontend.common.edit')" @click="openEdit(merchant)" />

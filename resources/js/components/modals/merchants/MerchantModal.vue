@@ -103,7 +103,7 @@ function submit() {
             </FormControl>
 
             <FormControl :error="fieldErrors.initials">
-                <div class="flex items-center justify-between">
+                <div class="flex items-center justify-between gap-2">
                     <Label for="merchant-initials" required>{{ __('frontend.merchants.fields.initials') }}</Label>
                     <span class="text-xs text-base-content/70">{{ __('frontend.merchants.fields.initials_hint') }}</span>
                 </div>
@@ -127,39 +127,11 @@ function submit() {
                 />
             </FormControl>
 
-            <FormControl :error="fieldErrors.white_label_enabled">
-                <div class="flex items-center justify-between">
-                    <Label for="merchant-white-label">{{ __('frontend.merchants.fields.white_label_enabled') }}</Label>
-                    <span class="text-xs text-base-content/70">{{ __('frontend.merchants.fields.white_label_enabled_hint') }}</span>
-                </div>
-                <div class="flex items-center gap-3">
-                    <input
-                        id="merchant-white-label"
-                        v-model="form.white_label_enabled"
-                        type="checkbox"
-                        class="toggle toggle-primary"
-                    />
-                    <span class="text-sm text-base-content/80">
-                        {{
-                            form.white_label_enabled
-                                ? __('frontend.merchants.fields.white_label_enabled_on')
-                                : __('frontend.merchants.fields.white_label_enabled_off')
-                        }}
-                    </span>
-                </div>
-                <p class="text-xs text-base-content/70 mt-1">
-                    {{ __('frontend.merchants.fields.white_label_enabled_description') }}
-                </p>
-            </FormControl>
-
             <FormControl :error="fieldErrors.invoice_expires_in_minutes">
                 <div class="flex items-center justify-between">
                     <Label for="merchant-invoice-expires" required>
                         {{ __('frontend.merchants.fields.invoice_expires_in_minutes') }}
                     </Label>
-                    <span class="text-xs text-base-content/70">
-                        {{ __('frontend.merchants.fields.invoice_expires_in_minutes_hint') }}
-                    </span>
                 </div>
                 <Input
                     id="merchant-invoice-expires"
@@ -173,7 +145,7 @@ function submit() {
             </FormControl>
 
             <FormControl :error="fieldErrors.logo">
-                <div class="flex items-center justify-between">
+                <div class="flex items-center justify-between gap-2">
                     <Label for="merchant-logo">{{ __('frontend.merchants.fields.logo') }}</Label>
                     <span class="text-xs opacity-70">{{ __('frontend.merchants.fields.logo_hint') }}</span>
                 </div>
@@ -195,6 +167,27 @@ function submit() {
                 />
                 <div v-if="form.logo" class="flex items-center justify-between text-xs text-base-content/70 mt-1">
                     <span class="truncate">{{ form.logo.name }}</span>
+                </div>
+            </FormControl>
+
+            <FormControl :error="fieldErrors.white_label_enabled">
+                <div class="flex items-center justify-between">
+                    <Label for="merchant-white-label">{{ __('frontend.merchants.fields.white_label_enabled') }}</Label>
+                </div>
+                <div class="flex items-center gap-3 mt-1">
+                    <input
+                        id="merchant-white-label"
+                        v-model="form.white_label_enabled"
+                        type="checkbox"
+                        class="toggle toggle-primary"
+                    />
+                    <span class="text-sm text-base-content/80">
+                        {{
+                            form.white_label_enabled
+                                ? __('frontend.merchants.fields.white_label_enabled_on')
+                                : __('frontend.merchants.fields.white_label_enabled_off')
+                        }}
+                    </span>
                 </div>
             </FormControl>
 
