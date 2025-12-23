@@ -363,23 +363,25 @@ const eventRequiresStatus = computed(() => ruleForm.event === 'invoice.status_ch
 <template>
   <AppLayout :breadcrumbs="[{ title: __('frontend.notifications.breadcrumb.home'), href: '/' }, { title: __('frontend.notifications.breadcrumb.title'), href: '/notifications' }]">
     <div class="grid gap-6">
-      <div class="tabs tabs-lifted">
-        <button
-          role="tab"
-          class="tab"
-          :class="{ 'tab-active': activeTab === 'notifications' }"
-          @click="activeTab = 'notifications'"
-        >
-          {{ __('frontend.notifications.list.title') }}
-        </button>
-        <button
-          role="tab"
-          class="tab"
-          :class="{ 'tab-active': activeTab === 'settings' }"
-          @click="activeTab = 'settings'"
-        >
-          {{ __('frontend.notifications.rules.title') }}
-        </button>
+      <div class="w-fit">
+          <div role="tablist" class="tabs tabs-box">
+              <button
+                  role="tab"
+                  class="tab"
+                  :class="{ 'tab-active': activeTab === 'notifications' }"
+                  @click="activeTab = 'notifications'"
+              >
+                  {{ __('frontend.notifications.list.title') }}
+              </button>
+              <button
+                  role="tab"
+                  class="tab"
+                  :class="{ 'tab-active': activeTab === 'settings' }"
+                  @click="activeTab = 'settings'"
+              >
+                  {{ __('frontend.notifications.rules.title') }}
+              </button>
+          </div>
       </div>
 
       <div v-show="activeTab === 'notifications'" class="space-y-4">
