@@ -8,6 +8,7 @@ use App\Contracts\Invoice\InvoiceServiceContract;
 use App\Contracts\Money\MoneyServiceContract;
 use App\Enums\Currency;
 use App\Enums\Network;
+use App\Jobs\SendSandboxInvoicePaymentJob;
 use App\Models\Client;
 use App\Models\Merchant;
 use Illuminate\Console\Command;
@@ -96,6 +97,8 @@ class CreateCallbackSandboxInvoiceCommand extends Command
         $this->line('callback_url: ' . $callbackUrl);
         $this->line('product: ' . $product['name'] . ' / ' . $product['description']);
 
+        $this->maybeSchedulePaymentJob($invoice->id);
+
         return self::SUCCESS;
     }
 
@@ -116,6 +119,28 @@ class CreateCallbackSandboxInvoiceCommand extends Command
     private function makeExternalInvoiceId(): string
     {
         return 'inv_' . Str::uuid()->toString();
+    }
+
+    private function maybeSchedulePaymentJob(string $invoiceId): void
+    {
+        if (app()->environment('production')) {
+            return;
+        }
+
+        $chance = random_int(70, 90);
+        $roll = random_int(1, 100);
+
+        if ($roll > $chance) {
+            $this->line("Оплата не запланирована (шанс {$chance}%, roll {$roll})");
+            return;
+        }
+
+        $delaySeconds = random_int(60, 180);
+
+        SendSandboxInvoicePaymentJob::dispatch($invoiceId)
+            ->delay(now()->addSeconds($delaySeconds));
+
+        $this->line("Оплата запланирована через {$delaySeconds} сек (шанс {$chance}%, roll {$roll})");
     }
 
     /**
