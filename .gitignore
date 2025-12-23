@@ -30,3 +30,4 @@ public-api.md
 todo.md
 wallet-signer/.env
 wallet-signer/node_modules/
+/security-audit.md
