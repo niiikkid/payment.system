@@ -43,7 +43,7 @@ const emit = defineEmits<{
   (e: 'reset'): void;
 }>();
 
-const collapsed = ref(false);
+const collapsed = ref(true);
 const storageKey = computed(() => {
   if (typeof window === 'undefined') {
     return null;
@@ -54,12 +54,12 @@ const storageKey = computed(() => {
 
 function readCollapsedState() {
   if (typeof document === 'undefined') {
-    return false;
+    return true;
   }
 
   const key = storageKey.value;
   if (!key) {
-    return false;
+    return true;
   }
 
   const cookies = document.cookie ? document.cookie.split(';') : [];
@@ -68,7 +68,7 @@ function readCollapsedState() {
     .find((cookie) => cookie.startsWith(`${key}=`));
 
   if (!matched) {
-    return false;
+    return true;
   }
 
   const [, value] = matched.split('=');
