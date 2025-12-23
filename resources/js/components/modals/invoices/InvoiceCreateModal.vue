@@ -106,19 +106,19 @@ const currencyAmountRules = computed<Record<string, CurrencyAmountRule>>(
 )
 
 const currentAmountRule = computed<CurrencyAmountRule>(() => {
-    const currency = (form.value.currency || '').toString().trim().toUpperCase()
+    const currency = (form.value.currency || '').toString().trim().toLowerCase()
     return currencyAmountRules.value[currency] ?? { decimals: 6, example: '12.123456', decimal_separator: '.' }
 })
 
 const amountPlaceholder = computed(() => {
-    const currency = (form.value.currency || '').toString().toUpperCase()
+    const currency = (form.value.currency || '').toString().toLowerCase()
     const rule = currencyAmountRules.value[currency]
     return rule?.example || __('frontend.invoices.fields.amount_placeholder')
 })
 
 const amountHint = computed(() => {
     const base = __('frontend.invoices.fields.amount_hint')
-    const currency = (form.value.currency || '').toString().toUpperCase()
+    const currency = (form.value.currency || '').toString().toLowerCase()
     if (!currency) return base
 
     const rule = currencyAmountRules.value[currency] ?? currentAmountRule.value

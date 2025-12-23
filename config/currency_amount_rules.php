@@ -24,7 +24,7 @@ return [
         'decimal_separator' => '.',
     ],
 
-    'USDT' => [
+    'usdt' => [
         'invoice_decimals' => 2,
         'example' => '12.50',
         'decimal_separator' => '.',
