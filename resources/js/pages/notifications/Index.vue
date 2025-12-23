@@ -399,10 +399,10 @@ const eventRequiresStatus = computed(() => ruleForm.event === 'invoice.status_ch
           @reset="resetFilters"
         />
 
-        <div class="card bg-base-100 shadow-sm">
-          <div class="card-body">
-            <div class="flex items-center justify-between mb-2">
-              <h3 class="card-title text-lg">{{ __('frontend.notifications.list.title') }}</h3>
+        <div class="lg:card lg:bg-base-100 lg:shadow-sm">
+          <div class="lg:card-body">
+            <div class="sm:flex items-center justify-between mb-3">
+              <h3 class="card-title text-lg mb-3 sm:mb-0">{{ __('frontend.notifications.list.title') }}</h3>
               <button class="btn btn-ghost btn-sm" :disabled="filterForm.processing" @click="markAllRead">
                 <span class="loading loading-spinner loading-xs mr-2" v-if="filterForm.processing" />
                 {{ __('frontend.notifications.actions.mark_all_read') }}
@@ -460,22 +460,24 @@ const eventRequiresStatus = computed(() => ruleForm.event === 'invoice.status_ch
             <div class="lg:hidden space-y-3">
               <div v-for="notification in notifications.data" :key="notification.id" class="card bg-base-100 shadow-sm">
                 <div class="card-body p-4 space-y-3">
-                  <div class="flex items-start justify-between gap-3">
+                  <div class="flex items-center justify-between gap-3">
                     <div>
                       <div class="font-semibold flex items-center gap-2">
                         <span v-if="notification.read_at === null" class="badge badge-primary badge-xs"></span>
                         {{ notification.title }}
                       </div>
-                      <div class="text-sm opacity-70 whitespace-pre-wrap">{{ notification.body }}</div>
                     </div>
                     <div class="text-xs opacity-70">
                       <DateTimeFormat short-year :value="notification.created_at" />
                     </div>
                   </div>
                   <div class="flex flex-wrap gap-2">
-                    <span class="badge badge-ghost whitespace-nowrap">{{ eventLabel(notification.event) }}</span>
+                      <div class="text-sm opacity-70 whitespace-pre-wrap">{{ notification.body }}</div>
                   </div>
-                  <div class="flex justify-end gap-2">
+                  <div class="flex items-center justify-between gap-2">
+                      <div>
+                          <span class="badge badge-ghost whitespace-nowrap">{{ eventLabel(notification.event) }}</span>
+                      </div>
                     <button
                       v-if="notification.read_at === null"
                       class="btn btn-primary btn-xs"
