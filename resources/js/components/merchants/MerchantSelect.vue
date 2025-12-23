@@ -113,9 +113,6 @@ function handleBlur(event: FocusEvent) {
                     />
                     <div class="flex-1 min-w-0">
                         <div class="font-medium truncate">{{ option.label }}</div>
-                        <div v-if="option.description" class="text-xs opacity-70 truncate">
-                            {{ option.description }}
-                        </div>
                     </div>
                     <div v-if="selected && String(selected.value) === String(option.value)" class="text-primary">
                         <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">

@@ -113,7 +113,7 @@ onMounted(() => {
             >
                 <div class="flex-1 min-w-0">
                     <div class="font-medium truncate">{{ option.label || option.value }}</div>
-                    <div v-if="option.contact" class="text-xs opacity-70 truncate">{{ option.contact }}</div>
+                    <div v-if="option.contact" class="text-xs opacity-70 truncate">ID: {{ option.external_id }}</div>
                 </div>
                 <span v-if="String(modelValue ?? '') === String(option.value)" class="text-primary">
                     <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
