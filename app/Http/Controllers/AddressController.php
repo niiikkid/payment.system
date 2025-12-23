@@ -12,6 +12,7 @@ use App\Models\Address;
 use App\Services\Address\AddressService;
 use App\Enums\Currency;
 use App\Enums\Network;
+use App\Enums\NetworkCurrency;
 use App\Exceptions\Address\AddressNotFoundOnBlockchainException;
 use App\Exceptions\Address\AddressServiceException;
 use App\Exceptions\Address\CurrencyNetworkMismatchException;
@@ -72,10 +73,24 @@ class AddressController extends Controller
             ];
         }, Network::cases());
 
+        $currencyNetworkOptions = [];
+        foreach (Currency::cases() as $currency) {
+            foreach (NetworkCurrency::networksByCurrency($currency) as $network) {
+                $currencyNetworkOptions[] = [
+                    'value' => $currency->value . '|' . $network->value,
+                    'currency' => $currency->value,
+                    'currency_label' => strtoupper($currency->value),
+                    'network' => $network->value,
+                    'network_label' => strtoupper($network->value),
+                ];
+            }
+        }
+
         return $this->inertia('addresses/Index', [
             'addresses' => $paginator,
             'currencyOptions' => $currencyOptions,
             'networkOptions' => $networkOptions,
+            'currencyNetworkOptions' => $currencyNetworkOptions,
             'filters' => $filters,
         ]);
     }

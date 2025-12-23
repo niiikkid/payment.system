@@ -62,11 +62,14 @@ return [
         'fields' => [
             'currency' => 'Currency',
             'currency_placeholder' => 'Select currency',
+            'currency_network' => 'Currency & network',
+            'currency_network_placeholder' => 'Select currency and network',
             'network' => 'Network',
             'network_placeholder' => 'Select network',
             'address' => 'Address',
             'address_placeholder' => 'For example: T...',
         ],
+        'empty' => 'No addresses yet',
     ],
     'clients' => [
         'list' => [

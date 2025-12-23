@@ -4,10 +4,8 @@ import ModalDialog from '@/components/ui/modal/ModalDialog.vue'
 import FormControl from '@/components/form/FormControl.vue'
 import Label from '@/components/form/Label.vue'
 import Input from '@/components/form/Input.vue'
-import Select from '@/components/form/Select.vue'
+import CurrencyNetworkSelect, { type CurrencyNetworkOption } from '@/components/ui/CurrencyNetworkSelect.vue'
 import { vueLang } from '@erag/lang-sync-inertia'
-
-interface Option { value: string; label: string }
 
 export interface AddressCreateForm {
     currency: string
@@ -20,8 +18,7 @@ type AddressCreateErrors = Partial<Record<keyof AddressCreateForm, string>>
 interface Props {
     modelValue: boolean
     form: AddressCreateForm
-    currencyOptions: Option[]
-    networkOptions: Option[]
+    currencyNetworkOptions: CurrencyNetworkOption[]
     errors: AddressCreateErrors | null
     loading: boolean
 }
@@ -34,8 +31,7 @@ const props = withDefaults(defineProps<Props>(), {
         network: '',
         address: '',
     }),
-    currencyOptions: () => [],
-    networkOptions: () => [],
+    currencyNetworkOptions: () => [],
     errors: () => ({} as AddressCreateErrors),
 })
 
@@ -52,8 +48,29 @@ const form = computed({
 })
 
 const fieldErrors = computed<AddressCreateErrors>(() => props.errors ?? {})
+const currencyNetworkError = computed(() => fieldErrors.value.currency || fieldErrors.value.network)
 
 const { __ } = vueLang()
+
+const currencyNetworkValue = computed<string | null>({
+    get: () => {
+        const currency = (form.value.currency || '').toString().trim()
+        const network = (form.value.network || '').toString().trim()
+        if (!currency || !network) return null
+        return `${currency}|${network}`
+    },
+    set: (value) => {
+        const raw = (value || '').toString()
+        if (!raw) {
+            form.value.currency = ''
+            form.value.network = ''
+            return
+        }
+        const [currency, network] = raw.split('|')
+        form.value.currency = (currency || '').toString().trim()
+        form.value.network = (network || '').toString().trim()
+    },
+})
 
 function close() {
     emit('update:modelValue', false)
@@ -81,24 +98,15 @@ function submit() {
         @close="close"
     >
         <form class="mt-4 grid gap-4" @submit.prevent="submit">
-            <FormControl :error="fieldErrors.currency">
-                <Label for="currency" required>{{ __('frontend.addresses.fields.currency') }}</Label>
-                <Select
-                    id="currency"
-                    v-model="form.currency"
-                    :options="currencyOptions"
-                    :placeholder="__('frontend.addresses.fields.currency_placeholder')"
-                    required
-                />
-            </FormControl>
-            <FormControl :error="fieldErrors.network">
-                <Label for="network" required>{{ __('frontend.addresses.fields.network') }}</Label>
-                <Select
-                    id="network"
-                    v-model="form.network"
-                    :options="networkOptions"
-                    :placeholder="__('frontend.addresses.fields.network_placeholder')"
-                    required
+            <FormControl :error="currencyNetworkError">
+                <Label for="currency_network" required>{{ __('frontend.addresses.fields.currency_network') }}</Label>
+                <CurrencyNetworkSelect
+                    id="currency_network"
+                    v-model="currencyNetworkValue"
+                    :options="currencyNetworkOptions"
+                    :placeholder="__('frontend.addresses.fields.currency_network_placeholder')"
+                    :empty-label="__('frontend.addresses.fields.currency_network_placeholder')"
+                    :disabled="loading"
                 />
             </FormControl>
             <FormControl :error="fieldErrors.address">

@@ -3,6 +3,7 @@ import { ref, computed } from 'vue';
 import AppLayout from '@/layouts/AppLayout.vue';
 import { useForm } from '@inertiajs/vue3';
 import CurrencyNetworkBadge from '@/components/ui/CurrencyNetworkBadge.vue';
+import type { CurrencyNetworkOption } from '@/components/ui/CurrencyNetworkSelect.vue';
 import AddressCopy from '@/components/ui/AddressCopy.vue';
 import DateTimeFormat from '@/components/ui/DateTimeFormat.vue';
 import Pagination from '@/components/ui/Pagination.vue';
@@ -55,6 +56,7 @@ interface Props {
     addresses: PaginatedAddresses;
     currencyOptions: { value: string; label: string }[];
     networkOptions: { value: string; label: string }[];
+    currencyNetworkOptions: CurrencyNetworkOption[];
     filters?: Partial<AddressFilters>;
 }
 
@@ -380,8 +382,7 @@ function toIso(input: string | null | undefined): string {
         <AddressCreateModal
             v-model="showCreate"
             :form="createForm"
-            :currency-options="props.currencyOptions"
-            :network-options="props.networkOptions"
+            :currency-network-options="props.currencyNetworkOptions"
             :errors="createForm.errors"
             :loading="createForm.processing"
             @update:form="updateCreatePayload"

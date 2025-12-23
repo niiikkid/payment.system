@@ -204,13 +204,6 @@ function submit() {
         },
     })
 }
-
-function toIso(input: string | null | undefined): string {
-    if (!input) return ''
-    if (typeof input !== 'string') return ''
-    if (input.includes('T')) return input
-    return `${input.replace(' ', 'T')}Z`
-}
 </script>
 
 <template>
@@ -272,7 +265,7 @@ function toIso(input: string | null | undefined): string {
                                         </div>
                                     </td>
                                     <td class="text-xs font-mono">
-                                        <DateTimeFormat v-if="client.created_at" short-year :value="toIso(client.created_at)" />
+                                        <DateTimeFormat v-if="client.created_at" short-year :value="client.created_at" />
                                         <span v-else class="opacity-60">—</span>
                                     </td>
                                     <td class="flex items-center gap-2">
@@ -307,38 +300,33 @@ function toIso(input: string | null | undefined): string {
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-3.5 opacity-70">
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5" />
                                         </svg>
-                                        <DateTimeFormat :value="toIso(client.created_at)" short-year />
+                                        <DateTimeFormat :value="client.created_at" short-year />
                                     </div>
                                 </div>
 
                                 <!-- Main Content -->
-                                <div class="grid grid-cols-[1fr_auto] gap-3 items-start">
-                                    <div class="space-y-1 min-w-0">
+                                <div class="grid grid-cols-[auto_1fr_auto] gap-3 items-center">
+                                    <div>
                                         <div class="font-semibold truncate">{{ client.name || '—' }}</div>
                                         <div class="font-mono text-xs text-base-content/70 truncate">
-                                            {{ client.external_id || '—' }}
+                                            {{ __('frontend.clients.table.external_id') }}: {{ client.external_id || '—' }}
                                         </div>
-                                        <div class="text-sm">
+                                    </div>
+                                    <div class="flex justify-center text-sm">
+                                        <div>
                                             <div v-if="client.telegram" class="truncate">@{{ client.telegram.replace('@', '') }}</div>
                                             <div v-if="client.contact" class="truncate text-xs text-base-content/70">{{ client.contact }}</div>
                                             <div v-if="!client.telegram && !client.contact" class="opacity-60 text-xs">—</div>
                                         </div>
                                     </div>
 
-                                    <div class="flex flex-col items-end gap-2">
+                                    <div class="inline-flex items-center gap-2">
                                         <NavigationLinkButton :href="invoicesLink(client)" :title="__('frontend.clients.actions.view_invoices')">
                                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4">
                                                 <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m3.75 9v7.5m2.25-6.466a9.016 9.016 0 0 0-3.461-.203c-.536.072-.974.478-1.021 1.017a4.559 4.559 0 0 0-.018.402c0 .464.336.844.775.994l2.95 1.012c.44.15.775.53.775.994 0 .136-.006.27-.018.402-.047.539-.485.945-1.021 1.017a9.077 9.077 0 0 1-3.461-.203M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
                                             </svg>
                                         </NavigationLinkButton>
                                         <EditButton :title="__('frontend.common.edit')" @click="openEdit(client)" />
-                                        <div class="text-xs text-base-content/70">
-                                            <span class="opacity-70">{{ __('frontend.common.created_at') }}:</span>
-                                            <span v-if="client.created_at" class="ml-1 font-mono">
-                                                <DateTimeFormat :value="toIso(client.created_at)" short-year />
-                                            </span>
-                                            <span v-else class="ml-1 opacity-60">—</span>
-                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -357,31 +345,24 @@ function toIso(input: string | null | undefined): string {
                                         <span class="text-xs opacity-70">UUID:</span>
                                         <UidCopy :uid="client.id" />
                                     </div>
-                                    <div class="text-xs text-base-content/70">
-                                        <span class="opacity-70">{{ __('frontend.clients.table.external_id') }}:</span>
-                                        <span class="font-mono ml-1">{{ client.external_id || '—' }}</span>
+                                    <div class="flex items-center gap-1.5 text-xs text-base-content/70" v-if="client.created_at">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-3.5 opacity-70">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5" />
+                                        </svg>
+                                        <DateTimeFormat :value="client.created_at" short-year />
                                     </div>
                                 </div>
 
-                                <div class="space-y-1">
-                                    <div class="font-semibold text-sm truncate">{{ client.name || '—' }}</div>
-                                    <div class="text-xs text-base-content/70 truncate">
-                                        <span v-if="client.telegram">@{{ client.telegram.replace('@', '') }}</span>
-                                        <span v-else class="opacity-60">—</span>
-                                    </div>
-                                    <div class="text-xs text-base-content/70 truncate">
-                                        <span v-if="client.contact">{{ client.contact }}</span>
-                                    </div>
-                                </div>
+                                <div class="flex justify-between items-center">
+                                    <div class="space-y-1">
+                                        <div class="font-semibold text-sm truncate">{{ client.name || '—' }}</div>
+                                        <div class="text-xs text-base-content/70">
+                                            <span class="opacity-70">{{ __('frontend.clients.table.external_id') }}:</span>
+                                            <span class="font-mono ml-1">{{ client.external_id || '—' }}</span>
+                                        </div>
 
-                                <div class="flex items-center justify-between">
-                                    <div class="text-xs text-base-content/70">
-                                        <span class="opacity-70">{{ __('frontend.common.created_at') }}:</span>
-                                        <span v-if="client.created_at" class="ml-1 font-mono">
-                                            <DateTimeFormat :value="toIso(client.created_at)" short-year hide-seconds />
-                                        </span>
-                                        <span v-else class="ml-1 opacity-60">—</span>
                                     </div>
+
                                     <div class="flex items-center gap-2">
                                         <NavigationLinkButton :href="invoicesLink(client)" :title="__('frontend.clients.actions.view_invoices')">
                                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4">
@@ -389,6 +370,16 @@ function toIso(input: string | null | undefined): string {
                                             </svg>
                                         </NavigationLinkButton>
                                         <EditButton :title="__('frontend.common.edit')" @click="openEdit(client)" />
+                                    </div>
+                                </div>
+
+                                <div class="flex items-center justify-between">
+                                    <div class="text-xs text-base-content/70 truncate">
+                                        <span v-if="client.telegram">@{{ client.telegram.replace('@', '') }}</span>
+                                        <span v-else class="opacity-60">—</span>
+                                    </div>
+                                    <div class="text-xs text-base-content/70 truncate">
+                                        <span v-if="client.contact">{{ client.contact }}</span>
                                     </div>
                                 </div>
                             </div>

@@ -62,11 +62,14 @@ return [
         'fields' => [
             'currency' => 'Валюта',
             'currency_placeholder' => 'Выберите валюту',
+            'currency_network' => 'Валюта и сеть',
+            'currency_network_placeholder' => 'Выберите валюту и сеть',
             'network' => 'Сеть',
             'network_placeholder' => 'Выберите сеть',
             'address' => 'Адрес',
             'address_placeholder' => 'Например: T...',
         ],
+        'empty' => 'Адресов пока нет',
     ],
     'clients' => [
         'list' => [
@@ -110,7 +113,7 @@ return [
             'contact_placeholder' => 'Любой контакт: email, чат и т.п.',
         ],
         'table' => [
-            'external_id' => 'Client ID',
+            'external_id' => 'ID',
             'name' => 'Имя',
             'contacts' => 'Контакты',
             'empty' => 'Клиентов пока нет',
