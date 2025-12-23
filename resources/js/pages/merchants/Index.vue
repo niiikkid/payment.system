@@ -217,7 +217,14 @@ function submit() {
     <AppLayout :breadcrumbs="[{ title: __('frontend.nav.dashboard'), href: '/' }, { title: __('frontend.nav.merchants'), href: '/merchants' }]">
         <template #header-actions>
             <div class="flex items-center gap-2">
-                <button class="btn btn-primary btn-sm" @click="openCreate">{{ __('frontend.merchants.actions.create') }}</button>
+                <button class="btn btn-primary btn-sm" @click="openCreate">
+                    <span class="hidden sm:block">{{ __('frontend.merchants.actions.create') }}</span>
+                    <span class="block sm:hidden">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="size-6">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                        </svg>
+                    </span>
+                </button>
             </div>
         </template>
 

@@ -226,7 +226,14 @@ function impersonate(user: UserItem) {
         :title="__('frontend.admin_users.title')"
     >
         <template #header-actions>
-            <button class="btn btn-primary btn-sm" @click="openCreate">{{ __('frontend.admin_users.actions.create_user') }}</button>
+            <button class="btn btn-primary btn-sm" @click="openCreate">
+                <span class="hidden sm:block">{{ __('frontend.admin_users.actions.create_user') }}</span>
+                <span class="block sm:hidden">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="size-6">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                        </svg>
+                    </span>
+            </button>
         </template>
 
         <div class="grid gap-6">
