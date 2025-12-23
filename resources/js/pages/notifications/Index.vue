@@ -274,7 +274,7 @@ async function copyTelegramLink() {
     telegramCopied.value = true;
     telegramTooltipText.value = __('frontend.notifications.telegram.copied');
     telegramShowTooltip.value = true;
-    
+
     if (telegramResetTimer) clearTimeout(telegramResetTimer);
     telegramResetTimer = window.setTimeout(() => {
       telegramShowTooltip.value = false;
@@ -498,13 +498,13 @@ const eventRequiresStatus = computed(() => ruleForm.event === 'invoice.status_ch
 
       <div v-show="activeTab === 'settings'" class="space-y-4">
         <div class="card bg-base-100 shadow-sm">
-          <div class="card-body space-y-3">
-            <div class="flex items-start justify-between gap-3">
+          <div class="card-body space-y-2">
+            <div class="sm:flex items-start justify-between gap-3">
               <div>
                 <h3 class="card-title text-lg">{{ __('frontend.notifications.telegram.title') }}</h3>
                 <p class="text-sm opacity-70">{{ __('frontend.notifications.telegram.description') }}</p>
               </div>
-              <span class="badge" :class="telegram?.is_active ? 'badge-success' : 'badge-ghost'">
+              <span class="text-nowrap badge mt-3 sm:mt-0" :class="telegram?.is_active ? 'badge-success' : 'badge-ghost'">
                 {{ telegram?.is_active ? __('frontend.notifications.telegram.status_connected') : __('frontend.notifications.telegram.status_disconnected') }}
               </span>
             </div>
