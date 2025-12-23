@@ -89,7 +89,7 @@ const filterFields = computed<FilterField[]>(() => [
         key: 'role',
         type: 'select',
         label: __('frontend.admin_users.filters.role'),
-        options: [{ value: '', label: __('frontend.admin_users.filters.any') }, ...roleOptions.value],
+        options: roleOptions.value,
     },
 ]);
 
