@@ -28,3 +28,5 @@ yarn-error.log
 /.zed
 public-api.md
 todo.md
+wallet-signer/.env
+wallet-signer/node_modules/
