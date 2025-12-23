@@ -135,15 +135,6 @@ function toIso(input: string | null | undefined): string {
                                 <span v-else class="text-base-content/60">#{{ invoice.address_id }}</span>
                             </div>
                         </div>
-                        <div class="flex-1 min-w-[200px]">
-                            <div class="text-xs text-base-content/60 mb-1">{{ __('frontend.invoices_details.main.client') }}</div>
-                            <div class="flex flex-col">
-                                <span class="font-medium">{{ invoice.client?.name || invoice.client_external_id || '—' }}</span>
-                                <span v-if="invoice.client?.external_id && invoice.client?.name" class="text-xs text-base-content/60 truncate">
-                                    {{ invoice.client?.external_id }}
-                                </span>
-                            </div>
-                        </div>
                     </div>
                 </div>
 
@@ -153,6 +144,15 @@ function toIso(input: string | null | undefined): string {
                 <div class="space-y-4">
                     <h3 class="text-sm font-semibold text-base-content/80">{{ __('frontend.invoices_details.payment.title') }}</h3>
                     <div class="space-y-3">
+                        <div class="flex flex-col sm:flex-row sm:items-center gap-2">
+                            <div class="text-xs text-base-content/60 sm:w-32 flex-shrink-0">{{ __('frontend.invoices_details.main.client') }}</div>
+                            <div class="flex-1 flex items-center gap-2 flex-wrap">
+                                <span class="font-medium">{{ invoice.client?.name || invoice.client_external_id || '—' }}</span>
+                                <span v-if="invoice.client?.external_id && invoice.client?.name" class="text-xs text-base-content/60 truncate">
+                                    {{ invoice.client?.external_id }}
+                                </span>
+                            </div>
+                        </div>
                         <div class="flex flex-col sm:flex-row sm:items-center gap-2">
                             <div class="text-xs text-base-content/60 sm:w-32 flex-shrink-0">{{ __('frontend.invoices_details.payment.external_id') }}</div>
                             <div class="flex-1 flex items-center gap-2 flex-wrap">

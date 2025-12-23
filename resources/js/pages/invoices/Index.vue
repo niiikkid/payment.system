@@ -535,7 +535,7 @@ watch(
                 <tr>
                   <th>{{ __('frontend.invoices_page.table.id') }}</th>
                   <th>{{ __('frontend.invoices_page.table.address') }}</th>
-                  <th>{{ __('frontend.invoices_page.table.client') }}</th>
+<!--                  <th>{{ __('frontend.invoices_page.table.client') }}</th>-->
                   <th>{{ __('frontend.invoices_page.table.amount') }}</th>
                   <th>{{ __('frontend.invoices_page.table.currency') }}</th>
                   <th>{{ __('frontend.invoices_page.table.status') }}</th>
@@ -552,14 +552,14 @@ watch(
                     <AddressCopy v-if="inv.address" :address="inv.address" />
                     <span v-else class="opacity-60">#{{ inv.address_id }}</span>
                   </td>
-                  <td class="text-sm">
+<!--                  <td class="text-sm">
                     <div class="flex flex-col">
                       <span class="truncate">{{ inv.client?.name || inv.client_external_id || '—' }}</span>
                       <span v-if="inv.client?.external_id && inv.client?.name" class="text-xs text-base-content/60 truncate">
                         {{ inv.client?.external_id }}
                       </span>
                     </div>
-                  </td>
+                  </td>-->
                   <td>
                       <span class="text-sm">{{ inv.amount }}</span>
                   </td>
@@ -622,9 +622,9 @@ watch(
                       <AddressCopy v-if="inv.address" :address="inv.address" />
                       <span v-else class="opacity-60">#{{ inv.address_id }}</span>
                     </div>
-                    <div class="text-xs text-base-content/70 truncate text-center">
+<!--                    <div class="text-xs text-base-content/70 truncate text-center">
                       {{ inv.client?.name || inv.client_external_id || '—' }}
-                    </div>
+                    </div>-->
                   </div>
 
                   <!-- Right Side: Status and Actions -->
@@ -696,9 +696,9 @@ watch(
                                     <AddressCopy v-if="inv.address" :address="inv.address" />
                                     <span v-else class="opacity-60">#{{ inv.address_id }}</span>
                                 </div>
-                                <div class="text-xs text-base-content/70 truncate text-center ml-2">
+<!--                                <div class="text-xs text-base-content/70 truncate text-center ml-2">
                                     {{ inv.client?.name || inv.client_external_id || '—' }}
-                                </div>
+                                </div>-->
                             </div>
                             <div class="flex items-center gap-2">
                                 <ViewButton @click="openDetails(inv)" />
