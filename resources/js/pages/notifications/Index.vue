@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import AppLayout from '@/layouts/AppLayout.vue';
 import { Link, useForm, usePage } from '@inertiajs/vue3';
-import { computed, ref } from 'vue';
+import { computed, ref, onUnmounted, watch } from 'vue';
 import { vueLang } from '@erag/lang-sync-inertia';
 import FilterPanel from '@/components/filters/FilterPanel.vue';
 import DateTimeFormat from '@/components/ui/DateTimeFormat.vue';
@@ -115,6 +115,11 @@ const telegramLinkForm = useForm({});
 const telegramCopying = ref(false);
 const telegramCopied = ref(false);
 const telegramCopyError = ref<string | null>(null);
+const telegramTooltipText = ref(__('frontend.notifications.telegram.copy_link'));
+const telegramShowTooltip = ref(false);
+let telegramResetTimer: number | undefined;
+let telegramTooltipElement = ref<HTMLElement | null>(null);
+let telegramTriggerElement = ref<HTMLElement | null>(null);
 
 const selectedRuleId = ref<number | null>(null);
 const markAllForm = useForm({});
@@ -202,6 +207,60 @@ function refreshTelegramLink() {
   });
 }
 
+function updateTelegramTooltipPosition() {
+  if (!telegramTooltipElement.value || !telegramTriggerElement.value || !telegramShowTooltip.value) return;
+
+  const triggerRect = telegramTriggerElement.value.getBoundingClientRect();
+  const tooltipRect = telegramTooltipElement.value.getBoundingClientRect();
+
+  let top = triggerRect.top - tooltipRect.height - 8;
+  let left = triggerRect.left + (triggerRect.width / 2) - (tooltipRect.width / 2);
+
+  if (top < 0) {
+    top = triggerRect.bottom + 8;
+  }
+
+  if (left < 0) {
+    left = 8;
+  } else if (left + tooltipRect.width > window.innerWidth) {
+    left = window.innerWidth - tooltipRect.width - 8;
+  }
+
+  telegramTooltipElement.value.style.top = `${top}px`;
+  telegramTooltipElement.value.style.left = `${left}px`;
+}
+
+function handleTelegramScroll() {
+  if (telegramShowTooltip.value) {
+    updateTelegramTooltipPosition();
+  }
+}
+
+function handleTelegramResize() {
+  if (telegramShowTooltip.value) {
+    updateTelegramTooltipPosition();
+  }
+}
+
+watch(telegramShowTooltip, (newValue) => {
+  if (newValue) {
+    window.addEventListener('scroll', handleTelegramScroll, true);
+    window.addEventListener('resize', handleTelegramResize);
+    requestAnimationFrame(() => {
+      updateTelegramTooltipPosition();
+    });
+  } else {
+    window.removeEventListener('scroll', handleTelegramScroll, true);
+    window.removeEventListener('resize', handleTelegramResize);
+  }
+});
+
+onUnmounted(() => {
+  window.removeEventListener('scroll', handleTelegramScroll, true);
+  window.removeEventListener('resize', handleTelegramResize);
+  if (telegramResetTimer) clearTimeout(telegramResetTimer);
+});
+
 async function copyTelegramLink() {
   if (!telegram.value?.start_link || !navigator?.clipboard) {
     telegramCopyError.value = __('frontend.notifications.telegram.copy_failed');
@@ -209,18 +268,22 @@ async function copyTelegramLink() {
   }
 
   telegramCopyError.value = null;
-  telegramCopying.value = true;
 
   try {
     await navigator.clipboard.writeText(telegram.value.start_link);
     telegramCopied.value = true;
-    setTimeout(() => {
+    telegramTooltipText.value = __('frontend.notifications.telegram.copied');
+    telegramShowTooltip.value = true;
+    
+    if (telegramResetTimer) clearTimeout(telegramResetTimer);
+    telegramResetTimer = window.setTimeout(() => {
+      telegramShowTooltip.value = false;
       telegramCopied.value = false;
+      telegramTooltipText.value = __('frontend.notifications.telegram.copy_link');
     }, 1500);
   } catch (error) {
     telegramCopyError.value = __('frontend.notifications.telegram.copy_failed');
-  } finally {
-    telegramCopying.value = false;
+    telegramShowTooltip.value = false;
   }
 }
 
@@ -451,10 +514,28 @@ const eventRequiresStatus = computed(() => ruleForm.event === 'invoice.status_ch
                 <Label>{{ __('frontend.notifications.telegram.start_link') }}</Label>
                 <div class="join w-full">
                   <Input class="join-item w-full" :model-value="telegram?.start_link ?? ''" :readonly="true" />
-                  <button class="btn btn-outline join-item" :disabled="!telegram?.start_link || telegramCopying" @click="copyTelegramLink">
-                    <span class="loading loading-spinner loading-xs mr-2" v-if="telegramCopying" />
-                    {{ telegramCopied ? __('frontend.notifications.telegram.copied') : __('frontend.notifications.telegram.copy_link') }}
-                  </button>
+                  <div class="relative">
+                    <button
+                      ref="telegramTriggerElement"
+                      class="btn btn-outline join-item"
+                      :disabled="!telegram?.start_link"
+                      @click="copyTelegramLink"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15.666 3.888A2.25 2.25 0 0 0 13.5 2.25h-3c-1.03 0-1.9.693-2.166 1.638m7.332 0c.055.194.084.4.084.612v0a.75.75 0 0 1-.75.75H9a.75.75 0 0 1-.75-.75v0c0-.212.03-.418.084-.612m7.332 0c.646.049 1.288.11 1.927.184 1.1.128 1.907 1.077 1.907 2.185V19.5a2.25 2.25 0 0 1-2.25 2.25H6.75A2.25 2.25 0 0 1 4.5 19.5V6.257c0-1.108.806-2.057 1.907-2.185a48.208 48.208 0 0 1 1.927-.184" />
+                      </svg>
+                    </button>
+                    <Teleport to="body">
+                      <div
+                        v-if="telegramShowTooltip"
+                        ref="telegramTooltipElement"
+                        class="fixed z-[9999] px-3 py-2 text-sm bg-base-300 text-base-content rounded-lg shadow-lg pointer-events-none whitespace-nowrap"
+                        :style="{ top: '0px', left: '0px' }"
+                      >
+                        {{ telegramTooltipText }}
+                      </div>
+                    </Teleport>
+                  </div>
                 </div>
                 <p class="text-xs opacity-70 mt-1">{{ __('frontend.notifications.telegram.start_hint') }}</p>
                 <p v-if="telegramCopyError" class="text-error text-sm mt-1">{{ telegramCopyError }}</p>
