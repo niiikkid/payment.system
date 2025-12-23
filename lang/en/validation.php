@@ -160,6 +160,9 @@ return [
             'txid_required_for_paid' => 'TXID is required for the paid status.',
             'amount_format' => 'The amount for currency :currency must be in format 12 or 12.34 (no more than :decimals digits after the dot).',
             'amount_positive' => 'The amount must be greater than 0.',
+            'callback_https_only' => 'Callback URL must use the https scheme.',
+            'callback_private_ip' => 'Callback URL cannot point to localhost or a private IP address.',
+            'callback_dns_failed' => 'Callback URL host must resolve to a public IP address.',
         ],
         'settings' => [
             'min_integer' => 'The minimum amount must be an integer.',

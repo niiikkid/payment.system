@@ -11,6 +11,7 @@ use App\Contracts\Money\MoneyServiceContract;
 use App\Services\Money\MoneyAmount;
 use App\Services\Money\CurrencyAmountRulesService;
 use App\Models\Merchant;
+use App\Rules\CallbackUrlRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Enum;
@@ -55,6 +56,12 @@ class StoreInvoiceRequest extends FormRequest
         if ($amount !== null) {
             $this->merge(['amount' => trim((string) $amount)]);
         }
+
+        $callbackUrl = $this->input('callback_url');
+        if ($callbackUrl !== null) {
+            $trimmed = trim((string) $callbackUrl);
+            $this->merge(['callback_url' => $trimmed === '' ? null : $trimmed]);
+        }
     }
 
     public function rules(): array
@@ -73,7 +80,7 @@ class StoreInvoiceRequest extends FormRequest
             ],
             'product_name' => ['nullable', 'string', 'max:255'],
             'product_description' => ['nullable', 'string', 'max:2000'],
-            'callback_url' => ['nullable', 'url', 'max:255'],
+            'callback_url' => ['nullable', 'string', 'url', 'max:255', new CallbackUrlRule()],
             'tag' => ['nullable', 'string', 'max:255'],
             'metadata' => ['nullable', 'array'],
             'client_id' => ['nullable', 'string', 'max:128'],

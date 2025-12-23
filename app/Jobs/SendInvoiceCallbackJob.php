@@ -51,6 +51,7 @@ class SendInvoiceCallbackJob implements ShouldQueue
 
         try {
             $response = Http::asJson()
+                ->withoutRedirecting()
                 ->timeout(10)
                 ->withHeaders([
                     'X-Callback-Event' => $this->event,

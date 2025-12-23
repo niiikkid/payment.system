@@ -160,6 +160,9 @@ return [
             'txid_required_for_paid' => 'TXID обязателен для статуса paid.',
             'amount_format' => 'Сумма для валюты :currency должна быть в формате 12 или 12.34 (не более :decimals знаков после точки).',
             'amount_positive' => 'Сумма должна быть больше 0.',
+            'callback_https_only' => 'Callback URL должен использовать схему https.',
+            'callback_private_ip' => 'Callback URL не может указывать на localhost или приватный IP-адрес.',
+            'callback_dns_failed' => 'Домен callback URL должен резолвиться в публичный IP-адрес.',
         ],
         'settings' => [
             'min_integer' => 'Минимальная сумма должна быть целым числом.',
