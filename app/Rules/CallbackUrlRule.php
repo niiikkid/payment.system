@@ -11,6 +11,10 @@ final class CallbackUrlRule implements ValidationRule
 {
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
+        if (function_exists('is_local') && is_local()) {
+            return;
+        }
+
         if ($value === null || $value === '') {
             return;
         }
