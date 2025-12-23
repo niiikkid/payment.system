@@ -325,6 +325,11 @@ const pageIconStrokeWidth = computed(() => (isNotificationsActive.value ? 1.5 : 
                         </button>
                     </div>
                 </div>
+                <div class="block lg:hidden mx-4">
+                    <div class="pb-2">
+                        <LanguageSwitcher />
+                    </div>
+                </div>
                 <div class="hidden lg:block mt-auto border-t border-base-200 p-2 mb-2">
                     <div class="pb-2">
                         <LanguageSwitcher />
