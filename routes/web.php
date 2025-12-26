@@ -23,7 +23,7 @@ use App\Support\LocaleOptions;
 use Inertia\Inertia;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
-Route::post('telegram/webhook', TelegramWebhookController::class)->name('telegram.webhook');
+Route::post('telegram/webhook', TelegramWebhookController::class)->middleware('telegram.secret')->name('telegram.webhook');
 
 Route::get('lang/{locale}', function (string $locale, LanguageSettingsServiceContract $languageSettingsService) {
     $normalizedLocale = LocaleOptions::normalize($locale);

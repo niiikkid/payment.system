@@ -28,6 +28,7 @@ class TelegramSetWebhookCommand extends Command
         $token = Arr::get($botConfig, 'token');
         $webhookUrl = Arr::get($botConfig, 'webhook_url');
         $allowedUpdates = Arr::get($botConfig, 'allowed_updates');
+        $secretToken = Arr::get($botConfig, 'secret_token');
 
         if (!$token || !$webhookUrl) {
             $this->error('Не заданы TELEGRAM_BOT_TOKEN или TELEGRAM_WEBHOOK_URL.');
@@ -39,6 +40,10 @@ class TelegramSetWebhookCommand extends Command
         $payload = [
             'url' => $webhookUrl,
         ];
+
+        if (is_string($secretToken) && $secretToken !== '') {
+            $payload['secret_token'] = $secretToken;
+        }
 
         if (is_array($allowedUpdates) || $allowedUpdates === null) {
             $payload['allowed_updates'] = $allowedUpdates;
