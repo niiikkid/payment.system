@@ -21,6 +21,17 @@ class HorizonServiceProvider extends HorizonApplicationServiceProvider
     }
 
     /**
+     * Configure the Horizon authorization services.
+     */
+    protected function authorization(): void
+    {
+        Horizon::auth(static function ($request) {
+            return app()->environment(['local', 'dev', 'development'])
+                || Gate::check('viewHorizon', [$request->user()]);
+        });
+    }
+
+    /**
      * Register the Horizon gate.
      *
      * This gate determines who can access Horizon in non-local environments.
