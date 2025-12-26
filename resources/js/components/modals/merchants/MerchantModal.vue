@@ -12,6 +12,7 @@ export interface MerchantForm {
     name: string;
     description: string;
     initials: string;
+    back_url: string;
     white_label_enabled: boolean;
     invoice_expires_in_minutes: number;
     logo: File | null;
@@ -37,6 +38,7 @@ const props = withDefaults(defineProps<Props>(), {
         name: '',
         description: '',
         initials: '',
+        back_url: '',
         white_label_enabled: true,
         invoice_expires_in_minutes: 30,
         logo: null,
@@ -124,6 +126,18 @@ function submit() {
                     v-model="form.description"
                     rows="3"
                     :placeholder="__('frontend.merchants.fields.description_placeholder')"
+                />
+            </FormControl>
+
+            <FormControl :error="fieldErrors.back_url">
+                <div class="flex items-center justify-between gap-2">
+                    <Label for="merchant-back-url">{{ __('frontend.merchants.fields.back_url') }}</Label>
+                </div>
+                <Input
+                    id="merchant-back-url"
+                    v-model="form.back_url"
+                    type="url"
+                    :placeholder="__('frontend.merchants.fields.back_url_placeholder')"
                 />
             </FormControl>
 

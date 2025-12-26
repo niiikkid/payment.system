@@ -21,6 +21,7 @@ type MerchantInfo = {
   initials: string
   logo_url: string | null
   white_label_enabled: boolean
+  back_url?: string | null
 };
 
 type Invoice = {
@@ -110,7 +111,7 @@ type WhiteLabelInfo = {
   productDescription: string;
   initials: string;
   logoUrl: string | null;
-  backUrl: string;
+  backUrl: string | null;
   backLabel: string;
 };
 
@@ -127,6 +128,7 @@ const whiteLabelInfo = computed<WhiteLabelInfo | null>(() => {
 
   const productName = invoice.value.product_name || null;
   const productDescription = invoice.value.product_description || null;
+  const backUrl = merchant.back_url || null;
 
   return {
     storeName: merchant.name,
@@ -135,7 +137,7 @@ const whiteLabelInfo = computed<WhiteLabelInfo | null>(() => {
     productDescription: productDescription ?? '',
     initials: merchant.initials,
     logoUrl: merchant.logo_url,
-    backUrl: '/',
+    backUrl,
     backLabel: __('frontend.payment_form.white_label.back_label'),
   };
 });
@@ -196,7 +198,7 @@ const whiteLabelInfo = computed<WhiteLabelInfo | null>(() => {
                 </div>
               </div>
 
-              <div class="mt-auto pt-2 lg:pt-3">
+              <div v-if="whiteLabelInfo.backUrl" class="mt-auto pt-2 lg:pt-3">
                 <a
                   :href="whiteLabelInfo.backUrl"
                   class="text-sm lg:text-base flex items-center gap-2 text-base-content/80 hover:text-primary no-underline transition-colors"

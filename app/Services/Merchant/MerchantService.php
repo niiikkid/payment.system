@@ -24,6 +24,7 @@ final class MerchantService implements MerchantServiceContract
         string $name,
         ?string $description,
         string $initials,
+        ?string $backUrl,
         bool $whiteLabelEnabled,
         int $invoiceExpiresInMinutes,
         ?UploadedFile $logo = null
@@ -36,6 +37,7 @@ final class MerchantService implements MerchantServiceContract
             'description' => $description,
             'initials' => $initials,
             'logo_path' => $logoPath,
+            'back_url' => $backUrl,
             'white_label_enabled' => $whiteLabelEnabled,
             'invoice_expires_in_minutes' => $invoiceExpiresInMinutes,
         ]);
@@ -46,6 +48,7 @@ final class MerchantService implements MerchantServiceContract
         string $name,
         ?string $description,
         string $initials,
+        ?string $backUrl,
         bool $whiteLabelEnabled,
         int $invoiceExpiresInMinutes,
         ?UploadedFile $logo = null
@@ -57,6 +60,7 @@ final class MerchantService implements MerchantServiceContract
             'description' => $description,
             'initials' => $initials,
             'logo_path' => $logoPath,
+            'back_url' => $backUrl,
             'white_label_enabled' => $whiteLabelEnabled,
             'invoice_expires_in_minutes' => $invoiceExpiresInMinutes,
         ]);

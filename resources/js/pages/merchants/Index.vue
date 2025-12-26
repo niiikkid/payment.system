@@ -28,6 +28,7 @@ interface Merchant {
     initials: string;
     logo_path: string | null;
     logo_url: string | null;
+    back_url: string | null;
     white_label_enabled: boolean;
     invoice_expires_in_minutes: number;
     created_at: string | null;
@@ -65,6 +66,7 @@ const merchantForm = useForm<MerchantForm>({
     name: '',
     description: '',
     initials: '',
+    back_url: '',
     white_label_enabled: true,
     invoice_expires_in_minutes: 30,
     logo: null,
@@ -166,6 +168,7 @@ function openEdit(item: Merchant) {
     merchantForm.name = item.name ?? '';
     merchantForm.description = item.description ?? '';
     merchantForm.initials = item.initials ?? '';
+    merchantForm.back_url = item.back_url ?? '';
     merchantForm.white_label_enabled = item.white_label_enabled;
     merchantForm.invoice_expires_in_minutes = Number(item.invoice_expires_in_minutes ?? 30);
     merchantForm.logo = null;
@@ -178,6 +181,7 @@ function updateFormPayload(payload: MerchantForm) {
     merchantForm.name = payload.name;
     merchantForm.description = payload.description;
     merchantForm.initials = payload.initials;
+    merchantForm.back_url = payload.back_url;
     merchantForm.white_label_enabled = payload.white_label_enabled;
     merchantForm.invoice_expires_in_minutes = payload.invoice_expires_in_minutes;
     merchantForm.logo = payload.logo;
@@ -192,6 +196,7 @@ function submit() {
         name: (merchantForm.name ?? editing.value?.name ?? '').toString().trim(),
         description: (merchantForm.description ?? editing.value?.description ?? '').toString().trim(),
         initials: (merchantForm.initials ?? editing.value?.initials ?? '').toString().trim(),
+        back_url: (merchantForm.back_url ?? editing.value?.back_url ?? '').toString().trim() || null,
         white_label_enabled: Boolean(merchantForm.white_label_enabled ?? editing.value?.white_label_enabled),
         invoice_expires_in_minutes: Number(
             merchantForm.invoice_expires_in_minutes ?? editing.value?.invoice_expires_in_minutes ?? 30

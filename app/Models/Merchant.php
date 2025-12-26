@@ -18,6 +18,7 @@ class Merchant extends Model
         'description',
         'initials',
         'logo_path',
+        'back_url',
         'white_label_enabled',
         'invoice_expires_in_minutes',
     ];

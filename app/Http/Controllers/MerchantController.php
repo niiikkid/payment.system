@@ -60,12 +60,14 @@ class MerchantController extends Controller
     {
         try {
             $invoiceExpiresInMinutes = (int) $request->input('invoice_expires_in_minutes', self::DEFAULT_INVOICE_EXPIRES_IN_MINUTES);
+            $backUrl = $request->filled('back_url') ? $request->string('back_url')->trim()->toString() : null;
 
             $merchant = $service->create(
                 $request->user(),
                 $request->string('name')->toString(),
                 $request->filled('description') ? $request->string('description')->toString() : null,
                 $request->string('initials')->toString(),
+                $backUrl,
                 $request->boolean('white_label_enabled', true),
                 $invoiceExpiresInMinutes,
                 $request->file('logo')
@@ -86,12 +88,16 @@ class MerchantController extends Controller
 
         try {
             $invoiceExpiresInMinutes = (int) $request->input('invoice_expires_in_minutes', (int) ($merchant->invoice_expires_in_minutes ?? self::DEFAULT_INVOICE_EXPIRES_IN_MINUTES));
+            $backUrl = $request->has('back_url')
+                ? ($request->filled('back_url') ? $request->string('back_url')->trim()->toString() : null)
+                : $merchant->back_url;
 
             $service->update(
                 $merchant,
                 $request->string('name')->toString(),
                 $request->filled('description') ? $request->string('description')->toString() : null,
                 $request->string('initials')->toString(),
+                $backUrl,
                 $request->boolean('white_label_enabled', true),
                 $invoiceExpiresInMinutes,
                 $request->file('logo')
