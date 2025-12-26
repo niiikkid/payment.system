@@ -39,7 +39,10 @@ use App\Contracts\Telegram\TelegramServiceContract;
 use App\Services\Telegram\TelegramService;
 use App\Contracts\WalletTransfer\WalletTransferServiceContract;
 use App\Services\WalletTransfer\WalletTransferService;
+use Illuminate\Cache\RateLimiting\Limit;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Response;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
 use LaravelLangSyncInertia\Services\LangService as VendorLangService;
 
@@ -76,6 +79,27 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        $this->configureRateLimiting();
         Response::mixin(new ResponseMixins());
+    }
+
+    private function configureRateLimiting(): void
+    {
+        RateLimiter::for('api.v1', function (Request $request) {
+            $ipKey = 'ip:'.(string) $request->ip();
+            $apiKey = (string) $request->header('X-Api-Key', '');
+            $keyIdentifier = $apiKey !== '' ? 'key:'.$apiKey : 'key:missing|'.$ipKey;
+
+            return collect([
+                Limit::perMinute(60)->by($ipKey),
+                Limit::perMinute(120)->by($keyIdentifier),
+            ])->map(function (Limit $limit) {
+                return $limit->response(function () {
+                    return response()->json([
+                        'message' => __('messages.api.rate_limited'),
+                    ], 429);
+                });
+            })->all();
+        });
     }
 }

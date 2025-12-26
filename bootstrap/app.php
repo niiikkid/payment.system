@@ -36,6 +36,8 @@ return Application::configure(basePath: dirname(__DIR__))
             AddLinkHeadersForPreloadedAssets::class,
         ]);
 
+        $middleware->throttleApi('api.v1');
+
         $middleware->alias([
             'api.key' => ApiKeyAuth::class,
             'approved' => EnsureUserApproved::class,

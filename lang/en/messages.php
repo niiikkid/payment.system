@@ -105,6 +105,7 @@ return [
     'api' => [
         'callback_failed' => 'Callback request failed with status :status.',
         'ip_not_allowed' => 'Requests from this IP address are not allowed for the current token.',
+        'rate_limited' => 'Too many requests. Please slow down and try again.',
     ],
     'money' => [
         'empty_string' => 'Empty amount string.',
