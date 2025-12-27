@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import ApiDocumentation from '@/pages/api/elements/ApiDocumentation.vue'
+import ApiCallbacksInfo from '@/pages/api/elements/ApiCallbacksInfo.vue'
 import CreateInvoiceRequest from '@/pages/api/elements/requests/CreateInvoiceRequest.vue'
 import ListInvoicesRequest from '@/pages/api/elements/requests/ListInvoicesRequest.vue'
 import GetInvoiceRequest from '@/pages/api/elements/requests/GetInvoiceRequest.vue'
@@ -32,5 +33,6 @@ const props = defineProps<Props>();
         <ListMerchantsRequest :api-key="props.apiKey" :api-base="props.apiBase" />
         <ListClientsRequest :api-key="props.apiKey" :api-base="props.apiBase" />
         <CreateClientRequest :api-key="props.apiKey" :api-base="props.apiBase" />
+        <ApiCallbacksInfo />
     </div>
 </template>

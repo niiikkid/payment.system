@@ -6,7 +6,6 @@ interface Props {
 }
 
 const { __ } = vueLang();
-
 defineProps<Props>();
 </script>
 

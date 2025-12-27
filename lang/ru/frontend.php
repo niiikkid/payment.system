@@ -641,6 +641,28 @@ return [
             'subtitle' => 'Все запросы должны содержать заголовок X-Api-Key со значением вашего токена. Базовый URL: {base}.',
             'accept_title' => 'Формат ответа',
             'accept_hint' => 'Обязательно указывайте заголовок Accept: application/json, иначе ошибки могут вернуться в HTML.',
+            'callbacks' => [
+                'title' => 'Коллбеки',
+                'description' => 'Мы отправляем POST-запросы на ваш callback_url после ключевых событий по инвойсу, чтобы вы могли обновлять свой сервис.',
+                'events_title' => 'События',
+                'events' => [
+                    'created' => '`created` — сразу после создания инвойса.',
+                    'status_changed' => '`status_changed` — при каждом изменении статуса (pending/paid/expired/failed).',
+                ],
+                'headers_title' => 'Заголовки',
+                'headers' => [
+                    'event' => 'X-Callback-Event: {event}',
+                    'content_type' => 'Content-Type: application/json; перенаправления отключены.',
+                ],
+                'delivery_title' => 'Правила доставки',
+                'delivery' => [
+                    'method' => 'POST {callback_url} с таймаутом 10 секунд.',
+                    'success' => 'Ожидаем ответ HTTP 2xx. Любой другой статус фиксируется как ошибка.',
+                    'retries' => 'Повторов нет; каждая попытка и ответ логируются.',
+                ],
+                'payload_title' => 'Пример тела',
+                'payload_hint' => 'Объект инвойса совпадает с ответом GET /invoices/{id} (InvoiceResource).',
+            ],
             'endpoints' => [
                 'create' => 'Создает новый инвойс.',
                 'list' => 'Возвращает список инвойсов.',

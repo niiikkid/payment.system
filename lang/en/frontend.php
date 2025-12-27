@@ -641,6 +641,28 @@ return [
             'subtitle' => 'All requests must include the X-Api-Key header with your token value. Base URL: {base}.',
             'accept_title' => 'Response format',
             'accept_hint' => 'Be sure to set Accept: application/json, otherwise errors may be returned as HTML.',
+            'callbacks' => [
+                'title' => 'Callbacks',
+                'description' => 'We send POST requests to your callback_url after key invoice events so you can update your system.',
+                'events_title' => 'Events',
+                'events' => [
+                    'created' => '`created` — sent right after invoice creation.',
+                    'status_changed' => '`status_changed` — sent on every status change (pending/paid/expired/failed).',
+                ],
+                'headers_title' => 'Headers',
+                'headers' => [
+                    'event' => 'X-Callback-Event: {event}',
+                    'content_type' => 'Content-Type: application/json; redirects are disabled.',
+                ],
+                'delivery_title' => 'Delivery rules',
+                'delivery' => [
+                    'method' => 'POST {callback_url} with a 10 second timeout.',
+                    'success' => 'HTTP 2xx response is expected. Any other status is treated as an error.',
+                    'retries' => 'No automatic retries; every attempt and response is logged.',
+                ],
+                'payload_title' => 'Payload example',
+                'payload_hint' => 'The invoice object matches GET /invoices/{id} (InvoiceResource).',
+            ],
             'endpoints' => [
                 'create' => 'Creates a new invoice.',
                 'list' => 'Returns a list of invoices.',
