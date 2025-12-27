@@ -338,7 +338,7 @@ return [
                 'maxProcesses' => 1,
             ],
             'supervisor-4' => [
-                'maxProcesses' => 1,
+                'maxProcesses' => 10,
             ],
             'supervisor-5' => [
                 'maxProcesses' => 1,
