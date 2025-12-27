@@ -22,8 +22,6 @@ class TwoFactorAuthenticationController extends Controller
      */
     public function show(TwoFactorAuthenticationRequest $request): Response
     {
-        $request->ensureStateIsValid();
-
         $user = $request->user();
 
         return $this->inertia('settings/TwoFactor', [
