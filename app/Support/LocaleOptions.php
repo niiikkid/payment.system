@@ -8,23 +8,7 @@ final class LocaleOptions
 {
     private const AVAILABLE = [
         ['code' => 'ru', 'label' => 'Русский', 'flag' => 'RU'],
-        ['code' => 'az', 'label' => 'Azərbaycan', 'flag' => 'AZ'],
-        ['code' => 'kk', 'label' => 'Қазақша', 'flag' => 'KZ'],
-        ['code' => 'ky', 'label' => 'Кыргызча', 'flag' => 'KG'],
-        ['code' => 'uz', 'label' => "O'zbekcha", 'flag' => 'UZ'],
-        ['code' => 'uk', 'label' => 'Українська', 'flag' => 'UA'],
-        ['code' => 'tr', 'label' => 'Türkçe', 'flag' => 'TR'],
-        ['code' => 'de', 'label' => 'Deutsch', 'flag' => 'DE'],
-        ['code' => 'pl', 'label' => 'Polski', 'flag' => 'PL'],
-        ['code' => 'fr', 'label' => 'Français', 'flag' => 'FR'],
-        ['code' => 'it', 'label' => 'Italiano', 'flag' => 'IT'],
-        ['code' => 'es', 'label' => 'Español', 'flag' => 'ES'],
-        ['code' => 'es-MX', 'label' => 'Español (México)', 'flag' => 'MX'],
-        ['code' => 'pt', 'label' => 'Português', 'flag' => 'PT'],
         ['code' => 'en', 'label' => 'English', 'flag' => 'US'],
-        ['code' => 'ar', 'label' => 'العربية', 'flag' => 'AE'],
-        ['code' => 'hi', 'label' => 'हिन्दी', 'flag' => 'IN'],
-        ['code' => 'zh', 'label' => '中文', 'flag' => 'CN'],
     ];
 
     public static function all(): array
