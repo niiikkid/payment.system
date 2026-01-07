@@ -79,11 +79,6 @@ return [
             'not_owner' => 'The client does not belong to the current user.',
         ],
     ],
-    'markets' => [
-        'created' => 'Fiat currency added',
-        'updated' => 'Settings saved',
-        'refreshed' => 'Rates updated',
-    ],
     'settings' => [
         'max_limit_exceeded' => 'The maximum amount cannot exceed :amount USDT.',
     ],

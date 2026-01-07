@@ -13,7 +13,3 @@ Schedule::command('addresses:sync-balances --only-active=1')->everyMinute();
 
 // Планировщик: создание инвойса для callback sandbox каждые 5 минут
 //Schedule::command('invoices:callback-sandbox')->everyFiveMinutes();
-// Временно скрыто: функционал маркетов - диспетчер задач парсинга курсов маркетов
-// Schedule::command('markets:dispatch BINANCE')->everySecond();
-// Schedule::command('markets:dispatch RAPIRA')->everySecond();
-// Schedule::command('markets:dispatch BYBIT')->everySecond();
