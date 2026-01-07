@@ -6,7 +6,7 @@ return [
     'layout' => [
         'page_titles' => [
             'dashboard' => 'Главная',
-            'addresses' => 'Адреса',
+            'addresses' => 'Кошельки',
             'merchants' => 'Мерчанты',
             'clients' => 'Клиенты',
             'invoices' => 'Инвойсы',
@@ -25,7 +25,7 @@ return [
             'paid' => 'Оплачено',
             'success' => 'Успех: {rate}%',
             'expired' => 'Истёкших',
-            'addresses' => 'Адресов: {count}',
+            'addresses' => 'Кошельков: {count}',
         ],
         'pending_approval' => [
             'title' => 'Ожидает модерации',
@@ -34,7 +34,7 @@ return [
     ],
     'addresses' => [
         'list' => [
-            'title' => 'Список адресов',
+            'title' => 'Список кошельков',
         ],
         'filters' => [
             'title' => 'Фильтры',
@@ -51,13 +51,13 @@ return [
         ],
         'modals' => [
             'create' => [
-                'title' => 'Добавить новый адрес',
-                'description' => 'Заполните данные для добавления нового адреса',
+                'title' => 'Добавить новый кошелек',
+                'description' => 'Заполните данные для добавления нового кошелька',
             ],
         ],
         'actions' => [
-            'add' => 'Добавить адрес',
-            'create' => 'Создать адрес',
+            'add' => 'Добавить кошелек',
+            'create' => 'Создать кошелек',
         ],
         'fields' => [
             'currency' => 'Валюта',
@@ -69,7 +69,7 @@ return [
             'address' => 'Адрес',
             'address_placeholder' => 'Например: T...',
         ],
-        'empty' => 'Адресов пока нет',
+        'empty' => 'Кошельков пока нет',
     ],
     'clients' => [
         'list' => [
@@ -173,7 +173,7 @@ return [
     ],
     'nav' => [
         'dashboard' => 'Главная',
-        'addresses' => 'Адреса',
+        'addresses' => 'Кошельки',
         'merchants' => 'Мерчанты',
         'clients' => 'Клиенты',
         'invoices' => 'Инвойсы',
