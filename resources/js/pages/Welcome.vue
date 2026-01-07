@@ -1,16 +1,21 @@
 <script setup lang="ts">
-import { dashboard, login, register } from '@/routes';
-import { Head, Link } from '@inertiajs/vue3';
+import type { BreadcrumbItemType } from '@/types';
+import { computed } from 'vue';
+import { Head, Link, usePage } from '@inertiajs/vue3';
 import LanguageSwitcher from '@/components/ui/LanguageSwitcher.vue';
 import { vueLang } from '@erag/lang-sync-inertia';
+import { dashboard, login, register } from '@/routes';
 
 withDefaults(defineProps<{ canRegister: boolean }>(), { canRegister: true });
 
+const appName = computed(() => (page.props as any)?.name ?? 'Laravel');
+
+const page = usePage();
 const { __ } = vueLang();
 </script>
 
 <template>
-    <Head :title="__('frontend.welcome.title')" />
+    <Head :title="appName" />
     <div class="relative min-h-screen overflow-hidden bg-base-200 text-base-content">
         <!-- Background -->
         <div class="pointer-events-none absolute inset-0">
@@ -43,7 +48,7 @@ const { __ } = vueLang();
 
                     <div class="space-y-4">
                         <h1 class="text-4xl font-bold leading-tight tracking-tight sm:text-5xl lg:text-6xl">
-                            {{ __('frontend.welcome.title') }}
+                            {{ appName }}
                         </h1>
                         <p class="max-w-2xl text-base text-base-content/70 sm:text-lg">
                             {{ __('frontend.welcome.description') }}
