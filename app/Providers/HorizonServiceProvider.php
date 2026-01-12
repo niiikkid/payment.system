@@ -27,8 +27,7 @@ class HorizonServiceProvider extends HorizonApplicationServiceProvider
     protected function authorization(): void
     {
         Horizon::auth(static function ($request) {
-            return $request->user()
-                && Gate::forUser($request->user())->check('viewHorizon');
+            return $request->user()->hasRole('admin');
         });
     }
 
