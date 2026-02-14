@@ -1,7 +1,7 @@
 import "dotenv/config";
 import { TronWeb } from "tronweb"; // важно: named export
 
-const TARGET = "TJGsJYvao988rAFV7kC9jE4pF7d2sHpRif";
+const TARGET = process.env.TARGET_ADDRESS;
 
 const paths = [
     "m/44'/195'/0'/0/0",
@@ -11,6 +11,8 @@ const paths = [
 ];
 
 async function main() {
+    if (!TARGET) throw new Error("TARGET_ADDRESS missing");
+
     const mnemonic = process.env.MNEMONIC;
     if (!mnemonic) throw new Error("MNEMONIC missing");
     if (!process.env.TRON_FULLHOST) throw new Error("TRON_FULLHOST missing");
