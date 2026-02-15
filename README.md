@@ -14,3 +14,5 @@
 - Node.js + npm
 - База данных: MySQL 8
 - Redis
+
+![1.png](1.png)![2.png](2.png)
