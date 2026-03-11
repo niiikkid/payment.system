@@ -9,7 +9,7 @@ use Illuminate\Console\Command;
 
 class ResetFirstAdminPasswordCommand extends Command
 {
-    protected $signature = 'user:reset-first-admin-password';
+    protected $signature = 'user:reset-first-admin-password {password}';
 
     protected $description = 'Сбросить пароль для пользователя с ID 1.';
 
@@ -23,18 +23,10 @@ class ResetFirstAdminPasswordCommand extends Command
             return self::FAILURE;
         }
 
-        $password = (string) $this->secret('Введите новый пароль для пользователя с ID 1');
+        $password = (string) $this->argument('password');
 
         if ($password === '') {
             $this->error('Пароль не может быть пустым.');
-
-            return self::FAILURE;
-        }
-
-        $password_confirmation = (string) $this->secret('Подтвердите новый пароль');
-
-        if ($password !== $password_confirmation) {
-            $this->error('Пароли не совпадают.');
 
             return self::FAILURE;
         }
