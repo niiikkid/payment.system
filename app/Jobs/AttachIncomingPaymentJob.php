@@ -7,11 +7,14 @@ namespace App\Jobs;
 use App\Contracts\Invoice\InvoiceServiceContract;
 use App\Enums\InvoiceStatus;
 use App\Models\Invoice;
+use GuzzleHttp\Exception\ConnectException;
 use Illuminate\Bus\Queueable;
+use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Throwable;
 
 class AttachIncomingPaymentJob implements ShouldQueue
 {
@@ -20,10 +23,21 @@ class AttachIncomingPaymentJob implements ShouldQueue
     use Queueable;
     use SerializesModels;
 
+    public int $tries = 8;
+
+    public int $timeout = 30;
+
+    public int $maxExceptions = 3;
+
     public function __construct(
         public readonly string $invoiceId,
     ) {
         $this->onQueue('invoices');
+    }
+
+    public function backoff(): array
+    {
+        return [10, 30, 60, 120, 300, 600, 900];
     }
 
     public function handle(InvoiceServiceContract $service): void
@@ -43,7 +57,19 @@ class AttachIncomingPaymentJob implements ShouldQueue
             return;
         }
 
-        $updated = $service->attachExactIncomingPayment($invoice);
+        try {
+            $updated = $service->attachExactIncomingPayment($invoice);
+        } catch (ConnectionException|ConnectException $exception) {
+            $this->release($this->backoffForAttempt());
+            return;
+        } catch (Throwable $exception) {
+            if ($this->isTransientTimeout($exception)) {
+                $this->release($this->backoffForAttempt());
+                return;
+            }
+
+            throw $exception;
+        }
 
         // Если платёж найден — переключаемся на проверку подтверждений
         if ($updated && $updated->status === InvoiceStatus::PROCESSING) {
@@ -53,6 +79,25 @@ class AttachIncomingPaymentJob implements ShouldQueue
 
         // Иначе — пробуем снова через минуту, пока инвойс активен
         self::dispatch($invoice->id)->delay(now()->addMinute());
+    }
+
+    private function backoffForAttempt(): int
+    {
+        $attempt = max(1, $this->attempts());
+        $backoff = $this->backoff();
+        $index = min(count($backoff) - 1, $attempt - 1);
+
+        return $backoff[$index] ?? 60;
+    }
+
+    private function isTransientTimeout(Throwable $exception): bool
+    {
+        $message = strtolower($exception->getMessage());
+
+        return str_contains($message, 'curl error 28')
+            || str_contains($message, 'resolving timed out')
+            || str_contains($message, 'operation timed out')
+            || str_contains($message, 'connection timed out');
     }
 }
 
