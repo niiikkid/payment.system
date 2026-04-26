@@ -18,13 +18,62 @@ return [
         ],
     ],
     'dashboard' => [
+        'hero' => [
+            'kicker' => 'Payments overview',
+            'title' => 'Dashboard',
+            'description' => 'A compact view of invoices, payments, networks, and clients for all time.',
+        ],
         'stats' => [
             'total' => 'Total invoices',
             'active' => 'Active: {count}',
             'paid' => 'Paid',
             'success' => 'Success: {rate}%',
+            'success_rate' => 'Payment success',
+            'callback_success' => 'Callback 2xx',
             'expired' => 'Expired',
+            'cancelled' => 'Cancelled',
+            'finalized' => 'Final statuses',
             'addresses' => 'Addresses: {count}',
+        ],
+        'charts' => [
+            'created' => 'Created',
+            'paid' => 'Paid',
+            'invoices' => 'Invoices',
+            'statuses' => 'Statuses',
+            'turnover' => 'Turnover',
+            'turnover_title' => 'Payment turnover',
+            'turnover_description' => 'Total amount of paid invoices for all time. Currencies are switched separately.',
+            'total_turnover' => 'Total turnover',
+            'timeline_title' => 'Invoice dynamics',
+            'timeline_description' => 'Created and paid invoices by day.',
+            'status_title' => 'Status breakdown',
+            'status_description' => 'Current structure of all invoices.',
+            'network_title' => 'Networks',
+            'network_description' => 'Invoice count by blockchain network.',
+            'clients_title' => 'Top clients',
+            'clients_description' => '10 clients with the highest number of invoices.',
+            'unknown_client' => 'Unnamed client',
+        ],
+        'clients_table' => [
+            'client' => 'Client',
+            'external_id' => 'External ID',
+            'invoices' => 'Invoices',
+            'paid_invoices' => 'Paid',
+            'empty_external_id' => 'Not set',
+        ],
+        'statuses' => [
+            'pending' => 'Pending',
+            'processing' => 'Processing',
+            'paid' => 'Paid',
+            'expired' => 'Expired',
+            'cancelled' => 'Cancelled',
+        ],
+        'empty' => [
+            'title' => 'No chart data yet',
+            'description' => 'Once invoices appear, this page will show payment dynamics, statuses, networks, and active clients.',
+            'no_data' => 'No data',
+            'no_clients' => 'Invoices are not linked to clients yet',
+            'no_turnover' => 'There are no paid invoices to calculate turnover yet',
         ],
         'pending_approval' => [
             'title' => 'Pending approval',
@@ -967,5 +1016,3 @@ return [
         'bullet_highload_ready' => 'High-load ready: queues, cache, events',
     ],
 ];
-
-
