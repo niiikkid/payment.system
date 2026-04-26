@@ -5,7 +5,7 @@ declare(strict_types=1);
 return [
     'layout' => [
         'page_titles' => [
-            'dashboard' => 'Главная',
+            'dashboard' => 'Панель управления',
             'addresses' => 'Кошельки',
             'merchants' => 'Мерчанты',
             'clients' => 'Клиенты',
@@ -171,7 +171,7 @@ return [
         ],
     ],
     'nav' => [
-        'dashboard' => 'Главная',
+        'dashboard' => 'Панель управления',
         'addresses' => 'Кошельки',
         'merchants' => 'Мерчанты',
         'clients' => 'Клиенты',
@@ -967,4 +967,3 @@ return [
         'bullet_highload_ready' => 'Готово для high-load: очереди, кэш, события',
     ],
 ];
-

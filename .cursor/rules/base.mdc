@@ -127,4 +127,4 @@ Vue.js и Inertia.JS
 
 - Используй Vue.js 3 Setup и Inertia.JS 2 для фронт энда.
 - Выполняй php artisan ziggy:generate resources/js/ziggy-routes.js, после создания новый эндпоинтов в web.php.
-
+- Для графиков мы используем данную библиотеку echarts vue-echarts
