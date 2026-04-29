@@ -1000,8 +1000,8 @@ return [
     'welcome' => [
         'title' => 'Welcome',
         'brand_subtitle' => 'Crypto payment infrastructure',
-        'hero_title' => 'Crypto payments for business',
-        'hero_title_accent' => 'on a reliability orbit.',
+        'hero_title' => 'Crypto payments',
+        'hero_title_accent' => 'via API and dashboard.',
         'description' => 'Payment infrastructure for accepting cryptocurrency: invoices, networks, clients, API tokens, and callback events in one protected control layer.',
         'go_dashboard' => 'Go to dashboard',
         'login' => 'Sign in',
@@ -1024,7 +1024,6 @@ return [
         'stat_uptime' => 'target uptime',
         'stat_callback' => 'callback delivery',
         'stat_monitoring' => 'monitoring',
-        'footer_trust' => 'A dark crypto platform for payments, invoices, and callback event automation.',
         'bullet_api_tokens' => 'Stable integration via API and access tokens',
         'bullet_invoices_notifications' => 'Invoice statuses and notifications support',
         'bullet_highload_ready' => 'High-load ready: queues, cache, events',

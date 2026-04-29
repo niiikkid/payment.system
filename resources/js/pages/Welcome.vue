@@ -434,17 +434,14 @@ onBeforeUnmount(() => {
         </section>
 
         <footer
-            class="relative mx-auto flex w-full max-w-7xl flex-col gap-4 border-t border-white/10 px-5 py-8 text-sm text-slate-500 sm:px-8 md:flex-row md:items-center md:justify-between lg:px-10"
+            class="relative mx-auto flex w-full max-w-7xl flex-wrap justify-center gap-3 border-t border-white/10 px-5 py-8 text-sm text-slate-500 sm:px-8 lg:px-10"
         >
-            <p>{{ __('frontend.welcome.footer_trust') }}</p>
-            <div class="flex flex-wrap gap-3">
-                <span class="rounded-full border border-white/10 px-3 py-1">{{
-                    __('frontend.welcome.bullet_api_tokens')
-                }}</span>
-                <span class="rounded-full border border-white/10 px-3 py-1">{{
-                    __('frontend.welcome.bullet_invoices_notifications')
-                }}</span>
-            </div>
+            <span class="rounded-full border border-white/10 px-3 py-1">{{
+                __('frontend.welcome.bullet_api_tokens')
+            }}</span>
+            <span class="rounded-full border border-white/10 px-3 py-1">{{
+                __('frontend.welcome.bullet_invoices_notifications')
+            }}</span>
         </footer>
     </main>
 </template>

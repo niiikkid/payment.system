@@ -1000,8 +1000,8 @@ return [
     'welcome' => [
         'title' => 'Добро пожаловать',
         'brand_subtitle' => 'Crypto payment infrastructure',
-        'hero_title' => 'Криптоплатежи для бизнеса',
-        'hero_title_accent' => 'на орбите надежности.',
+        'hero_title' => 'Криптоплатежи',
+        'hero_title_accent' => 'через API и кабинет.',
         'description' => 'Платежная инфраструктура для приема криптовалют: инвойсы, сети, клиенты, API-токены и callback-события в одном защищенном контуре.',
         'go_dashboard' => 'Перейти в панель',
         'login' => 'Войти',
@@ -1024,7 +1024,6 @@ return [
         'stat_uptime' => 'целевой uptime',
         'stat_callback' => 'доставка callback',
         'stat_monitoring' => 'мониторинг',
-        'footer_trust' => 'Темная crypto-платформа для платежей, инвойсов и автоматизации callback-событий.',
         'bullet_api_tokens' => 'Стабильная интеграция через API и токены доступа',
         'bullet_invoices_notifications' => 'Поддержка статусов инвойсов и уведомлений',
         'bullet_highload_ready' => 'Готово для high-load: очереди, кэш, события',
