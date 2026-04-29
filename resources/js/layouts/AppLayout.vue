@@ -5,6 +5,7 @@ import { Link, useForm, usePage } from '@inertiajs/vue3';
 import Alert from '@/components/ui/Alert.vue';
 import { vueLang } from '@erag/lang-sync-inertia';
 import LanguageSwitcher from '@/components/ui/LanguageSwitcher.vue';
+import ThemeSwitcher from '@/components/ui/ThemeSwitcher.vue';
 import { logout as logoutRoute } from '@/routes';
 
 interface Props {
@@ -143,7 +144,7 @@ const pageIconStrokeWidth = computed(() => (isNotificationsActive.value ? 1.5 : 
                             v-if="isApproved"
                             href="/settings/profile"
                             :class="{ 'menu-active': isProfileSettingsActive, active: isProfileSettingsActive }"
-                            class="btn btn-ghost btn-md w-full justify-start"
+                            class="btn btn-ghost btn-md w-full justify-start rounded-xl border border-base-300/70 bg-base-200/60 shadow-sm transition hover:border-primary/50 hover:bg-base-200"
                         >
                         <span class="flex items-center gap-3 truncate text-base font-semibold">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-7 opacity-30">
@@ -155,7 +156,7 @@ const pageIconStrokeWidth = computed(() => (isNotificationsActive.value ? 1.5 : 
                         <button
                             v-else
                             type="button"
-                            class="btn btn-error btn-md w-full justify-start"
+                            class="btn btn-error btn-md w-full justify-start rounded-xl shadow-sm"
                             :disabled="logoutForm.processing"
                             @click="logout"
                         >
@@ -333,19 +334,21 @@ const pageIconStrokeWidth = computed(() => (isNotificationsActive.value ? 1.5 : 
                     </div>
                 </div>
                 <div class="block lg:hidden mx-4">
-                    <div class="pb-2">
+                    <div class="flex items-center gap-2 pb-2">
                         <LanguageSwitcher />
+                        <ThemeSwitcher />
                     </div>
                 </div>
                 <div class="hidden lg:block mt-auto border-t border-base-200 p-2 mb-2">
-                    <div class="pb-2">
+                    <div class="flex items-center gap-2 pb-2">
                         <LanguageSwitcher />
+                        <ThemeSwitcher />
                     </div>
                     <Link
                         v-if="isApproved"
                         href="/settings/profile"
                         :class="{ 'menu-active': isProfileSettingsActive, active: isProfileSettingsActive }"
-                        class="btn btn-ghost btn-md w-full justify-start"
+                        class="btn btn-ghost btn-md w-full justify-start rounded-xl border border-base-300/70 bg-base-200/60 shadow-sm transition hover:border-primary/50 hover:bg-base-200"
                     >
                         <span class="flex items-center gap-3 truncate text-base font-semibold">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6 opacity-30">
@@ -357,7 +360,7 @@ const pageIconStrokeWidth = computed(() => (isNotificationsActive.value ? 1.5 : 
                     <button
                         v-else
                         type="button"
-                        class="btn btn-error btn-md w-full justify-start"
+                        class="btn btn-error btn-md w-full justify-start rounded-xl shadow-sm"
                         :disabled="logoutForm.processing"
                         @click="logout"
                     >

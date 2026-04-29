@@ -340,7 +340,6 @@ return [
             'password' => 'Пароль',
             'two_factor' => '2FA авторизация',
             'login_history' => 'История входов',
-            'appearance' => 'Внешний вид',
         ],
         'logout' => [
             'title' => 'Выйти из аккаунта',
@@ -804,11 +803,9 @@ return [
             ],
         ],
     ],
-    'appearance' => [
-        'breadcrumb' => 'Внешний вид',
-        'title' => 'Настройки внешнего вида',
-        'subtitle' => 'Выберите тему интерфейса',
-        'theme_label' => 'Тема {theme}',
+    'theme_switcher' => [
+        'light' => 'Светлая тема',
+        'dark' => 'Тёмная тема',
     ],
     'profile' => [
         'breadcrumb' => 'Настройки профиля',

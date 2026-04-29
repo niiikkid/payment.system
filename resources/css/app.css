@@ -6,7 +6,7 @@
 @source "../../storage/framework/views/*.php";
 
 @plugin "daisyui" {
-    themes: all;
+    themes: dark --default, light;
 }
 
 /* Базовый канвас под всем приложением: тёмный, чтобы при прокрутке/оверскролле не было белых «прыжков» */

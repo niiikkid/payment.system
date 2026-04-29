@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { toUrl, urlIsActive } from '@/lib/utils';
-import { edit as editAppearance } from '@/routes/appearance';
 import { edit as editProfile } from '@/routes/profile';
 import { show } from '@/routes/two-factor'; // временно скрыто
 import { edit as editPassword } from '@/routes/user-password';
@@ -19,7 +18,6 @@ const sidebarNavItems = computed<NavItem[]>(() => [
     { title: __('frontend.settings.nav.password'), href: editPassword() },
     { title: __('frontend.settings.nav.two_factor'), href: show() },
     { title: __('frontend.settings.nav.login_history'), href: loginHistory() },
-    { title: __('frontend.settings.nav.appearance'), href: editAppearance() },
 ]);
 
 const page = usePage();

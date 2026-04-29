@@ -340,7 +340,6 @@ return [
             'password' => 'Password',
             'two_factor' => '2FA',
             'login_history' => 'Login history',
-            'appearance' => 'Appearance',
         ],
         'logout' => [
             'title' => 'Log out',
@@ -804,11 +803,9 @@ return [
             ],
         ],
     ],
-    'appearance' => [
-        'breadcrumb' => 'Appearance',
-        'title' => 'Appearance settings',
-        'subtitle' => 'Choose an interface theme',
-        'theme_label' => 'Theme {theme}',
+    'theme_switcher' => [
+        'light' => 'Light theme',
+        'dark' => 'Dark theme',
     ],
     'profile' => [
         'breadcrumb' => 'Profile settings',

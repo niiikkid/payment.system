@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import LanguageSwitcher from '@/components/ui/LanguageSwitcher.vue';
+import ThemeSwitcher from '@/components/ui/ThemeSwitcher.vue';
 
 defineProps<{
     title?: string;
@@ -22,10 +23,9 @@ defineProps<{
                         <slot />
                     </div>
                 </div>
-                <div class="flex justify-center border-t border-base-200 pt-4">
-                    <div class="w-fit">
-                        <LanguageSwitcher/>
-                    </div>
+                <div class="flex w-full items-center justify-center gap-2 border-t border-base-200 pt-4">
+                    <LanguageSwitcher :full-width="false" />
+                    <ThemeSwitcher />
                 </div>
             </div>
         </div>

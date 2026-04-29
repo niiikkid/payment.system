@@ -9,10 +9,17 @@ type LocaleOption = {
     flag: string;
 };
 
-const props = defineProps<{
-    direction?: 'up' | 'down' | 'left' | 'right';
-    align?: 'start' | 'center' | 'end';
-}>();
+const props = withDefaults(
+    defineProps<{
+        direction?: 'up' | 'down' | 'left' | 'right';
+        align?: 'start' | 'center' | 'end';
+        /** Если false — ширина по содержимому (например под строку с переключателем темы). */
+        fullWidth?: boolean;
+    }>(),
+    {
+        fullWidth: true,
+    },
+);
 
 const fallbackLocales: LocaleOption[] = [
     { code: 'ru', label: 'Русский', flag: 'RU' },
@@ -73,8 +80,13 @@ function switchLocale(code: string) {
 </script>
 
 <template>
-    <div class="dropdown w-full" :class="[dropdownDirectionClass, dropdownAlignClass]">
-        <div tabindex="0" role="button" class="btn btn-ghost w-full justify-start">
+    <div class="dropdown" :class="[props.fullWidth ? 'w-full' : 'w-fit max-w-full', dropdownDirectionClass, dropdownAlignClass]">
+        <div
+            tabindex="0"
+            role="button"
+            class="btn btn-ghost justify-start rounded-xl border border-base-300/70 bg-base-200/60 shadow-sm transition hover:border-primary/50 hover:bg-base-200"
+            :class="props.fullWidth ? 'w-full' : 'w-fit'"
+        >
             <FlagIcon :code="current.flag" size="M" class="mr-2" />
             <span class="font-semibold">{{ current.label }}</span>
         </div>
