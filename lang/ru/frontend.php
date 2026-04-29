@@ -684,6 +684,7 @@ return [
             'copy' => 'Скопировать',
             'copied' => 'Скопировано',
             'copy_failed' => 'Не удалось скопировать',
+            'regenerate_short' => 'Обновить',
             'regenerate' => 'Обновить токен',
             'regenerate_callback' => 'Обновить callback-токен',
             'regenerate_confirm_title' => 'Обновить API токен',

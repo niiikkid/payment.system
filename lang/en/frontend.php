@@ -684,6 +684,7 @@ return [
             'copy' => 'Copy',
             'copied' => 'Copied',
             'copy_failed' => 'Failed to copy',
+            'regenerate_short' => 'Update',
             'regenerate' => 'Regenerate token',
             'regenerate_callback' => 'Regenerate callback token',
             'regenerate_confirm_title' => 'Regenerate API token',

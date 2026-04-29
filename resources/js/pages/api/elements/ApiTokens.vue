@@ -314,49 +314,110 @@ async function regenerateCallbackToken() {
 
 <template>
     <div class="card bg-base-100 shadow">
-        <div class="card-body">
-            <h3 class="card-title">{{ __('frontend.api.token.title') }}</h3>
+        <div class="card-body gap-0 p-4 sm:p-5">
+            <h3 class="card-title text-base mb-2">{{ __('frontend.api.token.title') }}</h3>
             <div class="form-control">
-                <label class="label">
-                    <span class="label-text">{{ __('frontend.api.token.x_api_key') }}</span>
+                <label class="label py-1">
+                    <span class="label-text text-xs">{{ __('frontend.api.token.x_api_key') }}</span>
                 </label>
-                <div class="relative inline-block w-full">
-                    <span
-                        ref="triggerElementKey"
-                        class="font-mono cursor-pointer hover:text-primary transition-colors block p-3 bg-base-200 rounded-lg border border-base-300 overflow-hidden"
-                        :title="apiKey"
-                        @click="copyToClipboard(apiKey, 'key')"
-                        @keydown="(e) => onKeydown(e, 'key')"
-                        @mouseenter="onMouseEnter('key')"
-                        @mouseleave="onMouseLeave('key')"
-                        @focus="showTooltipHandler('key')"
-                        @blur="hideTooltipHandler('key')"
-                        tabindex="0"
-                        role="button"
-                    >
-                        <span :class="['hidden sm:inline break-all']" :style="{ filter: !isHoveredKey ? 'blur(3px)' : 'none' }">{{ apiKey }}</span>
-                        <span :class="['inline sm:hidden']" :style="{ filter: !isHoveredKey ? 'blur(3px)' : 'none' }">{{ truncatedKey }}</span>
-                    </span>
-                    <Teleport to="body">
-                        <div
-                            v-if="showTooltipKey"
-                            ref="tooltipElementKey"
-                            class="fixed z-[9999] px-3 py-2 text-sm bg-base-300 text-base-content rounded-lg shadow-lg pointer-events-none whitespace-nowrap"
-                            :style="{ top: '0px', left: '0px' }"
+                <div class="grid grid-cols-1 gap-1.5 sm:grid-cols-[minmax(0,1fr)_auto] sm:gap-2 sm:items-center">
+                    <div class="relative min-w-0 h-11">
+                        <span
+                            ref="triggerElementKey"
+                            class="font-mono text-xs sm:text-sm cursor-pointer hover:text-primary transition-colors box-border flex h-11 w-full min-w-0 items-center px-2 sm:px-2.5 bg-base-200 rounded-md border border-base-300 overflow-hidden"
+                            :title="apiKey"
+                            @click="copyToClipboard(apiKey, 'key')"
+                            @keydown="(e) => onKeydown(e, 'key')"
+                            @mouseenter="onMouseEnter('key')"
+                            @mouseleave="onMouseLeave('key')"
+                            @focus="showTooltipHandler('key')"
+                            @blur="hideTooltipHandler('key')"
+                            tabindex="0"
+                            role="button"
                         >
-                            {{ tooltipTextKey }}
-                        </div>
-                    </Teleport>
+                            <span :class="['hidden sm:inline break-all']" :style="{ filter: !isHoveredKey ? 'blur(3px)' : 'none' }">{{ apiKey }}</span>
+                            <span :class="['inline sm:hidden']" :style="{ filter: !isHoveredKey ? 'blur(3px)' : 'none' }">{{ truncatedKey }}</span>
+                        </span>
+                        <Teleport to="body">
+                            <div
+                                v-if="showTooltipKey"
+                                ref="tooltipElementKey"
+                                class="fixed z-[9999] px-3 py-2 text-sm bg-base-300 text-base-content rounded-lg shadow-lg pointer-events-none whitespace-nowrap"
+                                :style="{ top: '0px', left: '0px' }"
+                            >
+                                {{ tooltipTextKey }}
+                            </div>
+                        </Teleport>
+                    </div>
+                    <button
+                        type="button"
+                        class="inline-flex h-11 w-full shrink-0 cursor-pointer items-center justify-center gap-1.5 box-border rounded-md border border-error/70 bg-base-100 px-3 text-xs font-medium text-error transition-colors hover:border-error hover:bg-error/5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-error/50 disabled:pointer-events-none disabled:opacity-40 sm:w-auto"
+                        :title="__('frontend.api.token.regenerate')"
+                        :disabled="isRegenerating"
+                        @click="openRegenerateModal"
+                    >
+                        <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                        </svg>
+                        {{ __('frontend.api.token.regenerate_short') }}
+                    </button>
                 </div>
             </div>
-            <div class="form-control mt-4">
-                <label class="label">
-                    <span class="label-text">{{ __('frontend.api.token.api_base') }}</span>
+            <div class="form-control mt-3">
+                <label class="label py-1">
+                    <span class="label-text text-xs">{{ __('frontend.api.token.callback_token') }}</span>
                 </label>
-                <div class="relative inline-block w-full">
+                <div class="grid grid-cols-1 gap-1.5 sm:grid-cols-[minmax(0,1fr)_auto] sm:gap-2 sm:items-center">
+                    <div class="relative min-w-0 h-11">
+                        <span
+                            ref="triggerElementCallback"
+                            class="font-mono text-xs sm:text-sm cursor-pointer hover:text-primary transition-colors box-border flex h-11 w-full min-w-0 items-center px-2 sm:px-2.5 bg-base-200 rounded-md border border-base-300 overflow-hidden"
+                            :title="callbackToken"
+                            @click="copyToClipboard(callbackToken, 'callback')"
+                            @keydown="(e) => onKeydown(e, 'callback')"
+                            @mouseenter="onMouseEnter('callback')"
+                            @mouseleave="onMouseLeave('callback')"
+                            @focus="showTooltipHandler('callback')"
+                            @blur="hideTooltipHandler('callback')"
+                            tabindex="0"
+                            role="button"
+                        >
+                            <span :class="['hidden sm:inline break-all']" :style="{ filter: !isHoveredCallback ? 'blur(3px)' : 'none' }">{{ callbackToken }}</span>
+                            <span :class="['inline sm:hidden']" :style="{ filter: !isHoveredCallback ? 'blur(3px)' : 'none' }">{{ truncatedCallbackToken }}</span>
+                        </span>
+                        <Teleport to="body">
+                            <div
+                                v-if="showTooltipCallback"
+                                ref="tooltipElementCallback"
+                                class="fixed z-[9999] px-3 py-2 text-sm bg-base-300 text-base-content rounded-lg shadow-lg pointer-events-none whitespace-nowrap"
+                                :style="{ top: '0px', left: '0px' }"
+                            >
+                                {{ tooltipTextCallback }}
+                            </div>
+                        </Teleport>
+                    </div>
+                    <button
+                        type="button"
+                        class="inline-flex h-11 w-full shrink-0 cursor-pointer items-center justify-center gap-1.5 box-border rounded-md border border-error/70 bg-base-100 px-3 text-xs font-medium text-error transition-colors hover:border-error hover:bg-error/5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-error/50 disabled:pointer-events-none disabled:opacity-40 sm:w-auto"
+                        :title="__('frontend.api.token.regenerate_callback')"
+                        :disabled="isRegeneratingCallback"
+                        @click="openRegenerateCallbackModal"
+                    >
+                        <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                        </svg>
+                        {{ __('frontend.api.token.regenerate_short') }}
+                    </button>
+                </div>
+            </div>
+            <div class="form-control mt-3">
+                <label class="label py-1">
+                    <span class="label-text text-xs">{{ __('frontend.api.token.api_base') }}</span>
+                </label>
+                <div class="relative w-full">
                     <span
                         ref="triggerElementBase"
-                        class="font-mono cursor-pointer hover:text-primary transition-colors block p-3 bg-base-200 rounded-lg border border-base-300 overflow-hidden"
+                        class="font-mono text-xs sm:text-sm cursor-pointer hover:text-primary transition-colors block py-1.5 px-2 sm:py-2 sm:px-2.5 bg-base-200 rounded-md border border-base-300 overflow-hidden"
                         :title="apiBase"
                         @click="copyToClipboard(apiBase, 'base')"
                         @keydown="(e) => onKeydown(e, 'base')"
@@ -382,63 +443,6 @@ async function regenerateCallbackToken() {
                     </Teleport>
                 </div>
             </div>
-            <div class="form-control mt-4">
-                <label class="label">
-                    <span class="label-text">{{ __('frontend.api.token.callback_token') }}</span>
-                </label>
-                <div class="relative inline-block w-full">
-                    <span
-                        ref="triggerElementCallback"
-                        class="font-mono cursor-pointer hover:text-primary transition-colors block p-3 bg-base-200 rounded-lg border border-base-300 overflow-hidden"
-                        :title="callbackToken"
-                        @click="copyToClipboard(callbackToken, 'callback')"
-                        @keydown="(e) => onKeydown(e, 'callback')"
-                        @mouseenter="onMouseEnter('callback')"
-                        @mouseleave="onMouseLeave('callback')"
-                        @focus="showTooltipHandler('callback')"
-                        @blur="hideTooltipHandler('callback')"
-                        tabindex="0"
-                        role="button"
-                    >
-                        <span :class="['hidden sm:inline break-all']" :style="{ filter: !isHoveredCallback ? 'blur(3px)' : 'none' }">{{ callbackToken }}</span>
-                        <span :class="['inline sm:hidden']" :style="{ filter: !isHoveredCallback ? 'blur(3px)' : 'none' }">{{ truncatedCallbackToken }}</span>
-                    </span>
-                    <Teleport to="body">
-                        <div
-                            v-if="showTooltipCallback"
-                            ref="tooltipElementCallback"
-                            class="fixed z-[9999] px-3 py-2 text-sm bg-base-300 text-base-content rounded-lg shadow-lg pointer-events-none whitespace-nowrap"
-                            :style="{ top: '0px', left: '0px' }"
-                        >
-                            {{ tooltipTextCallback }}
-                        </div>
-                    </Teleport>
-                </div>
-            </div>
-            <div class="form-control mt-4">
-                <button
-                    type="button"
-                    class="btn btn-outline btn-error btn-sm"
-                    @click="openRegenerateCallbackModal"
-                >
-                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
-                    </svg>
-                    {{ __('frontend.api.token.regenerate_callback') }}
-                </button>
-            </div>
-            <div class="form-control mt-4">
-                <button
-                    type="button"
-                    class="btn btn-outline btn-error btn-sm"
-                    @click="openRegenerateModal"
-                >
-                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
-                    </svg>
-                    {{ __('frontend.api.token.regenerate') }}
-                </button>
-            </div>
         </div>
     </div>
 
@@ -446,7 +450,7 @@ async function regenerateCallbackToken() {
         v-model="showRegenerateModal"
         :title="__('frontend.api.token.regenerate_confirm_title')"
         :message="__('frontend.api.token.regenerate_confirm_message')"
-        :confirm-text="__('frontend.api.token.regenerate')"
+        :confirm-text="__('frontend.api.token.regenerate_short')"
         :loading="isRegenerating"
         danger
         @confirm="regenerateToken"
@@ -457,7 +461,7 @@ async function regenerateCallbackToken() {
         v-model="showRegenerateCallbackModal"
         :title="__('frontend.api.token.regenerate_callback_confirm_title')"
         :message="__('frontend.api.token.regenerate_callback_confirm_message')"
-        :confirm-text="__('frontend.api.token.regenerate_callback')"
+        :confirm-text="__('frontend.api.token.regenerate_short')"
         :loading="isRegeneratingCallback"
         danger
         @confirm="regenerateCallbackToken"
