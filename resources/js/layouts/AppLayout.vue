@@ -200,7 +200,9 @@ const pageIconStrokeWidth = computed(() => (isNotificationsActive.value ? 1.5 : 
         </div>
         <div class="drawer-side">
             <label for="app-drawer" aria-label="close sidebar" class="drawer-overlay"></label>
-            <aside class="min-h-full w-60 border-r border-base-200 bg-base-100 flex flex-col">
+            <aside
+                class="sidebar-elevated relative z-[1] flex h-dvh max-h-dvh min-h-0 w-60 flex-col overflow-y-auto overscroll-y-contain border-r border-base-200 bg-base-100 lg:z-20"
+            >
                 <div class="p-2">
                     <a href="/dashboard" class="block px-2 py-3 text-xl font-semibold tracking-wide text-center">
                         {{ appName }}
