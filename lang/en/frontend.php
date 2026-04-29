@@ -583,16 +583,16 @@ return [
         'page_title' => 'Payment ID: {id}',
         'status' => [
             'paid' => 'Paid',
-            'processing' => 'Transaction found, waiting for confirmations',
+            'processing' => 'Waiting for confirmation',
             'expired' => 'Payment time expired',
             'cancelled' => 'Cancelled',
             'pending' => 'Waiting for payment',
         ],
         'important' => 'Important: send the exact amount so we can automatically recognize your payment.',
         'rules' => [
-            'exact_amount' => '- Send the exact amount to the specified address.',
-            'network_match' => '- The network must match the specified network.',
-            'auto_refresh' => '- After sending, the page will refresh automatically.',
+            'exact_amount' => 'Send the exact amount to the specified address.',
+            'network_match' => 'Make sure the transfer network matches the selected one.',
+            'auto_refresh' => 'After the transfer is confirmed, the page will refresh automatically.',
         ],
         'countdown' => [
             'title' => 'Time left',
@@ -619,6 +619,7 @@ return [
         ],
         'cards' => [
             'expired_title' => 'Payment time expired',
+            'cancelled_title' => 'Payment cancelled',
             'paid_title' => 'Paid',
             'open_explorer' => 'Open in explorer',
             'open_explorer_short' => 'Open in explorer',
