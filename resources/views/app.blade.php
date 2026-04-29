@@ -18,14 +18,18 @@
             })();
         </script>
 
-        {{-- Inline style to set the HTML background color based on our theme in app.css --}}
+        {{-- Базовый фон до загрузки CSS: тёмный слой под всем UI (без белых вспышек при прокрутке) --}}
         <style>
             html {
-                background-color: oklch(1 0 0);
+                background-color: #030712;
             }
 
             html.dark {
-                background-color: oklch(0.145 0 0);
+                background-color: #030712;
+            }
+
+            body {
+                background-color: #030712;
             }
         </style>
 

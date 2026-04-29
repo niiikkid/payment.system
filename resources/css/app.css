@@ -1,4 +1,4 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
 @source "../**/*.blade.php";
 @source "../**/*.js";
@@ -7,4 +7,21 @@
 
 @plugin "daisyui" {
     themes: all;
+}
+
+/* Базовый канвас под всем приложением: тёмный, чтобы при прокрутке/оверскролле не было белых «прыжков» */
+@layer base {
+    html {
+        background-color: #030712;
+    }
+
+    body {
+        background-color: #030712;
+        min-height: 100%;
+    }
+
+    /* Только лендинг Welcome: без горизонтального overflow */
+    html.page-welcome {
+        overflow-x: hidden;
+    }
 }
