@@ -8,10 +8,15 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Str;
 
 class ApiToken extends Model
 {
     use HasFactory;
+
+    public const NAME_DEFAULT = 'Default';
+
+    public const NAME_CALLBACK = 'Callback';
 
     protected $fillable = [
         'user_id',
@@ -33,6 +38,13 @@ class ApiToken extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    public static function generateUniqueToken(): string
+    {
+        do {
+            $token = Str::random(64);
+        } while (self::query()->where('token', $token)->exists());
+
+        return $token;
+    }
 }
-
-

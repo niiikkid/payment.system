@@ -61,6 +61,7 @@ const callbackExample = `{
                     </h5>
                     <ul class="list-disc list-inside text-sm space-y-1">
                         <li>{{ __('frontend.api.documentation.callbacks.headers.event', { event: 'status_changed' }) }}</li>
+                        <li>{{ __('frontend.api.documentation.callbacks.headers.token') }}</li>
                         <li>{{ __('frontend.api.documentation.callbacks.headers.content_type') }}</li>
                     </ul>
                 </div>

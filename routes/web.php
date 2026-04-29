@@ -1,25 +1,24 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\HomeController;
-use App\Http\Controllers\DashboardController;
+use App\Contracts\Lang\LanguageSettingsServiceContract;
 use App\Http\Controllers\AddressController;
-use App\Http\Controllers\InvoiceController;
-use App\Http\Controllers\CallbackLogController;
-use App\Http\Controllers\ApiController;
-use App\Http\Controllers\Dev\CallbackSandboxController;
 use App\Http\Controllers\Admin\UsersController;
-use App\Http\Controllers\ImpersonationController;
-use App\Http\Controllers\MerchantController;
+use App\Http\Controllers\ApiController;
+use App\Http\Controllers\ApiTokenAllowedIpController;
+use App\Http\Controllers\CallbackLogController;
 use App\Http\Controllers\ClientController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\Dev\CallbackSandboxController;
+use App\Http\Controllers\HomeController;
+use App\Http\Controllers\ImpersonationController;
+use App\Http\Controllers\InvoiceController;
+use App\Http\Controllers\MerchantController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\NotificationRuleController;
 use App\Http\Controllers\TelegramSettingsController;
 use App\Http\Controllers\TelegramWebhookController;
-use App\Http\Controllers\ApiTokenAllowedIpController;
-use App\Contracts\Lang\LanguageSettingsServiceContract;
 use App\Support\LocaleOptions;
-use Inertia\Inertia;
+use Illuminate\Support\Facades\Route;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::post('telegram/webhook', TelegramWebhookController::class)->middleware('telegram.secret')->name('telegram.webhook');
@@ -72,7 +71,7 @@ Route::middleware(['auth', 'verified', 'approved'])->group(function () {
     Route::post('invoices', [InvoiceController::class, 'store'])->name('invoices.store');
     Route::get('invoices/{invoice}', [InvoiceController::class, 'show'])->name('invoices.show');
     Route::patch('invoices/{invoice}', [InvoiceController::class, 'update'])->name('invoices.update');
-        Route::post('invoices/{invoice}/send-callback', [InvoiceController::class, 'sendCallback'])->name('invoices.send-callback');
+    Route::post('invoices/{invoice}/send-callback', [InvoiceController::class, 'sendCallback'])->name('invoices.send-callback');
 
     // Notifications
     Route::get('notifications', [NotificationController::class, 'index'])->name('notifications.index');
@@ -92,12 +91,13 @@ Route::middleware(['auth', 'verified', 'approved'])->group(function () {
     Route::middleware('role:admin')->group(function () {
         Route::get('app-settings', [\App\Http\Controllers\AppSettingsController::class, 'index'])->name('app-settings.index');
         Route::put('app-settings', [\App\Http\Controllers\AppSettingsController::class, 'update'])->name('app-settings.update');
-            Route::put('app-settings/locales', [\App\Http\Controllers\AppSettingsController::class, 'updateLocales'])->name('app-settings.locales.update');
+        Route::put('app-settings/locales', [\App\Http\Controllers\AppSettingsController::class, 'updateLocales'])->name('app-settings.locales.update');
     });
 
     // API Docs & Playground (не в настройках)
     Route::get('api', ApiController::class)->name('api.docs');
     Route::post('api/regenerate-token', [ApiController::class, 'regenerate'])->name('api.regenerate-token');
+    Route::post('api/regenerate-callback-token', [ApiController::class, 'regenerateCallback'])->name('api.regenerate-callback-token');
     Route::post('api/allowed-ips', [ApiTokenAllowedIpController::class, 'store'])->name('api.allowed-ips.store');
     Route::delete('api/allowed-ips/{allowedIp}', [ApiTokenAllowedIpController::class, 'destroy'])->name('api.allowed-ips.destroy');
 });

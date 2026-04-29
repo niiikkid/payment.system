@@ -6,6 +6,7 @@ namespace App\Jobs;
 
 use App\Exceptions\Invoice\InvoiceCallbackException;
 use App\Http\Resources\InvoiceResource;
+use App\Models\ApiToken;
 use App\Models\Invoice;
 use App\Models\InvoiceCallbackLog;
 use Illuminate\Bus\Queueable;
@@ -29,11 +30,19 @@ class SendInvoiceCallbackJob implements ShouldQueue
     public function handle(): void
     {
         $invoice = Invoice::query()->find($this->invoiceId);
-        if (!$invoice || empty($invoice->callback_url)) {
+        if (! $invoice || empty($invoice->callback_url)) {
             return;
         }
 
+        $invoice->loadMissing('user');
+
         $callbackUrl = $invoice->callback_url;
+        $callbackToken = $invoice->user?->apiTokens()
+            ->firstOrCreate(
+                ['name' => ApiToken::NAME_CALLBACK],
+                ['token' => ApiToken::generateUniqueToken()]
+            )
+            ->token;
 
         $payload = [
             'event' => $this->event,
@@ -55,10 +64,11 @@ class SendInvoiceCallbackJob implements ShouldQueue
                 ->timeout(10)
                 ->withHeaders([
                     'X-Callback-Event' => $this->event,
+                    'X-Callback-Token' => $callbackToken,
                 ])
                 ->post($callbackUrl, $payload);
 
-            if (!$response->successful()) {
+            if (! $response->successful()) {
                 throw new InvoiceCallbackException(__('messages.api.callback_failed', [
                     'status' => $response->status(),
                 ]));
@@ -75,5 +85,3 @@ class SendInvoiceCallbackJob implements ShouldQueue
         }
     }
 }
-
-
