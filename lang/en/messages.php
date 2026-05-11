@@ -52,7 +52,7 @@ return [
             'currency_mismatch_value' => 'Currency :currency is not available on network :network.',
             'not_owner' => 'The address does not belong to the current user.',
             'not_exist_blockchain' => 'The address does not exist on the blockchain for the specified currency/network.',
-            'no_available' => 'No available address for this amount.',
+            'no_available' => 'No available address for this amount. Try entering a different deposit amount.',
             'invalid_balance' => 'Balance must be a non-negative decimal string.',
         ],
     ],
