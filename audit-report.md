@@ -1,5 +1,3 @@
-Аудит завершён. Ниже полный отчёт.
-
 # Полный отчёт по аудиту безопасности backend
 Проект: Crypto Processing Platform
 Стек: Laravel 12, PHP 8.4, Vue/Inertia 2, MySQL, Redis/Horizon, TRON/TRC-20 USDT, Node wallet-signer
